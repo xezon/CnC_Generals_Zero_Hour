@@ -10,6 +10,6 @@ add_subdirectory(GameEngineDevice)
 # Contains the main game exe target.
 add_subdirectory(Main)
 
-if (GENERALS_TOOLS)
+if (BUILD_GENERALS_TOOLS)
     add_subdirectory(Tools)
 endif()
