@@ -1,10 +1,8 @@
 add_executable(generals WIN32)
 
-target_link_directories(generals PRIVATE
-    ../GameEngine
-)
-
 target_link_libraries(generals PRIVATE
+    gi_libraries_include
+    gi_libraries_source
     gameengineg
     gameenginedeviceg
     winmm
@@ -44,8 +42,6 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/BuildVersion.h
 target_link_options(generals PRIVATE "/NODEFAULTLIB:libci.lib")
 
 target_include_directories(generals PRIVATE
-    ../Libraries/Include
-    ../Libraries/Source
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_BINARY_DIR}/Code/Libraries

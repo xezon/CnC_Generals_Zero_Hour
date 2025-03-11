@@ -4,10 +4,10 @@ target_include_directories(gameenginedeviceg PUBLIC
     Include
 )
 
-target_include_directories(gameenginedeviceg PRIVATE
-    ../Libraries/Include
-    ../Libraries/Source
-    ../Main
+target_link_libraries(gameenginedeviceg PRIVATE
+    gi_main
+    gi_libraries_include
+    gi_libraries_source
 )
 
 target_link_libraries(gameenginedeviceg PUBLIC

@@ -4,8 +4,8 @@ target_include_directories(compression INTERFACE
     .
 )
 
-target_include_directories(compression PRIVATE
-    ../../Include
+target_link_libraries(compression PRIVATE
+    zi_libraries_include
 )
 
 target_link_libraries(compression PUBLIC

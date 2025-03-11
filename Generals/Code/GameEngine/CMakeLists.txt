@@ -8,8 +8,11 @@ set_target_properties(gameengineg PROPERTIES OUTPUT_NAME $<IF:$<CONFIG:Debug>,ga
 
 target_include_directories(gameengineg PRIVATE
     Include/Precompiled
-    ../Libraries/Include
-    ../Libraries/Source
+)
+
+target_link_libraries(gameengineg PRIVATE
+    gi_libraries_include
+    gi_libraries_source
 )
 
 target_link_libraries(gameengineg PUBLIC

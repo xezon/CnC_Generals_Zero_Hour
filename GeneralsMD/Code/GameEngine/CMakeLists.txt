@@ -8,8 +8,11 @@ set_target_properties(gameengine PROPERTIES OUTPUT_NAME $<IF:$<CONFIG:Debug>,gam
 
 target_include_directories(gameengine PRIVATE
     Include/Precompiled
-    ../Libraries/Include
-    ../Libraries/Source
+)
+
+target_link_libraries(gameengine PRIVATE
+    zi_libraries_include
+    zi_libraries_source
 )
 
 target_link_libraries(gameengine PUBLIC

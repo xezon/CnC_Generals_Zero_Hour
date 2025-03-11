@@ -1,12 +1,10 @@
 add_executable(zerohour WIN32)
 
-target_link_directories(zerohour PRIVATE
-    ../GameEngine
-)
-
 target_link_libraries(zerohour PRIVATE
+    zi_libraries_include
+    zi_libraries_source
     gameengine
-    gameenginedevice  
+    gameenginedevice
     winmm
     imm32
     dbghelplib
@@ -44,8 +42,6 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/BuildVersion.h
 target_link_options(zerohour PRIVATE "/NODEFAULTLIB:libci.lib")
 
 target_include_directories(zerohour PRIVATE
-    ../Libraries/Include
-    ../Libraries/Source
     .
     ${CMAKE_CURRENT_BINARY_DIR}
 )

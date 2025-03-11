@@ -35,19 +35,15 @@ set_target_properties(particleeditorg PROPERTIES PREFIX "")
 target_include_directories(particleeditorg PRIVATE
     include
     res
-    ../../Libraries/Include
-    ../../gameengine/Include
-    ../../Libraries/Source/WWVegas
-    ../../Libraries/Source/WWVegas/WW3D2
-    ../../Libraries/Source/WWVegas/WWDebug
-    ../../Libraries/Source/WWVegas/WWLib
-    ../../Libraries/Source/WWVegas/WWMath
-    ../../Libraries/Source/WWVegas/WWSaveLoad
 )
 
 target_compile_definitions(particleeditorg PRIVATE _AFXDLL)
 
 target_link_libraries(particleeditorg PRIVATE
+    gi_gameengine_include
+    gi_libraries_include
+    gi_libraries_source_wwvegas
+    gi_libraries_source_wwvegas_wwlib
     stlport
     winmm
     imm32

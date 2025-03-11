@@ -4,8 +4,8 @@ target_include_directories(profile INTERFACE
     .
 )
 
-target_include_directories(profile PRIVATE
-    ../../Include
+target_link_libraries(profile PRIVATE
+    zi_libraries_include
 )
 
 target_sources(profile PRIVATE

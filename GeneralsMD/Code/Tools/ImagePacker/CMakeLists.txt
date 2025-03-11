@@ -21,10 +21,10 @@ add_executable(imagepacker WIN32)
 target_include_directories(imagepacker PRIVATE
     Include
     Resource
-    ../../Libraries/Include
 )
 
 target_link_libraries(imagepacker PRIVATE
+    zi_libraries_include
     comctl32
     winmm
     imm32

@@ -19,13 +19,9 @@ set(PATCHGET_SRC
 
 macro(setup_patchgrabber appname)
     add_executable(${appname} WIN32)
-
-    target_include_directories(${appname} PRIVATE
-        ../../Libraries/Include
-    )
     target_sources(${appname} PRIVATE ${PATCHGET_SRC})
-
     target_link_libraries(${appname} PRIVATE
+        zi_libraries_include
         gamespy::gamespy
         comctl32
         winmm

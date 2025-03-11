@@ -9,10 +9,10 @@ add_executable(mapcachebuilder WIN32)
 target_include_directories(mapcachebuilder PRIVATE
     Include
     Resource
-    ../../Libraries/Include
 )
 #
 target_link_libraries(mapcachebuilder PRIVATE
+    zi_libraries_include
     winmm
     imm32
     vfw32

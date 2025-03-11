@@ -51,13 +51,10 @@ set(AUTORUN_SRC
 macro(setup_autorun appname)
 add_executable(${appname} WIN32)
 
-target_include_directories(${appname} PRIVATE
-    ../../Libraries/Include
-)
-
 target_sources(${appname} PRIVATE ${AUTORUN_SRC})
 
 target_link_libraries(${appname} PRIVATE
+    zi_libraries_include
     winmm
 )
 

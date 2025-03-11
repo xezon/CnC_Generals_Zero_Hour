@@ -207,14 +207,12 @@ target_include_directories(worldbuilder PRIVATE
     .
     include
     res
-    ../../Libraries/Include
-    ../../GameEngine/Include
-    ../../GameEngineDevice/Include
 )
 
-
-
 target_link_libraries(worldbuilder PRIVATE
+    zi_gameengine_include
+    zi_gameenginedevice_include
+    zi_libraries_include
     gameengine
     gameenginedevice
     browserdispatch

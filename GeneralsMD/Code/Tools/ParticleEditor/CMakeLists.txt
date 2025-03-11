@@ -35,17 +35,13 @@ set_target_properties(particleeditor PROPERTIES PREFIX "")
 target_include_directories(particleeditor PRIVATE
     include
     res
-    ../../Libraries/Include
-    ../../gameengine/Include
-    ../../Libraries/Source/WWVegas
-    ../../Libraries/Source/WWVegas/WW3D2
-    ../../Libraries/Source/WWVegas/WWDebug
-    ../../Libraries/Source/WWVegas/WWLib
-    ../../Libraries/Source/WWVegas/WWMath
-    ../../Libraries/Source/WWVegas/WWSaveLoad
 )
 
 target_link_libraries(particleeditor PRIVATE
+    zi_gameengine_include
+    zi_libraries_include
+    zi_libraries_source_wwvegas
+    zi_libraries_source_wwvegas_wwlib
     stlport
     winmm
     imm32

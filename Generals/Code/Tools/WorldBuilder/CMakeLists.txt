@@ -202,14 +202,14 @@ target_include_directories(worldbuildergen PRIVATE
     .
     include
     res
-    ../../Libraries/Include
-    ../../gameengine/Include
-    ../../gameenginedevice/Include
 )
 
 target_compile_definitions(worldbuildergen PRIVATE _AFXDLL)
 
 target_link_libraries(worldbuildergen PRIVATE
+    gi_gameengine_include
+    gi_gameenginedevice_include
+    gi_libraries_include
     gameengineg
     gameenginedeviceg
     browserdispatch

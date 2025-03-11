@@ -40,10 +40,10 @@ add_executable(guiedit WIN32)
 target_include_directories(guiedit PRIVATE
     Include
     Resource
-    ../../Libraries/Include
 )
 
 target_link_libraries(guiedit PRIVATE
+    zi_libraries_include
     comctl32
     stlport
     winmm

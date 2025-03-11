@@ -6,12 +6,9 @@ set(COMRPESS_SRC
 
 add_executable(compress WIN32)
 
-target_include_directories(compress PRIVATE
-    ../../Libraries/Include
-    ../../Libraries/Source
-)
-
 target_link_libraries(compress PRIVATE
+    zi_libraries_include
+    zi_libraries_source
     compression
 )
 
