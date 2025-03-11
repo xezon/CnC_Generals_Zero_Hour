@@ -27,6 +27,9 @@
 
 #include <cstdarg>
 
+namespace patchget
+{
+
 void DebugLog( const char *fmt, ... );
 #define DEBUG_LOG(x) DebugLog x
 
@@ -68,6 +71,8 @@ void DebugLog( const char *fmt, ... );
 	#define DEBUG_ASSERTCRASH(c, m)	((void)0)
 
 #endif
+
+} // namespace patchget
 
 #endif // __DEBUG_H__
 

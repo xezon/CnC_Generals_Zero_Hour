@@ -40,6 +40,9 @@
 #include "WWDownload/urlBuilder.h"
 #include "debug.h"
 
+namespace patchget
+{
+
 enum EVENT_TYPES
 {
   NOUPDATE_EVENT=0,    // don't need to update
@@ -1794,3 +1797,5 @@ STDMETHODIMP CChatEventSink::OnSquadInfo(HRESULT, unsigned long, Squad *)
 }
 
 */
+
+} // namespace patchget

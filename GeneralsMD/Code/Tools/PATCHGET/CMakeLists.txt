@@ -31,8 +31,11 @@ macro(setup_patchgrabber appname)
         winmm
         wwvegas
         gameengine
+        gameenginedevice
         dbghelplib
         profile
+        vfw32
+        imm32
     )
 
     if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
