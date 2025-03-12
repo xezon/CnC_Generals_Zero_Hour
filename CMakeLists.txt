@@ -58,23 +58,23 @@ add_subdirectory(GeneralsMD/Code/Libraries/Source/Compression)
 add_subdirectory(GeneralsMD/Code/Libraries/Source/EABrowserDispatch)
 
 # Do we want to build extra SDK stuff or just the game binary?
-option(GENZH_ZEROHOUR_PROJECT "Build Zero Hour code." ON)
-option(GENZH_GENERALS_PROJECT "Build Generals code." ON) # TODO
+option(BUILD_ZEROHOUR "Build Zero Hour code." ON)
+option(BUILD_GENERALS "Build Generals code." ON)
 
-if(NOT GENZH_ZEROHOUR_PROJECT AND NOT GENZH_GENERALS_PROJECT)
-    set(GENZH_ZEROHOUR_PROJECT TRUE)
+if(NOT BUILD_ZEROHOUR AND NOT BUILD_GENERALS)
+    set(BUILD_ZEROHOUR TRUE)
     message("You must select one project to build, building Zero Hour by default.")
 endif()
 
-add_feature_info(ZeroHourStuff GENZH_ZEROHOUR_PROJECT "Build Zero Hour code")
-add_feature_info(GeneralsStuff GENZH_GENERALS_PROJECT "Build Generals code")
+add_feature_info(ZeroHourStuff BUILD_ZEROHOUR "Build Zero Hour code")
+add_feature_info(GeneralsStuff BUILD_GENERALS "Build Generals code")
 
 # Add main build targets
-if(GENZH_ZEROHOUR_PROJECT)
+if(BUILD_ZEROHOUR)
     add_subdirectory(GeneralsMD)
 endif()
 
-if(GENZH_GENERALS_PROJECT)
+if(BUILD_GENERALS)
     add_subdirectory(Generals)
 endif()
 
