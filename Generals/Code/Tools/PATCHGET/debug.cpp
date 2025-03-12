@@ -24,6 +24,9 @@
 #include "debug.h"
 #include <cstdio>
 
+namespace patchget
+{
+
 char* TheCurrentIgnoreCrashPtr;
 
 #define LARGE_BUFFER	8192
@@ -110,3 +113,5 @@ void DebugCrash(const char *format, ...)
 }
 
 #endif
+
+} // namespace patchget

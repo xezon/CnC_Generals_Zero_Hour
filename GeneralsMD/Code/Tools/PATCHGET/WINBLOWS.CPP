@@ -27,6 +27,8 @@
 #include "CHATAPI.h"
 
 
+// TheSuperHackers @fix xezon 13/03/2025 Fix debug linker errors by
+// adding "patchget" namespaces and these globals here.
 // just to satisfy the game libraries we link to
 HINSTANCE ApplicationHInstance = NULL;  ///< our application instance
 HWND ApplicationHWnd = NULL;
