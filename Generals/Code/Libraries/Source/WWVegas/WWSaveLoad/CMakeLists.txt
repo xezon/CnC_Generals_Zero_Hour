@@ -40,8 +40,8 @@ set(WWSAVELOAD_SRC
 add_library(g_wwsaveload STATIC)
 set_target_properties(g_wwsaveload PROPERTIES OUTPUT_NAME wwsaveload)
 
+target_sources(g_wwsaveload PRIVATE ${WWSAVELOAD_SRC})
+
 target_link_libraries(g_wwsaveload PRIVATE
     g_wwcommon
 )
-
-target_sources(g_wwsaveload PRIVATE ${WWSAVELOAD_SRC})

@@ -19,6 +19,8 @@ set(IMAGEPACKER_SRC
 add_executable(z_imagepacker WIN32)
 set_target_properties(z_imagepacker PROPERTIES OUTPUT_NAME imagepacker)
 
+target_sources(z_imagepacker PRIVATE ${IMAGEPACKER_SRC})
+
 target_include_directories(z_imagepacker PRIVATE
     Include
     Resource
@@ -40,5 +42,3 @@ target_link_libraries(z_imagepacker PRIVATE
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
     target_sources(z_imagepacker PRIVATE Resource/ImagePacker.rc)
 endif()
-
-target_sources(z_imagepacker PRIVATE ${IMAGEPACKER_SRC})

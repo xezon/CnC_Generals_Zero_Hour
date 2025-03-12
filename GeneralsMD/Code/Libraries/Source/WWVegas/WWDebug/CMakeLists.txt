@@ -13,8 +13,8 @@ set(WWDEBUG_SRC
 add_library(z_wwdebug STATIC)
 set_target_properties(z_wwdebug PROPERTIES OUTPUT_NAME wwdebug)
 
+target_sources(z_wwdebug PRIVATE ${WWDEBUG_SRC})
+
 target_link_libraries(z_wwdebug PRIVATE
     z_wwcommon
 )
-
-target_sources(z_wwdebug PRIVATE ${WWDEBUG_SRC})

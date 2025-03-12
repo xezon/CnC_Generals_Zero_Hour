@@ -83,8 +83,8 @@ set(WWMATH_SRC
 add_library(g_wwmath STATIC)
 set_target_properties(g_wwmath PROPERTIES OUTPUT_NAME wwmath)
 
+target_sources(g_wwmath PRIVATE ${WWMATH_SRC})
+
 target_link_libraries(g_wwmath PRIVATE
     g_wwcommon
 )
-
-target_sources(g_wwmath PRIVATE ${WWMATH_SRC})

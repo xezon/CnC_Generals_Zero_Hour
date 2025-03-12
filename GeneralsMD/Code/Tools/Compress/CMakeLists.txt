@@ -7,6 +7,8 @@ set(COMRPESS_SRC
 add_executable(z_compress WIN32)
 set_target_properties(z_compress PROPERTIES OUTPUT_NAME compress)
 
+target_sources(z_compress PRIVATE ${COMRPESS_SRC})
+
 target_link_libraries(z_compress PRIVATE
     zi_libraries_include
     zi_libraries_source
@@ -19,5 +21,3 @@ if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
     endif()
     target_link_options(z_compress PRIVATE /subsystem:console)
 endif()
-
-target_sources(z_compress PRIVATE ${COMRPESS_SRC})

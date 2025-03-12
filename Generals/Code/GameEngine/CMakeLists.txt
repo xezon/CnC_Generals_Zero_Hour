@@ -1,41 +1,4 @@
-add_library(g_gameengine STATIC)
-set_target_properties(g_gameengine PROPERTIES OUTPUT_NAME $<IF:$<CONFIG:Debug>,gameenginedebug,gameengine>)
-
-target_include_directories(g_gameengine PUBLIC
-    Include
-)
-target_include_directories(g_gameengine PRIVATE
-    Include/Precompiled
-)
-
-target_link_libraries(g_gameengine PRIVATE
-    gi_libraries_include
-    gi_libraries_source
-)
-
-target_link_libraries(g_gameengine PUBLIC
-    stlport
-    d3d8lib
-    g_wwvegas
-    g_compression
-    g_browserdispatch
-    gamespy::gamespy
-)
-
-target_compile_options(g_gameengine INTERFACE
-    ${GENZH_FLAGS}
-)
-
-target_compile_definitions(g_gameengine PRIVATE
-    IG_DEBUG_STACKTRACE
-)
-
-target_compile_definitions(g_gameengine PUBLIC
-    $<$<CONFIG:Debug>:_DEBUG>
-    $<$<CONFIG:Debug>:DEBUG>
-)
-
-target_sources(g_gameengine PRIVATE
+set(GAMEENGINE_SRC
     Source/Common/Thing/DrawModule.cpp
     Source/Common/Thing/Module.cpp
     Source/Common/Thing/ModuleFactory.cpp
@@ -1092,4 +1055,43 @@ target_sources(g_gameengine PRIVATE
     Include/GameNetwork/udp.h
     Include/GameNetwork/User.h
     Include/Precompiled/PreRTS.h
+)
+
+add_library(g_gameengine STATIC)
+set_target_properties(g_gameengine PROPERTIES OUTPUT_NAME $<IF:$<CONFIG:Debug>,gameenginedebug,gameengine>)
+
+target_sources(g_gameengine PRIVATE ${GAMEENGINE_SRC})
+
+target_include_directories(g_gameengine PUBLIC
+    Include
+)
+target_include_directories(g_gameengine PRIVATE
+    Include/Precompiled
+)
+
+target_link_libraries(g_gameengine PRIVATE
+    gi_libraries_include
+    gi_libraries_source
+)
+
+target_link_libraries(g_gameengine PUBLIC
+    stlport
+    d3d8lib
+    g_wwvegas
+    g_compression
+    g_browserdispatch
+    gamespy::gamespy
+)
+
+target_compile_options(g_gameengine INTERFACE
+    ${GENZH_FLAGS}
+)
+
+target_compile_definitions(g_gameengine PRIVATE
+    IG_DEBUG_STACKTRACE
+)
+
+target_compile_definitions(g_gameengine PUBLIC
+    $<$<CONFIG:Debug>:_DEBUG>
+    $<$<CONFIG:Debug>:DEBUG>
 )

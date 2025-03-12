@@ -10,8 +10,8 @@ set(WWUTIL_SRC
 add_library(g_wwutil STATIC)
 set_target_properties(g_wwutil PROPERTIES OUTPUT_NAME wwutil)
 
+target_sources(g_wwutil PRIVATE ${WWUTIL_SRC})
+
 target_link_libraries(g_wwutil PRIVATE
     g_wwcommon
 )
-
-target_sources(g_wwutil PRIVATE ${WWUTIL_SRC})

@@ -56,6 +56,6 @@ set(PLUGLIB_SRC
 add_library(z_pluglib STATIC)
 set_target_properties(z_pluglib PROPERTIES OUTPUT_NAME pluglib)
 
-target_link_libraries(z_pluglib PRIVATE maxsdk)
-
 target_sources(z_pluglib PRIVATE ${PLUGLIB_SRC})
+
+target_link_libraries(z_pluglib PRIVATE maxsdk)

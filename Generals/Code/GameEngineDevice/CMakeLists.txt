@@ -1,25 +1,4 @@
-add_library(g_gameenginedevice STATIC)
-set_target_properties(g_gameenginedevice PROPERTIES OUTPUT_NAME gameenginedevice)
-
-target_include_directories(g_gameenginedevice PUBLIC
-    Include
-)
-
-target_link_libraries(g_gameenginedevice PRIVATE
-    gi_main
-    gi_libraries_include
-    gi_libraries_source
-)
-
-target_link_libraries(g_gameenginedevice PUBLIC
-    g_gameengine
-    milesstub
-    binkstub
-    benchmark
-    d3d8lib
-)
-
-target_sources(g_gameenginedevice PRIVATE
+set(GAMEENGINEDEVICE_SRC
     Source/W3DDevice/GameLogic/W3DGameLogic.cpp
     Source/W3DDevice/GameLogic/W3DGhostObject.cpp
     Source/W3DDevice/GameLogic/W3DTerrainLogic.cpp
@@ -201,4 +180,27 @@ target_sources(g_gameenginedevice PRIVATE
     Include/Win32Device/GameClient/Win32Mouse.h
     Include/VideoDevice/Bink/BinkVideoPlayer.h
     Include/MilesAudioDevice/MilesAudioManager.h
+)
+
+add_library(g_gameenginedevice STATIC)
+set_target_properties(g_gameenginedevice PROPERTIES OUTPUT_NAME gameenginedevice)
+
+target_sources(g_gameenginedevice PRIVATE ${GAMEENGINEDEVICE_SRC})
+
+target_include_directories(g_gameenginedevice PUBLIC
+    Include
+)
+
+target_link_libraries(g_gameenginedevice PRIVATE
+    gi_main
+    gi_libraries_include
+    gi_libraries_source
+)
+
+target_link_libraries(g_gameenginedevice PUBLIC
+    g_gameengine
+    milesstub
+    binkstub
+    benchmark
+    d3d8lib
 )

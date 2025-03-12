@@ -225,8 +225,8 @@ set(WW3D2_SRC
 add_library(g_ww3d2 STATIC)
 set_target_properties(g_ww3d2 PROPERTIES OUTPUT_NAME ww3d2)
 
+target_sources(g_ww3d2 PRIVATE ${WW3D2_SRC})
+
 target_link_libraries(g_ww3d2 PRIVATE
     g_wwcommon
 )
-
-target_sources(g_ww3d2 PRIVATE ${WW3D2_SRC})

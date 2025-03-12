@@ -17,8 +17,8 @@ set(WWDOWNLOAD_SRC
 add_library(g_wwdownload STATIC)
 set_target_properties(g_wwdownload PROPERTIES OUTPUT_NAME wwdownload)
 
+target_sources(g_wwdownload PRIVATE ${WWDOWNLOAD_SRC})
+
 target_link_libraries(g_wwdownload PRIVATE
     g_wwcommon
 )
-
-target_sources(g_wwdownload PRIVATE ${WWDOWNLOAD_SRC})

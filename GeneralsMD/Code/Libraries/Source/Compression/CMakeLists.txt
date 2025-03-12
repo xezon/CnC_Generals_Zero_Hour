@@ -1,20 +1,4 @@
-add_library(z_compression STATIC)
-set_target_properties(z_compression PROPERTIES OUTPUT_NAME compression)
-
-target_include_directories(z_compression INTERFACE
-    .
-)
-
-target_link_libraries(z_compression PRIVATE
-    zi_libraries_include
-)
-
-target_link_libraries(z_compression PUBLIC
-    liblzhl
-    libzlib
-)
-
-target_sources(z_compression PRIVATE
+set(COMPRESSION_SRC
     EAC/btreeabout.cpp
     EAC/btreedecode.cpp
     EAC/btreeencode.cpp
@@ -33,4 +17,22 @@ target_sources(z_compression PRIVATE
     LZHCompress/NoxCompress.h
     CompressionManager.cpp
     Compression.h
+)
+
+add_library(z_compression STATIC)
+set_target_properties(z_compression PROPERTIES OUTPUT_NAME compression)
+
+target_sources(z_compression PRIVATE ${COMPRESSION_SRC})
+
+target_include_directories(z_compression INTERFACE
+    .
+)
+
+target_link_libraries(z_compression PRIVATE
+    zi_libraries_include
+)
+
+target_link_libraries(z_compression PUBLIC
+    liblzhl
+    libzlib
 )

@@ -11,6 +11,8 @@ set(DEBUGWINDOW_SRC
 add_library(z_debugwindow SHARED)
 set_target_properties(z_debugwindow PROPERTIES OUTPUT_NAME debugwindow)
 
+target_sources(z_debugwindow PRIVATE ${DEBUGWINDOW_SRC})
+
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
     target_compile_definitions(z_debugwindow PRIVATE _AFXDLL)
     target_sources(z_debugwindow PRIVATE
@@ -21,5 +23,3 @@ if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
 else()
     set_target_properties(z_debugwindow PROPERTIES OUTPUT_NAME debugwindow)
 endif()
-
-target_sources(z_debugwindow PRIVATE ${DEBUGWINDOW_SRC})

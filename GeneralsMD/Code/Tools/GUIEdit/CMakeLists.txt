@@ -38,6 +38,8 @@ set(GUIEDIT_SRC
 add_executable(z_guiedit WIN32)
 set_target_properties(z_guiedit PROPERTIES OUTPUT_NAME guiedit)
 
+target_sources(z_guiedit PRIVATE ${GUIEDIT_SRC})
+
 target_include_directories(z_guiedit PRIVATE
     Include
     Resource
@@ -64,5 +66,3 @@ if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
 
     target_sources(z_guiedit PRIVATE Resource/GUIEdit.rc)
 endif()
-
-target_sources(z_guiedit PRIVATE ${GUIEDIT_SRC})

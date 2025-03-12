@@ -1,35 +1,35 @@
-# Set source files
 set(PARTICLEED_SRC
-    CButtonShowColor.cpp
-    CColorAlphaDialog.cpp
-    CSwitchesDialog.cpp
-    EmissionTypePanels.cpp
-    MoreParmsDialog.cpp
-    ParticleEditor.cpp
-    ParticleEditorDialog.cpp
-    ParticleTypePanels.cpp
-    ShaderTypePanels.cpp
-    StdAfx.cpp
-    VelocityTypePanels.cpp
-    CButtonShowColor.h
-    CColorAlphaDialog.h
-    CSwitchesDialog.h
-    EmissionTypePanels.h
-    ISwapablePanel.h
-    MoreParmsDialog.h
-    ParticleEditor.h
-    ParticleEditorDialog.h
-    ParticleEditorExport.h
-    ParticleTypePanels.h
-    Resource.h
-    ShaderTypePanels.h
-    StdAfx.h
-    VelocityTypePanels.h
+    "CButtonShowColor.cpp"
+    "CColorAlphaDialog.cpp"
+    "CSwitchesDialog.cpp"
+    "EmissionTypePanels.cpp"
+    "MoreParmsDialog.cpp"
+    "ParticleEditor.cpp"
+    "ParticleEditorDialog.cpp"
+    "ParticleTypePanels.cpp"
+    "ShaderTypePanels.cpp"
+    "StdAfx.cpp"
+    "VelocityTypePanels.cpp"
+    "CButtonShowColor.h"
+    "CColorAlphaDialog.h"
+    "CSwitchesDialog.h"
+    "EmissionTypePanels.h"
+    "ISwapablePanel.h"
+    "MoreParmsDialog.h"
+    "ParticleEditor.h"
+    "ParticleEditorDialog.h"
+    "ParticleEditorExport.h"
+    "ParticleTypePanels.h"
+    "Resource.h"
+    "ShaderTypePanels.h"
+    "StdAfx.h"
+    "VelocityTypePanels.h"
 )
 
-# Targets to build.
 add_library(z_particleeditor SHARED)
 set_target_properties(z_particleeditor PROPERTIES OUTPUT_NAME particleeditor PREFIX "")
+
+target_sources(z_particleeditor PRIVATE ${PARTICLEED_SRC})
 
 target_include_directories(z_particleeditor PRIVATE
     include
@@ -58,5 +58,3 @@ if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
 else()
     set_target_properties(z_particleeditor PROPERTIES OUTPUT_NAME particleeditor)
 endif()
-
-target_sources(z_particleeditor PRIVATE ${PARTICLEED_SRC})

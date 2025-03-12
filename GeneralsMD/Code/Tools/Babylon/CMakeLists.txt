@@ -54,9 +54,9 @@ set(BABYLON_SRC
 add_executable(z_babylon WIN32)
 set_target_properties(z_babylon PROPERTIES OUTPUT_NAME babylon)
 
+target_sources(z_babylon PRIVATE ${BABYLON_SRC})
+
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
     target_compile_definitions(z_babylon PRIVATE _AFXDLL)
     target_sources(z_babylon PRIVATE Babylon.rc)
 endif()
-
-target_sources(z_babylon PRIVATE ${BABYLON_SRC})

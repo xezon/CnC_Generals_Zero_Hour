@@ -200,8 +200,8 @@ set(WWLIB_SRC
 add_library(z_wwlib STATIC)
 set_target_properties(z_wwlib PROPERTIES OUTPUT_NAME wwlib)
 
+target_sources(z_wwlib PRIVATE ${WWLIB_SRC})
+
 target_link_libraries(z_wwlib PRIVATE
     z_wwcommon
 )
-
-target_sources(z_wwlib PRIVATE ${WWLIB_SRC})

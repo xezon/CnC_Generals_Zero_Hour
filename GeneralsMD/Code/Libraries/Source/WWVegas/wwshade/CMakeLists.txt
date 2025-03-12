@@ -73,8 +73,8 @@ endif()
 add_library(z_wwshade STATIC)
 set_target_properties(z_wwshade PROPERTIES OUTPUT_NAME wwshade)
 
+target_sources(z_wwshade PRIVATE ${WWSHADE_SRC})
+
 target_link_libraries(z_wwshade PRIVATE
     z_wwcommon
 )
-
-target_sources(z_wwshade PRIVATE ${WWSHADE_SRC})

@@ -1,42 +1,4 @@
-add_library(z_gameengine STATIC)
-set_target_properties(z_gameengine PROPERTIES OUTPUT_NAME $<IF:$<CONFIG:Debug>,gameenginedebug,gameengine>)
-
-target_include_directories(z_gameengine PUBLIC
-    Include
-)
-
-target_include_directories(z_gameengine PRIVATE
-    Include/Precompiled
-)
-
-target_link_libraries(z_gameengine PRIVATE
-    zi_libraries_include
-    zi_libraries_source
-)
-
-target_link_libraries(z_gameengine PUBLIC
-    stlport
-    d3d8lib
-    z_wwvegas
-    z_compression
-    z_browserdispatch
-    gamespy::gamespy
-)
-
-target_compile_options(z_gameengine INTERFACE
-    ${GENZH_FLAGS}
-)
-
-target_compile_definitions(z_gameengine PRIVATE
-    IG_DEBUG_STACKTRACE
-)
-
-target_compile_definitions(z_gameengine PUBLIC
-    $<$<CONFIG:Debug>:_DEBUG>
-    $<$<CONFIG:Debug>:DEBUG>
-)
-
-target_sources(z_gameengine PRIVATE
+set(GAMEENGINE_SRC
     Include/Common/AcademyStats.h
     Include/Common/ActionManager.h
     Include/Common/ArchiveFile.h
@@ -1176,4 +1138,44 @@ target_sources(z_gameengine PRIVATE
     Source/GameNetwork/User.cpp
     Source/GameNetwork/WOLBrowser/WebBrowser.cpp
     Source/Precompiled/PreRTS.cpp
+)
+
+add_library(z_gameengine STATIC)
+set_target_properties(z_gameengine PROPERTIES OUTPUT_NAME $<IF:$<CONFIG:Debug>,gameenginedebug,gameengine>)
+
+target_sources(z_gameengine PRIVATE ${GAMEENGINE_SRC})
+
+target_include_directories(z_gameengine PUBLIC
+    Include
+)
+
+target_include_directories(z_gameengine PRIVATE
+    Include/Precompiled
+)
+
+target_link_libraries(z_gameengine PRIVATE
+    zi_libraries_include
+    zi_libraries_source
+)
+
+target_link_libraries(z_gameengine PUBLIC
+    stlport
+    d3d8lib
+    z_wwvegas
+    z_compression
+    z_browserdispatch
+    gamespy::gamespy
+)
+
+target_compile_options(z_gameengine INTERFACE
+    ${GENZH_FLAGS}
+)
+
+target_compile_definitions(z_gameengine PRIVATE
+    IG_DEBUG_STACKTRACE
+)
+
+target_compile_definitions(z_gameengine PUBLIC
+    $<$<CONFIG:Debug>:_DEBUG>
+    $<$<CONFIG:Debug>:DEBUG>
 )

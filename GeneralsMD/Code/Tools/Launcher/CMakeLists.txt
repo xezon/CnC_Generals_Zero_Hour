@@ -52,6 +52,8 @@ set(LAUNCHER_SRC
 add_executable(z_launcher WIN32)
 set_target_properties(z_launcher PROPERTIES OUTPUT_NAME launcher)
 
+target_sources(z_launcher PRIVATE ${LAUNCHER_SRC})
+
 target_include_directories(z_launcher PRIVATE
     Toolkit
 )
@@ -69,5 +71,3 @@ target_link_libraries(z_launcher PRIVATE
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
     target_sources(z_launcher PRIVATE launcher1.rc)
 endif()
-
-target_sources(z_launcher PRIVATE ${LAUNCHER_SRC})
