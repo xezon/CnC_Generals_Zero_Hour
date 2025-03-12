@@ -174,7 +174,6 @@ static void ListGroupRoomsCallback ( PEER peer, PEERBool success, int groupID, S
 	}
 }
 
-// TheSuperHackers @tweak xezon 06/03/2025 Add function arguments to fit Gamespy Sdk
 static void ConnectCallback ( PEER peer, PEERBool success, int failureReason, void * param)
 {
 	MatcherClass *matcher = (MatcherClass *)param;
@@ -189,7 +188,6 @@ static void JoinCallback ( PEER peer, PEERBool success, PEERJoinResult result, R
 		matcher->handleJoin( success == PEERTrue );
 }
 
-// TheSuperHackers @tweak xezon 06/03/2025 Add function arguments to fit Gamespy Sdk
 static void NickErrorCallback ( PEER peer, int type, const char * badNick, int numSuggestedNicks, const const char ** suggestedNicks, void * param)
 {
 	ERRMSG("Nick error with " << badNick);
