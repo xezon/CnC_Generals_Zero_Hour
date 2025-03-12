@@ -17,8 +17,8 @@ target_link_libraries(g_gameengine PUBLIC
     stlport
     d3d8lib
     g_wwvegas
-    z_compression
-    z_browserdispatch
+    g_compression
+    g_browserdispatch
     gamespy::gamespy
 )
 

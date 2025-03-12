@@ -17,7 +17,6 @@ target_link_libraries(g_generals PRIVATE
     dxguid
     binkstub
     milesstub
-    z_profile
     safedisc
 )
 

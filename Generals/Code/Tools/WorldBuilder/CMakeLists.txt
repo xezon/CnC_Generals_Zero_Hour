@@ -212,12 +212,11 @@ target_link_libraries(g_worldbuilder PRIVATE
     gi_libraries_include
     g_gameengine
     g_gameenginedevice
-    z_browserdispatch
+    g_browserdispatch
     winmm
     imm32
     vfw32
     d3d8lib
-    z_profile
     dbghelplib
 )
 

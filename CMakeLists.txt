@@ -52,10 +52,10 @@ add_subdirectory(Dependencies/SafeDisc)
 add_subdirectory(Dependencies/MaxSDK)
 
 # EA Compression library, shared between games (diff is comments only)
-add_subdirectory(GeneralsMD/Code/Libraries/Source/Compression)
+#add_subdirectory(GeneralsMD/Code/Libraries/Source/Compression)
 
 # BrowserDispatch COM object interface (No difference)
-add_subdirectory(GeneralsMD/Code/Libraries/Source/EABrowserDispatch)
+#add_subdirectory(GeneralsMD/Code/Libraries/Source/EABrowserDispatch)
 
 # Do we want to build extra SDK stuff or just the game binary?
 option(BUILD_ZEROHOUR "Build Zero Hour code." ON)

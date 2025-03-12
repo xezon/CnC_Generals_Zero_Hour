@@ -48,7 +48,6 @@ target_link_libraries(g_particleeditor PRIVATE
     imm32
     vfw32
     d3d8lib
-    z_profile
     dbghelplib
 )
 

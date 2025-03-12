@@ -3,3 +3,6 @@ add_subdirectory(Source/WWVegas)
 
 # profiling library
 add_subdirectory(Source/profile)
+
+add_subdirectory(Source/EABrowserDispatch)
+add_subdirectory(Source/Compression)
