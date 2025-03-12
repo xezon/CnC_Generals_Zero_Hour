@@ -201,36 +201,36 @@ set(WORLDBUILDER_SRC
 )
 
 # Targets to build.
-add_executable(worldbuilder WIN32)
+add_executable(z_worldbuilder WIN32)
 
-target_include_directories(worldbuilder PRIVATE
+target_include_directories(z_worldbuilder PRIVATE
     .
     include
     res
 )
 
-target_link_libraries(worldbuilder PRIVATE
+target_link_libraries(z_worldbuilder PRIVATE
     zi_gameengine_include
     zi_gameenginedevice_include
     zi_libraries_include
-    gameengine
-    gameenginedevice
-    browserdispatch
+    z_gameengine
+    z_gameenginedevice
+    z_browserdispatch
     winmm
     imm32
     vfw32
     d3d8lib
-    profile
+    z_profile
     dbghelplib
 )
 
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
-    target_link_options(worldbuilder PRIVATE /NODEFAULTLIB:libci.lib /NODEFAULTLIB:libc.lib)
-    target_compile_definitions(worldbuilder PRIVATE _AFXDLL)
-    target_sources(worldbuilder PRIVATE res/WorldBuilder.rc)
-    set_target_properties(worldbuilder PROPERTIES OUTPUT_NAME WorldBuilder)
+    target_link_options(z_worldbuilder PRIVATE /NODEFAULTLIB:libci.lib /NODEFAULTLIB:libc.lib)
+    target_compile_definitions(z_worldbuilder PRIVATE _AFXDLL)
+    target_sources(z_worldbuilder PRIVATE res/WorldBuilder.rc)
+    set_target_properties(z_worldbuilder PROPERTIES OUTPUT_NAME WorldBuilder)
 else()
-    set_target_properties(worldbuilder PROPERTIES OUTPUT_NAME worldbuilder)
+    set_target_properties(z_worldbuilder PROPERTIES OUTPUT_NAME worldbuilder)
 endif()
 
-target_sources(worldbuilder PRIVATE ${WORLDBUILDER_SRC})
+target_sources(z_worldbuilder PRIVATE ${WORLDBUILDER_SRC})

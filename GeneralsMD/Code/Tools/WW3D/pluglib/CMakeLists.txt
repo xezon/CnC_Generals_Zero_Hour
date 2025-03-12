@@ -53,8 +53,9 @@ set(PLUGLIB_SRC
     "WWmatrix3.h"
 )
 
-add_library(pluglib STATIC)
+add_library(z_pluglib STATIC)
+set_target_properties(z_pluglib PROPERTIES OUTPUT_NAME pluglib)
 
-target_link_libraries(pluglib PRIVATE maxsdk)
+target_link_libraries(z_pluglib PRIVATE maxsdk)
 
-target_sources(pluglib PRIVATE ${PLUGLIB_SRC})
+target_sources(z_pluglib PRIVATE ${PLUGLIB_SRC})

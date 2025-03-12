@@ -37,10 +37,11 @@ set(WWSAVELOAD_SRC
 )
 
 # Targets to build.
-add_library(wwsaveload STATIC)
+add_library(z_wwsaveload STATIC)
+set_target_properties(z_wwsaveload PROPERTIES OUTPUT_NAME wwsaveload)
 
-target_link_libraries(wwsaveload PRIVATE
-    wwcommon
+target_link_libraries(z_wwsaveload PRIVATE
+    z_wwcommon
 )
 
-target_sources(wwsaveload PRIVATE ${WWSAVELOAD_SRC})
+target_sources(z_wwsaveload PRIVATE ${WWSAVELOAD_SRC})

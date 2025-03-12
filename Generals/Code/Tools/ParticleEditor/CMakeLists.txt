@@ -28,18 +28,17 @@ set(PARTICLEED_SRC
 )
 
 # Targets to build.
-add_library(particleeditorg SHARED)
+add_library(g_particleeditor SHARED)
+set_target_properties(g_particleeditor PROPERTIES OUTPUT_NAME particleeditor PREFIX "")
 
-set_target_properties(particleeditorg PROPERTIES PREFIX "")
-
-target_include_directories(particleeditorg PRIVATE
+target_include_directories(g_particleeditor PRIVATE
     include
     res
 )
 
-target_compile_definitions(particleeditorg PRIVATE _AFXDLL)
+target_compile_definitions(g_particleeditor PRIVATE _AFXDLL)
 
-target_link_libraries(particleeditorg PRIVATE
+target_link_libraries(g_particleeditor PRIVATE
     gi_gameengine_include
     gi_libraries_include
     gi_libraries_source_wwvegas
@@ -49,17 +48,17 @@ target_link_libraries(particleeditorg PRIVATE
     imm32
     vfw32
     d3d8lib
-    profile
+    z_profile
     dbghelplib
 )
 
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
-    target_link_options(particleeditorg PRIVATE /NODEFAULTLIB:libci.lib /NODEFAULTLIB:libc.lib)
+    target_link_options(g_particleeditor PRIVATE /NODEFAULTLIB:libci.lib /NODEFAULTLIB:libc.lib)
 
-    target_sources(particleeditorg PRIVATE ParticleEditor.rc)
-    set_target_properties(particleeditorg PROPERTIES OUTPUT_NAME ParticleEditor)
+    target_sources(g_particleeditor PRIVATE ParticleEditor.rc)
+    set_target_properties(g_particleeditor PROPERTIES OUTPUT_NAME ParticleEditor)
 else()
-    set_target_properties(particleeditorg PROPERTIES OUTPUT_NAME particleeditor)
+    set_target_properties(g_particleeditor PROPERTIES OUTPUT_NAME particleeditor)
 endif()
 
-target_sources(particleeditorg PRIVATE ${PARTICLEED_SRC})
+target_sources(g_particleeditor PRIVATE ${PARTICLEED_SRC})

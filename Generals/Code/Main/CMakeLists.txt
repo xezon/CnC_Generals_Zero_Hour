@@ -1,10 +1,12 @@
-add_executable(generals WIN32)
+add_executable(g_generals WIN32)
 
-target_link_libraries(generals PRIVATE
+set_target_properties(g_generals PROPERTIES OUTPUT_NAME generals)
+
+target_link_libraries(g_generals PRIVATE
     gi_libraries_include
     gi_libraries_source
-    gameengineg
-    gameenginedeviceg
+    g_gameengine
+    g_gameenginedevice
     winmm
     imm32
     dbghelplib
@@ -15,7 +17,7 @@ target_link_libraries(generals PRIVATE
     dxguid
     binkstub
     milesstub
-    profile
+    z_profile
     safedisc
 )
 
@@ -39,21 +41,21 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/BuildVersion.h
 "
 )
 
-target_link_options(generals PRIVATE "/NODEFAULTLIB:libci.lib")
+target_link_options(g_generals PRIVATE "/NODEFAULTLIB:libci.lib")
 
-target_include_directories(generals PRIVATE
+target_include_directories(g_generals PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_BINARY_DIR}/Code/Libraries
 )
 
-target_sources(generals PRIVATE
+target_sources(g_generals PRIVATE
     WinMain.cpp
     WinMain.h
 )
 
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
-    target_sources(generals PRIVATE
+    target_sources(g_generals PRIVATE
         RTS.RC
     )
 endif()

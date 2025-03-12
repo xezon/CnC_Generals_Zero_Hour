@@ -197,10 +197,11 @@ set(WWLIB_SRC
 )
 
 # Targets to build.
-add_library(wwlib STATIC)
+add_library(z_wwlib STATIC)
+set_target_properties(z_wwlib PROPERTIES OUTPUT_NAME wwlib)
 
-target_link_libraries(wwlib PRIVATE
-    wwcommon
+target_link_libraries(z_wwlib PRIVATE
+    z_wwcommon
 )
 
-target_sources(wwlib PRIVATE ${WWLIB_SRC})
+target_sources(z_wwlib PRIVATE ${WWLIB_SRC})

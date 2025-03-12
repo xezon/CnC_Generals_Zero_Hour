@@ -16,14 +16,15 @@ set(IMAGEPACKER_SRC
     "Source/Window Procedures/PreviewProc.cpp"
 )
 
-add_executable(imagepacker WIN32)
+add_executable(z_imagepacker WIN32)
+set_target_properties(z_imagepacker PROPERTIES OUTPUT_NAME imagepacker)
 
-target_include_directories(imagepacker PRIVATE
+target_include_directories(z_imagepacker PRIVATE
     Include
     Resource
 )
 
-target_link_libraries(imagepacker PRIVATE
+target_link_libraries(z_imagepacker PRIVATE
     zi_libraries_include
     comctl32
     winmm
@@ -31,13 +32,13 @@ target_link_libraries(imagepacker PRIVATE
     vfw32
     benchmark
     dbghelplib
-    profile
-    gameengine
-    gameenginedevice
+    z_profile
+    z_gameengine
+    z_gameenginedevice
 )
 
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
-    target_sources(imagepacker PRIVATE Resource/ImagePacker.rc)
+    target_sources(z_imagepacker PRIVATE Resource/ImagePacker.rc)
 endif()
 
-target_sources(imagepacker PRIVATE ${IMAGEPACKER_SRC})
+target_sources(z_imagepacker PRIVATE ${IMAGEPACKER_SRC})

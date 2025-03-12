@@ -1,43 +1,42 @@
-add_library(gameengine STATIC)
+add_library(z_gameengine STATIC)
+set_target_properties(z_gameengine PROPERTIES OUTPUT_NAME $<IF:$<CONFIG:Debug>,gameenginedebug,gameengine>)
 
-target_include_directories(gameengine PUBLIC
+target_include_directories(z_gameengine PUBLIC
     Include
 )
 
-set_target_properties(gameengine PROPERTIES OUTPUT_NAME $<IF:$<CONFIG:Debug>,gameenginedebug,gameengine>)
-
-target_include_directories(gameengine PRIVATE
+target_include_directories(z_gameengine PRIVATE
     Include/Precompiled
 )
 
-target_link_libraries(gameengine PRIVATE
+target_link_libraries(z_gameengine PRIVATE
     zi_libraries_include
     zi_libraries_source
 )
 
-target_link_libraries(gameengine PUBLIC
+target_link_libraries(z_gameengine PUBLIC
     stlport
     d3d8lib
-    wwvegas
-    compression
-    browserdispatch
+    z_wwvegas
+    z_compression
+    z_browserdispatch
     gamespy::gamespy
 )
 
-target_compile_options(gameengine INTERFACE
+target_compile_options(z_gameengine INTERFACE
     ${GENZH_FLAGS}
 )
 
-target_compile_definitions(gameengine PRIVATE
+target_compile_definitions(z_gameengine PRIVATE
     IG_DEBUG_STACKTRACE
 )
 
-target_compile_definitions(gameengine PUBLIC
+target_compile_definitions(z_gameengine PUBLIC
     $<$<CONFIG:Debug>:_DEBUG>
     $<$<CONFIG:Debug>:DEBUG>
 )
 
-target_sources(gameengine PRIVATE
+target_sources(z_gameengine PRIVATE
     Include/Common/AcademyStats.h
     Include/Common/ActionManager.h
     Include/Common/ArchiveFile.h

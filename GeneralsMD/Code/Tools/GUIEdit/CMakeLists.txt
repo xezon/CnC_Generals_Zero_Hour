@@ -35,14 +35,15 @@ set(GUIEDIT_SRC
     "Source/Dialog Procedures/TextEntryProperties.cpp"
 )
 
-add_executable(guiedit WIN32)
+add_executable(z_guiedit WIN32)
+set_target_properties(z_guiedit PROPERTIES OUTPUT_NAME guiedit)
 
-target_include_directories(guiedit PRIVATE
+target_include_directories(z_guiedit PRIVATE
     Include
     Resource
 )
 
-target_link_libraries(guiedit PRIVATE
+target_link_libraries(z_guiedit PRIVATE
     zi_libraries_include
     comctl32
     stlport
@@ -50,18 +51,18 @@ target_link_libraries(guiedit PRIVATE
     imm32
     vfw32
     d3d8lib
-    profile
+    z_profile
     dbghelplib
     benchmark
-    wwvegas
-    gameengine
-    gameenginedevice
+    z_wwvegas
+    z_gameengine
+    z_gameenginedevice
 )
 
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
-    target_link_options(guiedit PRIVATE /NODEFAULTLIB:libci.lib /NODEFAULTLIB:libc.lib)
+    target_link_options(z_guiedit PRIVATE /NODEFAULTLIB:libci.lib /NODEFAULTLIB:libc.lib)
 
-    target_sources(guiedit PRIVATE Resource/GUIEdit.rc)
+    target_sources(z_guiedit PRIVATE Resource/GUIEdit.rc)
 endif()
 
-target_sources(guiedit PRIVATE ${GUIEDIT_SRC})
+target_sources(z_guiedit PRIVATE ${GUIEDIT_SRC})

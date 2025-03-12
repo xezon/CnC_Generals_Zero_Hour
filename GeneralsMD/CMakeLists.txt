@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 
-project(zerohour LANGUAGES C CXX)
+project(z_generals LANGUAGES C CXX)
 
 # Do we want to build extra SDK stuff or just the game binary?
 option(BUILD_ZEROHOUR_TOOLS "Build tools for Zero Hour" OFF)

@@ -1,24 +1,25 @@
-add_library(gameenginedevice STATIC)
+add_library(z_gameenginedevice STATIC)
+set_target_properties(z_gameenginedevice PROPERTIES OUTPUT_NAME gameenginedevice)
 
-target_include_directories(gameenginedevice PUBLIC
+target_include_directories(z_gameenginedevice PUBLIC
     Include
 )
 
-target_link_libraries(gameenginedevice PRIVATE
+target_link_libraries(z_gameenginedevice PRIVATE
     zi_main
     zi_libraries_include
     zi_libraries_source
 )
 
-target_link_libraries(gameenginedevice PUBLIC
-    gameengine
+target_link_libraries(z_gameenginedevice PUBLIC
+    z_gameengine
     milesstub
     binkstub
     benchmark
     d3d8lib
 )
 
-target_sources(gameenginedevice PRIVATE
+target_sources(z_gameenginedevice PRIVATE
     Include/MilesAudioDevice/MilesAudioManager.h
     Include/VideoDevice/Bink/BinkVideoPlayer.h
     Include/W3DDevice/Common/W3DConvert.h

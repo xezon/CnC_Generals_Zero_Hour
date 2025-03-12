@@ -146,19 +146,19 @@ set(MAX2W3D_SRC
     "w3d_obsolete.h"
 )
 
-add_library(max2w3d SHARED)
-set_target_properties(max2w3d PROPERTIES SUFFIX ".dle")
+add_library(z_max2w3d SHARED)
+set_target_properties(z_max2w3d PROPERTIES OUTPUT_NAME max2w3d SUFFIX ".dle")
 
-target_include_directories(max2w3d PRIVATE
+target_include_directories(z_max2w3d PRIVATE
     "../pluglib"
 )
 
-target_sources(max2w3d PRIVATE ${MAX2W3D_SRC})
+target_sources(z_max2w3d PRIVATE ${MAX2W3D_SRC})
 
 # TODO: What does W3D_MAX4 do? Needs cmake option?
-target_compile_definitions(max2w3d PRIVATE W3D_MAX4)
+target_compile_definitions(z_max2w3d PRIVATE W3D_MAX4)
 
-target_link_libraries(max2w3d PRIVATE
+target_link_libraries(z_max2w3d PRIVATE
     Comctl32
     # This is only linked to have its basetsd.h used instead of the vs6's basetsd.h
     # The headers typedef INT_PTR to different types, but maxsdk expects it
@@ -169,8 +169,8 @@ target_link_libraries(max2w3d PRIVATE
     maxsdk
 )
 
-set_target_properties(max2w3d PROPERTIES LINK_FLAGS "/DEF:max2w3d.def")
+set_target_properties(z_max2w3d PROPERTIES LINK_FLAGS "/DEF:max2w3d.def")
 
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
-    target_sources(max2w3d PRIVATE max2w3d.rc)
+    target_sources(z_max2w3d PRIVATE max2w3d.rc)
 endif()

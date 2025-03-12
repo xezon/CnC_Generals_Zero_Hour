@@ -10,10 +10,11 @@ set(WWDEBUG_SRC
 )
 
 # Targets to build.
-add_library(wwdebugg STATIC)
+add_library(g_wwdebug STATIC)
+set_target_properties(g_wwdebug PROPERTIES OUTPUT_NAME wwdebug)
 
-target_link_libraries(wwdebugg PRIVATE
-    wwcommong
+target_link_libraries(g_wwdebug PRIVATE
+    g_wwcommon
 )
 
-target_sources(wwdebugg PRIVATE ${WWDEBUG_SRC})
+target_sources(g_wwdebug PRIVATE ${WWDEBUG_SRC})

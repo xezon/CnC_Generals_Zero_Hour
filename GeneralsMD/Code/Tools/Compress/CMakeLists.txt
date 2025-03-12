@@ -4,19 +4,20 @@ set(COMRPESS_SRC
     "../CRCDiff/debug.h"
 )
 
-add_executable(compress WIN32)
+add_executable(z_compress WIN32)
+set_target_properties(z_compress PROPERTIES OUTPUT_NAME compress)
 
-target_link_libraries(compress PRIVATE
+target_link_libraries(z_compress PRIVATE
     zi_libraries_include
     zi_libraries_source
-    compression
+    z_compression
 )
 
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
     if(MSVC_VERSION LESS 1300) # VS6
-        target_compile_definitions(compress PRIVATE vsnprintf=_vsnprintf)
+        target_compile_definitions(z_compress PRIVATE vsnprintf=_vsnprintf)
     endif()
-    target_link_options(compress PRIVATE /subsystem:console)
+    target_link_options(z_compress PRIVATE /subsystem:console)
 endif()
 
-target_sources(compress PRIVATE ${COMRPESS_SRC})
+target_sources(z_compress PRIVATE ${COMRPESS_SRC})

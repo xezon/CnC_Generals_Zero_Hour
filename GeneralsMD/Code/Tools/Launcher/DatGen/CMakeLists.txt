@@ -6,15 +6,16 @@ set(DATGEN_SRC
     "../Toolkit/Debug/DebugPrint.h"
 )
 
-add_executable(datgen WIN32)
+add_executable(z_datgen WIN32)
+set_target_properties(z_datgen PROPERTIES OUTPUT_NAME datgen)
 
-target_include_directories(datgen PRIVATE
+target_include_directories(z_datgen PRIVATE
     ../
     ../Toolkit
 )
 
-target_link_libraries(datgen PRIVATE
+target_link_libraries(z_datgen PRIVATE
     safedisc
 )
 
-target_sources(datgen PRIVATE ${DATGEN_SRC})
+target_sources(z_datgen PRIVATE ${DATGEN_SRC})

@@ -1,24 +1,24 @@
 # Interface libraries to set common defines and includes, avoid duplication later
-add_library(wwcommon INTERFACE)
+add_library(z_wwcommon INTERFACE)
 
-target_compile_definitions(wwcommon INTERFACE
+target_compile_definitions(z_wwcommon INTERFACE
     #NOMINMAX
     WIN32_LEAN_AND_MEAN
     $<$<CONFIG:Debug>:WWDEBUG>
     $<$<CONFIG:Debug>:_DEBUG>
 )
 
-target_compile_options(wwcommon INTERFACE
+target_compile_options(z_wwcommon INTERFACE
     ${GENZH_FLAGS}
 )
 
-target_link_libraries(wwcommon INTERFACE
+target_link_libraries(z_wwcommon INTERFACE
     stlport
     milesstub
     d3d8lib
 )
 
-target_include_directories(wwcommon INTERFACE
+target_include_directories(z_wwcommon INTERFACE
     WWDebug
     WWLib
     WWMath
@@ -40,9 +40,9 @@ add_subdirectory(WWDownload)
 add_subdirectory(wwshade)
 
 # Helpful interface to bundle the ww modules together.
-add_library(wwvegas INTERFACE)
+add_library(z_wwvegas INTERFACE)
 
-target_include_directories(wwvegas INTERFACE
+target_include_directories(z_wwvegas INTERFACE
     WWDebug
     WWLib
     WWMath
@@ -54,13 +54,13 @@ target_include_directories(wwvegas INTERFACE
     .
 )
 
-target_link_libraries(wwvegas INTERFACE
-    wwdebug
-    wwlib
-    wwmath
-    wwutil
-    wwsaveload
-    ww3d2
-    wwdownload
-    wwshade
+target_link_libraries(z_wwvegas INTERFACE
+    z_wwdebug
+    z_wwlib
+    z_wwmath
+    z_wwutil
+    z_wwsaveload
+    z_ww3d2
+    z_wwdownload
+    z_wwshade
 )

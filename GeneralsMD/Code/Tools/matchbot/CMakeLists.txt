@@ -59,15 +59,17 @@ set(MATCHBOT_SRC
     "wnet/udp.h"
 )
 
-add_executable(matchbot WIN32)
-target_include_directories(matchbot PRIVATE . wlib wnet)
-target_sources(matchbot PRIVATE ${MATCHBOT_SRC})
+add_executable(z_matchbot WIN32)
+set_target_properties(z_matchbot PROPERTIES OUTPUT_NAME matchbot)
 
-target_link_libraries(matchbot PRIVATE
+target_include_directories(z_matchbot PRIVATE . wlib wnet)
+target_sources(z_matchbot PRIVATE ${MATCHBOT_SRC})
+
+target_link_libraries(z_matchbot PRIVATE
     gamespy::gamespy
     stlport
 )
 
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
-    target_link_options(matchbot PRIVATE /subsystem:console)
+    target_link_options(z_matchbot PRIVATE /subsystem:console)
 endif()

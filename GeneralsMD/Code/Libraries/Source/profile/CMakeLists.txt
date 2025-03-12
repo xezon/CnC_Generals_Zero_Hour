@@ -1,14 +1,15 @@
-add_library(profile STATIC)
+add_library(z_profile STATIC)
+set_target_properties(z_profile PROPERTIES OUTPUT_NAME profile)
 
-target_include_directories(profile INTERFACE
+target_include_directories(z_profile INTERFACE
     .
 )
 
-target_link_libraries(profile PRIVATE
+target_link_libraries(z_profile PRIVATE
     zi_libraries_include
 )
 
-target_sources(profile PRIVATE
+target_sources(z_profile PRIVATE
     profile_funclevel.cpp
 	profile_funclevel.h
 	profile_highlevel.cpp
@@ -28,4 +29,4 @@ target_sources(profile PRIVATE
 	profile_doc.h
 )
 
-set_target_properties(profile PROPERTIES OUTPUT_NAME $<IF:$<CONFIG:Debug>,profiledebug,profile>)
+set_target_properties(z_profile PROPERTIES OUTPUT_NAME $<IF:$<CONFIG:Debug>,profiledebug,profile>)

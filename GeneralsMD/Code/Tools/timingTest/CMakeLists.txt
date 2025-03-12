@@ -4,14 +4,15 @@ set(TIMINGTEST_SRC
     "timingTest.cpp"
 )
 
-add_executable(timingtest WIN32)
+add_executable(z_timingtest WIN32)
+set_target_properties(z_timingtest PROPERTIES OUTPUT_NAME timingtest)
 
-target_link_libraries(timingtest PRIVATE
+target_link_libraries(z_timingtest PRIVATE
     winmm
 )
 
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
-    target_link_options(timingtest PRIVATE /subsystem:console)
+    target_link_options(z_timingtest PRIVATE /subsystem:console)
 endif()
 
-target_sources(timingtest PRIVATE ${TIMINGTEST_SRC})
+target_sources(z_timingtest PRIVATE ${TIMINGTEST_SRC})

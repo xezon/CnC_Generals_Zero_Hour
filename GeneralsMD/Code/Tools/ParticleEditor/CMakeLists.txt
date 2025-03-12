@@ -28,16 +28,15 @@ set(PARTICLEED_SRC
 )
 
 # Targets to build.
-add_library(particleeditor SHARED)
+add_library(z_particleeditor SHARED)
+set_target_properties(z_particleeditor PROPERTIES OUTPUT_NAME particleeditor PREFIX "")
 
-set_target_properties(particleeditor PROPERTIES PREFIX "")
-
-target_include_directories(particleeditor PRIVATE
+target_include_directories(z_particleeditor PRIVATE
     include
     res
 )
 
-target_link_libraries(particleeditor PRIVATE
+target_link_libraries(z_particleeditor PRIVATE
     zi_gameengine_include
     zi_libraries_include
     zi_libraries_source_wwvegas
@@ -47,17 +46,17 @@ target_link_libraries(particleeditor PRIVATE
     imm32
     vfw32
     d3d8lib
-    profile
+    z_profile
     dbghelplib
 )
 
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
-    target_link_options(particleeditor PRIVATE /NODEFAULTLIB:libci.lib /NODEFAULTLIB:libc.lib)
-    target_compile_definitions(particleeditor PRIVATE _AFXDLL)
-    target_sources(particleeditor PRIVATE ParticleEditor.rc)
-    set_target_properties(particleeditor PROPERTIES OUTPUT_NAME ParticleEditor)
+    target_link_options(z_particleeditor PRIVATE /NODEFAULTLIB:libci.lib /NODEFAULTLIB:libc.lib)
+    target_compile_definitions(z_particleeditor PRIVATE _AFXDLL)
+    target_sources(z_particleeditor PRIVATE ParticleEditor.rc)
+    set_target_properties(z_particleeditor PROPERTIES OUTPUT_NAME ParticleEditor)
 else()
-    set_target_properties(particleeditor PROPERTIES OUTPUT_NAME particleeditor)
+    set_target_properties(z_particleeditor PROPERTIES OUTPUT_NAME particleeditor)
 endif()
 
-target_sources(particleeditor PRIVATE ${PARTICLEED_SRC})
+target_sources(z_particleeditor PRIVATE ${PARTICLEED_SRC})

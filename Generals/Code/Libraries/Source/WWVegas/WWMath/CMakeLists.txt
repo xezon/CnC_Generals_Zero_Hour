@@ -80,10 +80,11 @@ set(WWMATH_SRC
 )
 
 # Targets to build.
-add_library(wwmathg STATIC)
+add_library(g_wwmath STATIC)
+set_target_properties(g_wwmath PROPERTIES OUTPUT_NAME wwmath)
 
-target_link_libraries(wwmathg PRIVATE
-    wwcommong
+target_link_libraries(g_wwmath PRIVATE
+    g_wwcommon
 )
 
-target_sources(wwmathg PRIVATE ${WWMATH_SRC})
+target_sources(g_wwmath PRIVATE ${WWMATH_SRC})

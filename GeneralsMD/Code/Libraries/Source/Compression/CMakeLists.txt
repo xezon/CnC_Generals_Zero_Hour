@@ -1,19 +1,20 @@
-add_library(compression STATIC)
+add_library(z_compression STATIC)
+set_target_properties(z_compression PROPERTIES OUTPUT_NAME compression)
 
-target_include_directories(compression INTERFACE
+target_include_directories(z_compression INTERFACE
     .
 )
 
-target_link_libraries(compression PRIVATE
+target_link_libraries(z_compression PRIVATE
     zi_libraries_include
 )
 
-target_link_libraries(compression PUBLIC
+target_link_libraries(z_compression PUBLIC
     liblzhl
     libzlib
 )
 
-target_sources(compression PRIVATE
+target_sources(z_compression PRIVATE
     EAC/btreeabout.cpp
     EAC/btreedecode.cpp
     EAC/btreeencode.cpp

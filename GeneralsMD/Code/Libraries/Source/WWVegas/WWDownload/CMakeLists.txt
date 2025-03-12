@@ -14,10 +14,11 @@ set(WWDOWNLOAD_SRC
 )
 
 # Targets to build.
-add_library(wwdownload STATIC)
+add_library(z_wwdownload STATIC)
+set_target_properties(z_wwdownload PROPERTIES OUTPUT_NAME wwdownload)
 
-target_link_libraries(wwdownload PRIVATE
-    wwcommon
+target_link_libraries(z_wwdownload PRIVATE
+    z_wwcommon
 )
 
-target_sources(wwdownload PRIVATE ${WWDOWNLOAD_SRC})
+target_sources(z_wwdownload PRIVATE ${WWDOWNLOAD_SRC})

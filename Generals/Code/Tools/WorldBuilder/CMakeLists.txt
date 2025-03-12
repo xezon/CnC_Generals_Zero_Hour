@@ -196,38 +196,38 @@ set(WORLDBUILDER_SRC
 )
 
 # Targets to build.
-add_executable(worldbuildergen WIN32)
+add_executable(g_worldbuilder WIN32)
 
-target_include_directories(worldbuildergen PRIVATE
+target_include_directories(g_worldbuilder PRIVATE
     .
     include
     res
 )
 
-target_compile_definitions(worldbuildergen PRIVATE _AFXDLL)
+target_compile_definitions(g_worldbuilder PRIVATE _AFXDLL)
 
-target_link_libraries(worldbuildergen PRIVATE
+target_link_libraries(g_worldbuilder PRIVATE
     gi_gameengine_include
     gi_gameenginedevice_include
     gi_libraries_include
-    gameengineg
-    gameenginedeviceg
-    browserdispatch
+    g_gameengine
+    g_gameenginedevice
+    z_browserdispatch
     winmm
     imm32
     vfw32
     d3d8lib
-    profile
+    z_profile
     dbghelplib
 )
 
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
-    target_link_options(worldbuildergen PRIVATE /NODEFAULTLIB:libci.lib /NODEFAULTLIB:libc.lib)
+    target_link_options(g_worldbuilder PRIVATE /NODEFAULTLIB:libci.lib /NODEFAULTLIB:libc.lib)
 
-    target_sources(worldbuildergen PRIVATE res/WorldBuilder.rc)
-    set_target_properties(worldbuildergen PROPERTIES OUTPUT_NAME WorldBuilder)
+    target_sources(g_worldbuilder PRIVATE res/WorldBuilder.rc)
+    set_target_properties(g_worldbuilder PROPERTIES OUTPUT_NAME WorldBuilder)
 else()
-    set_target_properties(worldbuildergen PROPERTIES OUTPUT_NAME worldbuilder)
+    set_target_properties(g_worldbuilder PROPERTIES OUTPUT_NAME worldbuilder)
 endif()
 
-target_sources(worldbuildergen PRIVATE ${WORLDBUILDER_SRC})
+target_sources(g_worldbuilder PRIVATE ${WORLDBUILDER_SRC})

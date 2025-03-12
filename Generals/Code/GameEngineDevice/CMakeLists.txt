@@ -1,24 +1,25 @@
-add_library(gameenginedeviceg STATIC)
+add_library(g_gameenginedevice STATIC)
+set_target_properties(g_gameenginedevice PROPERTIES OUTPUT_NAME gameenginedevice)
 
-target_include_directories(gameenginedeviceg PUBLIC
+target_include_directories(g_gameenginedevice PUBLIC
     Include
 )
 
-target_link_libraries(gameenginedeviceg PRIVATE
+target_link_libraries(g_gameenginedevice PRIVATE
     gi_main
     gi_libraries_include
     gi_libraries_source
 )
 
-target_link_libraries(gameenginedeviceg PUBLIC
-    gameengineg
+target_link_libraries(g_gameenginedevice PUBLIC
+    g_gameengine
     milesstub
     binkstub
     benchmark
     d3d8lib
 )
 
-target_sources(gameenginedeviceg PRIVATE
+target_sources(g_gameenginedevice PRIVATE
     Source/W3DDevice/GameLogic/W3DGameLogic.cpp
     Source/W3DDevice/GameLogic/W3DGhostObject.cpp
     Source/W3DDevice/GameLogic/W3DTerrainLogic.cpp

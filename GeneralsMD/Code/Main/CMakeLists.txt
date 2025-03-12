@@ -1,10 +1,11 @@
-add_executable(zerohour WIN32)
+add_executable(z_generals WIN32)
+set_target_properties(z_generals PROPERTIES OUTPUT_NAME generals)
 
-target_link_libraries(zerohour PRIVATE
+target_link_libraries(z_generals PRIVATE
     zi_libraries_include
     zi_libraries_source
-    gameengine
-    gameenginedevice
+    z_gameengine
+    z_gameenginedevice
     winmm
     imm32
     dbghelplib
@@ -15,7 +16,7 @@ target_link_libraries(zerohour PRIVATE
     dxguid
     binkstub
     milesstub
-    profile
+    z_profile
     safedisc
 )
 
@@ -39,20 +40,20 @@ file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/BuildVersion.h
 "
 )
 
-target_link_options(zerohour PRIVATE "/NODEFAULTLIB:libci.lib")
+target_link_options(z_generals PRIVATE "/NODEFAULTLIB:libci.lib")
 
-target_include_directories(zerohour PRIVATE
+target_include_directories(z_generals PRIVATE
     .
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-target_sources(zerohour PRIVATE
+target_sources(z_generals PRIVATE
     WinMain.cpp
     WinMain.h
 )
 
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
-    target_sources(zerohour PRIVATE
+    target_sources(z_generals PRIVATE
         RTS.RC
     )
 endif()

@@ -49,24 +49,25 @@ set(LAUNCHER_SRC
     "Toolkit/Support/Visualc.h"
 )
 
-add_executable(launcher WIN32)
+add_executable(z_launcher WIN32)
+set_target_properties(z_launcher PROPERTIES OUTPUT_NAME launcher)
 
-target_include_directories(launcher PRIVATE
+target_include_directories(z_launcher PRIVATE
     Toolkit
 )
 
-target_compile_definitions(launcher PRIVATE
+target_compile_definitions(z_launcher PRIVATE
     USE_NOTEPAD
     $<$<CONFIG:Debug>:USE_GAMEDIR_FROM_LCF>
 )
 
-target_link_libraries(launcher PRIVATE
+target_link_libraries(z_launcher PRIVATE
     comctl32
     safedisc
 )
 
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
-    target_sources(launcher PRIVATE launcher1.rc)
+    target_sources(z_launcher PRIVATE launcher1.rc)
 endif()
 
-target_sources(launcher PRIVATE ${LAUNCHER_SRC})
+target_sources(z_launcher PRIVATE ${LAUNCHER_SRC})

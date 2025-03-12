@@ -1,43 +1,41 @@
-add_library(gameengineg STATIC)
+add_library(g_gameengine STATIC)
+set_target_properties(g_gameengine PROPERTIES OUTPUT_NAME $<IF:$<CONFIG:Debug>,gameenginedebug,gameengine>)
 
-target_include_directories(gameengineg PUBLIC
+target_include_directories(g_gameengine PUBLIC
     Include
 )
-
-set_target_properties(gameengineg PROPERTIES OUTPUT_NAME $<IF:$<CONFIG:Debug>,gameenginedebug,gameengine>)
-
-target_include_directories(gameengineg PRIVATE
+target_include_directories(g_gameengine PRIVATE
     Include/Precompiled
 )
 
-target_link_libraries(gameengineg PRIVATE
+target_link_libraries(g_gameengine PRIVATE
     gi_libraries_include
     gi_libraries_source
 )
 
-target_link_libraries(gameengineg PUBLIC
+target_link_libraries(g_gameengine PUBLIC
     stlport
     d3d8lib
-    wwvegasg
-    compression
-    browserdispatch
+    g_wwvegas
+    z_compression
+    z_browserdispatch
     gamespy::gamespy
 )
 
-target_compile_options(gameengineg INTERFACE
+target_compile_options(g_gameengine INTERFACE
     ${GENZH_FLAGS}
 )
 
-target_compile_definitions(gameengineg PRIVATE
+target_compile_definitions(g_gameengine PRIVATE
     IG_DEBUG_STACKTRACE
 )
 
-target_compile_definitions(gameengineg PUBLIC
+target_compile_definitions(g_gameengine PUBLIC
     $<$<CONFIG:Debug>:_DEBUG>
     $<$<CONFIG:Debug>:DEBUG>
 )
 
-target_sources(gameengineg PRIVATE
+target_sources(g_gameengine PRIVATE
     Source/Common/Thing/DrawModule.cpp
     Source/Common/Thing/Module.cpp
     Source/Common/Thing/ModuleFactory.cpp

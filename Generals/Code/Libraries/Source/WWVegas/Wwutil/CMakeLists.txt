@@ -7,10 +7,11 @@ set(WWUTIL_SRC
 )
 
 # Targets to build.
-add_library(wwutilg STATIC)
+add_library(g_wwutil STATIC)
+set_target_properties(g_wwutil PROPERTIES OUTPUT_NAME wwutil)
 
-target_link_libraries(wwutilg PRIVATE
-    wwcommong
+target_link_libraries(g_wwutil PRIVATE
+    g_wwcommon
 )
 
-target_sources(wwutilg PRIVATE ${WWUTIL_SRC})
+target_sources(g_wwutil PRIVATE ${WWUTIL_SRC})

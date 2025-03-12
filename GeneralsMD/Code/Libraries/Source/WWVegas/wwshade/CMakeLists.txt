@@ -70,10 +70,11 @@ if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
     endforeach()
 endif()
 
-add_library(wwshade STATIC)
+add_library(z_wwshade STATIC)
+set_target_properties(z_wwshade PROPERTIES OUTPUT_NAME wwshade)
 
-target_link_libraries(wwshade PRIVATE
-    wwcommon
+target_link_libraries(z_wwshade PRIVATE
+    z_wwcommon
 )
 
-target_sources(wwshade PRIVATE ${WWSHADE_SRC})
+target_sources(z_wwshade PRIVATE ${WWSHADE_SRC})

@@ -222,10 +222,11 @@ set(WW3D2_SRC
 )
 
 # Targets to build.
-add_library(ww3d2g STATIC)
+add_library(g_ww3d2 STATIC)
+set_target_properties(g_ww3d2 PROPERTIES OUTPUT_NAME ww3d2)
 
-target_link_libraries(ww3d2g PRIVATE
-    wwcommong
+target_link_libraries(g_ww3d2 PRIVATE
+    g_wwcommon
 )
 
-target_sources(ww3d2g PRIVATE ${WW3D2_SRC})
+target_sources(g_ww3d2 PRIVATE ${WW3D2_SRC})

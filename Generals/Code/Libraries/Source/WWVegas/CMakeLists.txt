@@ -1,24 +1,24 @@
 # Interface libraries to set common defines and includes, avoid duplication later
-add_library(wwcommong INTERFACE)
+add_library(g_wwcommon INTERFACE)
 
-target_compile_definitions(wwcommong INTERFACE
+target_compile_definitions(g_wwcommon INTERFACE
     #NOMINMAX
     WIN32_LEAN_AND_MEAN
     $<$<CONFIG:Debug>:WWDEBUG>
     $<$<CONFIG:Debug>:_DEBUG>
 )
 
-target_compile_options(wwcommong INTERFACE
+target_compile_options(g_wwcommon INTERFACE
     ${WARNING_FLAGS}
 )
 
-target_link_libraries(wwcommong INTERFACE
+target_link_libraries(g_wwcommon INTERFACE
     stlport
     milesstub
     d3d8lib
 )
 
-target_include_directories(wwcommong INTERFACE
+target_include_directories(g_wwcommon INTERFACE
     WWDebug
     WWLib
     WWMath
@@ -38,9 +38,9 @@ add_subdirectory(WW3D2)
 add_subdirectory(WWDownload)
 
 # Helpful interface to bundle the ww modules together.
-add_library(wwvegasg INTERFACE)
+add_library(g_wwvegas INTERFACE)
 
-target_include_directories(wwvegasg INTERFACE
+target_include_directories(g_wwvegas INTERFACE
     WWDebug
     WWLib
     WWMath
@@ -51,12 +51,12 @@ target_include_directories(wwvegasg INTERFACE
     .
 )
 
-target_link_libraries(wwvegasg INTERFACE
-    wwdebugg
-    wwlibg
-    wwmathg
-    wwutilg
-    wwsaveloadg
-    ww3d2g
-    wwdownloadg
+target_link_libraries(g_wwvegas INTERFACE
+    g_wwdebug
+    g_wwlib
+    g_wwmath
+    g_wwutil
+    g_wwsaveload
+    g_ww3d2
+    g_wwdownload
 )

@@ -63,9 +63,13 @@ if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
 endif()
 endmacro()
 
-setup_autorun(autorun_en)
-setup_autorun(autorun_de)
-setup_autorun(autorun_fr)
-setup_autorun(autorun_es)
+setup_autorun(z_autorun_en)
+setup_autorun(z_autorun_de)
+setup_autorun(z_autorun_fr)
+setup_autorun(z_autorun_es)
+set_target_properties(z_autorun_en PROPERTIES OUTPUT_NAME autorun_en)
+set_target_properties(z_autorun_de PROPERTIES OUTPUT_NAME autorun_de)
+set_target_properties(z_autorun_fr PROPERTIES OUTPUT_NAME autorun_fr)
+set_target_properties(z_autorun_es PROPERTIES OUTPUT_NAME autorun_es)
 
 # TODO: Configure different resources for languages. See Autorun.dsp
