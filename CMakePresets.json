@@ -32,10 +32,11 @@
             }
         },
         {
-            "name": "win",
+            "name": "win32",
+            "architecture": "Win32",
             "inherits": "default",
             "hidden": false,
-            "displayName": "Windows builds",
+            "displayName": "Win32 build",
             "cacheVariables": {
                 "GENZH_FLAGS": "/W3"
             }
@@ -44,7 +45,7 @@
             "name": "unix",
             "inherits": "default",
             "hidden": false,
-            "displayName": "None Windows builds",
+            "displayName": "Non Windows build",
             "cacheVariables": {
                 "CMAKE_CXX_FLAGS_RELEASE": "-O2 -g -DNDEBUG",
                 "CMAKE_C_FLAGS_RELEASE": "-O2 -g -DNDEBUG"
@@ -53,8 +54,8 @@
     ],
     "buildPresets": [
         {
-            "name": "win",
-            "configurePreset": "win",
+            "name": "win32",
+            "configurePreset": "win32",
             "displayName": "Build Windows build",
             "description": "Build Windows build",
             "configuration": "Release"
@@ -69,15 +70,15 @@
     ],
     "workflowPresets": [
         {
-            "name": "win",
+            "name": "win32",
             "steps": [
                 {
                     "type": "configure",
-                    "name": "win"
+                    "name": "win32"
                 },
                 {
                     "type": "build",
-                    "name": "win"
+                    "name": "win32"
                 }
             ]
         },
