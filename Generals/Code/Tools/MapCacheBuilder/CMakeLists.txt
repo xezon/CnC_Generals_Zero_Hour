@@ -15,13 +15,13 @@ target_include_directories(g_mapcachebuilder PRIVATE
 )
 #
 target_link_libraries(g_mapcachebuilder PRIVATE
-    gi_libraries_include
-    winmm
-    imm32
-    vfw32
     dbghelplib
     g_gameengine
     g_gameenginedevice
+    gi_libraries_include
+    imm32
+    vfw32
+    winmm
 )
 
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")

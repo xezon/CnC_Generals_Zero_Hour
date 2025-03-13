@@ -27,15 +27,15 @@ target_include_directories(g_imagepacker PRIVATE
 )
 
 target_link_libraries(g_imagepacker PRIVATE
-    gi_libraries_include
-    comctl32
-    winmm
-    imm32
-    vfw32
     benchmark
+    comctl32
     dbghelplib
     g_gameengine
     g_gameenginedevice
+    gi_libraries_include
+    imm32
+    vfw32
+    winmm
 )
 
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")

@@ -1075,12 +1075,12 @@ target_link_libraries(g_gameengine PRIVATE
 )
 
 target_link_libraries(g_gameengine PUBLIC
-    stlport
     d3d8lib
-    g_wwvegas
-    g_compression
     g_browserdispatch
+    g_compression
+    g_wwvegas
     gamespy::gamespy
+    stlport
 )
 
 target_compile_options(g_gameengine INTERFACE

@@ -2,22 +2,22 @@ add_executable(z_generals WIN32)
 set_target_properties(z_generals PROPERTIES OUTPUT_NAME generals)
 
 target_link_libraries(z_generals PRIVATE
-    zi_libraries_include
-    zi_libraries_source
-    z_gameengine
-    z_gameenginedevice
-    winmm
-    imm32
-    dbghelplib
-    vfw32
+    binkstub
     d3d8
     d3dx8
+    dbghelplib
     dinput8
     dxguid
-    binkstub
+    imm32
     milesstub
-    z_profile
     safedisc
+    vfw32
+    winmm
+    z_gameengine
+    z_gameenginedevice
+    z_profile
+    zi_libraries_include
+    zi_libraries_source
 )
 
 # TODO Originally referred to build host and user, replace with git info perhaps?

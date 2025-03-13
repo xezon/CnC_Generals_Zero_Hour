@@ -1159,12 +1159,12 @@ target_link_libraries(z_gameengine PRIVATE
 )
 
 target_link_libraries(z_gameengine PUBLIC
-    stlport
     d3d8lib
-    z_wwvegas
-    z_compression
-    z_browserdispatch
     gamespy::gamespy
+    stlport
+    z_browserdispatch
+    z_compression
+    z_wwvegas
 )
 
 target_compile_options(z_gameengine INTERFACE

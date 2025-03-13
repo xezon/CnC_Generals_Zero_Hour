@@ -54,8 +54,8 @@ add_executable(${appname} WIN32)
 target_sources(${appname} PRIVATE ${AUTORUN_SRC})
 
 target_link_libraries(${appname} PRIVATE
-    zi_libraries_include
     winmm
+    zi_libraries_include
 )
 
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")

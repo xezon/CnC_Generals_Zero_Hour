@@ -46,18 +46,18 @@ target_include_directories(g_guiedit PRIVATE
 )
 
 target_link_libraries(g_guiedit PRIVATE
-    gi_libraries_include
+    benchmark
     comctl32
-    stlport
-    winmm
-    imm32
-    vfw32
     d3d8lib
     dbghelplib
-    benchmark
-    g_wwvegas
     g_gameengine
     g_gameenginedevice
+    g_wwvegas
+    gi_libraries_include
+    imm32
+    stlport
+    vfw32
+    winmm
 )
 
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")

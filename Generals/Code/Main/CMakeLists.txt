@@ -3,21 +3,21 @@ add_executable(g_generals WIN32)
 set_target_properties(g_generals PROPERTIES OUTPUT_NAME generals)
 
 target_link_libraries(g_generals PRIVATE
-    gi_libraries_include
-    gi_libraries_source
-    g_gameengine
-    g_gameenginedevice
-    winmm
-    imm32
-    dbghelplib
-    vfw32
+    binkstub
     d3d8
     d3dx8
+    dbghelplib
     dinput8
     dxguid
-    binkstub
+    g_gameengine
+    g_gameenginedevice
+    gi_libraries_include
+    gi_libraries_source
+    imm32
     milesstub
     safedisc
+    vfw32
+    winmm
 )
 
 # TODO Originally referred to build host and user, replace with git info perhaps?

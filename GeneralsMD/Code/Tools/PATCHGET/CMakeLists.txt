@@ -21,17 +21,17 @@ macro(setup_patchgrabber appname)
     add_executable(${appname} WIN32)
     target_sources(${appname} PRIVATE ${PATCHGET_SRC})
     target_link_libraries(${appname} PRIVATE
-        zi_libraries_include
-        gamespy::gamespy
         comctl32
+        dbghelplib
+        gamespy::gamespy
+        imm32
+        vfw32
         winmm
-        z_wwvegas
         z_gameengine
         z_gameenginedevice
-        dbghelplib
         z_profile
-        vfw32
-        imm32
+        z_wwvegas
+        zi_libraries_include
     )
 
     if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")

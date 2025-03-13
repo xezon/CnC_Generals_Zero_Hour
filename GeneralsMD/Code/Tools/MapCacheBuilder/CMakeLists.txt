@@ -15,14 +15,14 @@ target_include_directories(z_mapcachebuilder PRIVATE
 )
 #
 target_link_libraries(z_mapcachebuilder PRIVATE
-    zi_libraries_include
-    winmm
+    dbghelplib
     imm32
     vfw32
-    z_profile
-    dbghelplib
+    winmm
     z_gameengine
     z_gameenginedevice
+    z_profile
+    zi_libraries_include
 )
 
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")

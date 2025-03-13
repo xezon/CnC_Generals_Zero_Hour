@@ -13,20 +13,20 @@ target_compile_options(g_wwcommon INTERFACE
 )
 
 target_link_libraries(g_wwcommon INTERFACE
-    stlport
-    milesstub
     d3d8lib
+    milesstub
+    stlport
 )
 
 target_include_directories(g_wwcommon INTERFACE
+    .
+    WW3D2
+    WWAudio
     WWDebug
     WWLib
     WWMath
-    Wwutil
     WWSaveLoad
-    WW3D2
-    WWAudio
-    .
+    Wwutil
 )
 
 add_subdirectory(WWDebug)
@@ -41,22 +41,22 @@ add_subdirectory(WWDownload)
 add_library(g_wwvegas INTERFACE)
 
 target_include_directories(g_wwvegas INTERFACE
+    .
+    WW3D2
     WWDebug
+    WWDownload
     WWLib
     WWMath
-    WW3D2
-    WWDownload
     WWSaveLoad
     Wwutil
-    .
 )
 
 target_link_libraries(g_wwvegas INTERFACE
+    g_ww3d2
     g_wwdebug
+    g_wwdownload
     g_wwlib
     g_wwmath
-    g_wwutil
     g_wwsaveload
-    g_ww3d2
-    g_wwdownload
+    g_wwutil
 )

@@ -41,16 +41,16 @@ target_include_directories(g_particleeditor PRIVATE
 target_compile_definitions(g_particleeditor PRIVATE _AFXDLL)
 
 target_link_libraries(g_particleeditor PRIVATE
+    d3d8lib
+    dbghelplib
     gi_gameengine_include
     gi_libraries_include
     gi_libraries_source_wwvegas
     gi_libraries_source_wwvegas_wwlib
-    stlport
-    winmm
     imm32
+    stlport
     vfw32
-    d3d8lib
-    dbghelplib
+    winmm
 )
 
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")

@@ -37,17 +37,17 @@ target_include_directories(z_particleeditor PRIVATE
 )
 
 target_link_libraries(z_particleeditor PRIVATE
+    d3d8lib
+    dbghelplib
+    imm32
+    stlport
+    vfw32
+    winmm
+    z_profile
     zi_gameengine_include
     zi_libraries_include
     zi_libraries_source_wwvegas
     zi_libraries_source_wwvegas_wwlib
-    stlport
-    winmm
-    imm32
-    vfw32
-    d3d8lib
-    z_profile
-    dbghelplib
 )
 
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")

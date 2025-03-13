@@ -164,9 +164,9 @@ target_link_libraries(z_max2w3d PRIVATE
     # The headers typedef INT_PTR to different types, but maxsdk expects it
     # typedef'ed to int, otherwise throws linker errors.
     d3d8lib
+    maxsdk
     pluglib
     winmm
-    maxsdk
 )
 
 set_target_properties(z_max2w3d PROPERTIES LINK_FLAGS "/DEF:max2w3d.def")

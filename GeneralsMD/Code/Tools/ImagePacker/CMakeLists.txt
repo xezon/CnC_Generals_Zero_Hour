@@ -27,16 +27,16 @@ target_include_directories(z_imagepacker PRIVATE
 )
 
 target_link_libraries(z_imagepacker PRIVATE
-    zi_libraries_include
+    benchmark
     comctl32
-    winmm
+    dbghelplib
     imm32
     vfw32
-    benchmark
-    dbghelplib
-    z_profile
+    winmm
     z_gameengine
     z_gameenginedevice
+    z_profile
+    zi_libraries_include
 )
 
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")

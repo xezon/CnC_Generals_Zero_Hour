@@ -10,9 +10,9 @@ set_target_properties(z_compress PROPERTIES OUTPUT_NAME compress)
 target_sources(z_compress PRIVATE ${COMRPESS_SRC})
 
 target_link_libraries(z_compress PRIVATE
+    z_compression
     zi_libraries_include
     zi_libraries_source
-    z_compression
 )
 
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")

@@ -206,15 +206,15 @@ target_include_directories(z_gameenginedevice PUBLIC
 )
 
 target_link_libraries(z_gameenginedevice PRIVATE
-    zi_main
     zi_libraries_include
     zi_libraries_source
+    zi_main
 )
 
 target_link_libraries(z_gameenginedevice PUBLIC
-    z_gameengine
-    milesstub
-    binkstub
     benchmark
+    binkstub
     d3d8lib
+    milesstub
+    z_gameengine
 )

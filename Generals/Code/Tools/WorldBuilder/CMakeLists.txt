@@ -207,17 +207,17 @@ target_include_directories(g_worldbuilder PRIVATE
 target_compile_definitions(g_worldbuilder PRIVATE _AFXDLL)
 
 target_link_libraries(g_worldbuilder PRIVATE
+    d3d8lib
+    dbghelplib
+    g_browserdispatch
+    g_gameengine
+    g_gameenginedevice
     gi_gameengine_include
     gi_gameenginedevice_include
     gi_libraries_include
-    g_gameengine
-    g_gameenginedevice
-    g_browserdispatch
-    winmm
     imm32
     vfw32
-    d3d8lib
-    dbghelplib
+    winmm
 )
 
 if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
