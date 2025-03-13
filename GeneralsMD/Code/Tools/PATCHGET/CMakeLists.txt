@@ -34,6 +34,10 @@ macro(setup_patchgrabber appname)
         zi_libraries_include
     )
 
+    target_compile_definitions(${appname} PRIVATE
+        $<$<CONFIG:Debug>:DEBUG_CRASHING>
+    )
+
     if(WIN32 OR "${CMAKE_SYSTEM}" MATCHES "Windows")
         target_sources(${appname} PRIVATE SCRIPT1.RC)
     endif()
