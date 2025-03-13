@@ -28,8 +28,6 @@ namespace patchget
 
 #ifdef DEBUG
 
-#include <cstdarg>
-
 void DebugLog( const char *fmt, ... );
 #define DEBUG_LOG(x) DebugLog x
 

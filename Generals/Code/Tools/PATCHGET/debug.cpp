@@ -22,6 +22,7 @@
 
 #include <windows.h>
 #include "debug.h"
+#include <cstdarg>
 #include <cstdio>
 
 namespace patchget
