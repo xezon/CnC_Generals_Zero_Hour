@@ -1023,7 +1023,8 @@ void WOLDisplayGameOptions( void )
     GadgetCheckBoxSetChecked( checkBoxLimitSuperweapons, limitSuperweapons );
   
   Int itemCount = GadgetComboBoxGetLength(comboBoxStartingCash);
-  for ( Int index = 0; index < itemCount; index++ )
+  Int index = 0;
+  for ( ; index < itemCount; index++ )
   {
     Int value  = (Int)GadgetComboBoxGetItemData(comboBoxStartingCash, index);
     if ( value == theGame->getStartingCash().countMoney() )

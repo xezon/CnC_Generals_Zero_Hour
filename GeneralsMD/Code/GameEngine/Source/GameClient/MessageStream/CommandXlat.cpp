@@ -4054,7 +4054,7 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 		//-----------------------------------------------------------------------------------------
 		case GameMessage::MSG_META_DEMO_TOGGLE_BW_VIEW:
 		{   //We're not testing BW mode anymore, so use this message for toggling wireframe mode.
-			static mode=0;
+			static Int mode=0;
 			if (mode == 0)
 			{	//First turn on wireframe
 				TheTacticalView->set3DWireFrameMode(TRUE);
@@ -5026,12 +5026,13 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 		//-----------------------------------------------------------------------------------------
 		case GameMessage::MSG_META_DEBUG_OBJECT_ID_PERFORMANCE:
 		{
+            Int testindex;
 			static __int64 startTime64;
 			static __int64 endTime64,freq64;
 			QueryPerformanceCounter((LARGE_INTEGER *)&startTime64);
 			QueryPerformanceFrequency((LARGE_INTEGER *)&freq64);
 			Int numberLookups = 10000;
-			for( Int testindex = 1; testindex < numberLookups; testindex++ )
+			for( testindex = 1; testindex < numberLookups; testindex++ )
 			{
 				Object *objPtr = TheGameLogic->findObjectByID((ObjectID)testindex);
 				objPtr++;
@@ -5076,12 +5077,13 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 		//-----------------------------------------------------------------------------------------
 		case GameMessage::MSG_META_DEBUG_DRAWABLE_ID_PERFORMANCE:
 		{
+            Int testindex;
 			static __int64 startTime64;
 			static __int64 endTime64,freq64;
 			QueryPerformanceCounter((LARGE_INTEGER *)&startTime64);
 			QueryPerformanceFrequency((LARGE_INTEGER *)&freq64);
 			Int numberLookups = 10000;
-			for( Int testindex = 1; testindex < numberLookups; testindex++ )
+			for( testindex = 1; testindex < numberLookups; testindex++ )
 			{
 				Drawable *drawPtr = TheGameClient->findDrawableByID((DrawableID)testindex);
 				drawPtr++;

@@ -3138,7 +3138,8 @@ void MemoryPoolFactory::debugMemoryReport(Int flags, Int startCheckpoint, Int en
 		DEBUG_LOG(("------------------------------------------\n"));
 		DEBUG_LOG(("Begin Pool Overflow Report\n"));
 		DEBUG_LOG(("------------------------------------------\n"));
-		for (MemoryPool *pool = m_firstPoolInFactory; pool; pool = pool->getNextPoolInList())
+        MemoryPool *pool;
+		for (pool = m_firstPoolInFactory; pool; pool = pool->getNextPoolInList())
 		{
 			if (pool->getPeakBlockCount() > pool->getInitialBlockCount())
 			{
