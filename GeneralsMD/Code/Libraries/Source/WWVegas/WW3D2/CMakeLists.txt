@@ -249,4 +249,5 @@ endif()
 target_link_libraries(z_ww3d2 PRIVATE
     z_browserengine
     z_wwcommon
+    zi_libraries_include
 )

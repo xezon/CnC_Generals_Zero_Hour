@@ -44,4 +44,5 @@ target_sources(z_wwsaveload PRIVATE ${WWSAVELOAD_SRC})
 
 target_link_libraries(z_wwsaveload PRIVATE
     z_wwcommon
+    zi_libraries_include
 )

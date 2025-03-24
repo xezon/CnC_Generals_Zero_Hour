@@ -87,4 +87,5 @@ target_sources(z_wwmath PRIVATE ${WWMATH_SRC})
 
 target_link_libraries(z_wwmath PRIVATE
     z_wwcommon
+    zi_libraries_include
 )

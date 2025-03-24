@@ -12,6 +12,7 @@ set_target_properties(z_wwutil PROPERTIES OUTPUT_NAME wwutil)
 
 target_link_libraries(z_wwutil PRIVATE
     z_wwcommon
+    zi_libraries_include
 )
 
 target_sources(z_wwutil PRIVATE ${WWUTIL_SRC})

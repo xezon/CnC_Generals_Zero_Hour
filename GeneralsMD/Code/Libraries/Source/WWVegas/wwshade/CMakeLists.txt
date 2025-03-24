@@ -77,4 +77,5 @@ target_sources(z_wwshade PRIVATE ${WWSHADE_SRC})
 
 target_link_libraries(z_wwshade PRIVATE
     z_wwcommon
+    zi_libraries_include
 )
