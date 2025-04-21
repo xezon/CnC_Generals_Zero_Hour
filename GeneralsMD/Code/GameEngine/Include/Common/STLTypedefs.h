@@ -160,7 +160,7 @@ namespace rts
 
 	template<> struct hash<DrawableID>
 	{
-		size_t operator()(DrawableID nkt) const
+		size_t operator()(const DrawableID& nkt) const
 		{ 
 			std::hash<UnsignedInt> tmp;
 			return tmp((UnsignedInt)nkt);
@@ -169,7 +169,7 @@ namespace rts
 
 	template<> struct hash<ObjectID>
 	{
-		size_t operator()(ObjectID nkt) const
+		size_t operator()(const ObjectID& nkt) const
 		{ 
 			std::hash<UnsignedInt> tmp;
 			return tmp((UnsignedInt)nkt);
