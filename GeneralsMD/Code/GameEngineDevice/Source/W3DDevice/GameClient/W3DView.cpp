@@ -410,8 +410,7 @@ void W3DView::buildCameraTransform( Matrix3D *transform )
 
 	//WST 11/12/2002 New camera shaker system
 	// TheSuperHackers @tweak The camera shaker is now decoupled from the render update.
-	const Real logicTimeScaleOverFpsRatio = TheGameEngine->getActualLogicTimeScaleOverFpsRatio();
-	CameraShakerSystem.Timestep(TheW3DFrameLengthInMsec * logicTimeScaleOverFpsRatio);
+	CameraShakerSystem.Timestep(TheGameEngine->getLogicTimeStepMilliseconds());
 	CameraShakerSystem.Update_Camera_Shaker(sourcePos, &m_shakerAngles);
 	transform->Rotate_X(m_shakerAngles.X);
 	transform->Rotate_Y(m_shakerAngles.Y);
@@ -701,7 +700,7 @@ void W3DView::reset( void )
 static void drawDrawable( Drawable *draw, void *userData )
 {
 
-	draw->draw( (View *)userData );
+	draw->draw();
 
 }  // end drawDrawable
 
@@ -1057,8 +1056,7 @@ Bool W3DView::updateCameraMovements()
 	} else if (m_doingMoveCameraOnWaypointPath) {
 		m_previousLookAtPosition = *getPosition();
 		// TheSuperHackers @tweak The scripted camera movement is now decoupled from the render update.
-		const Real logicTimeScaleOverFpsRatio = TheGameEngine->getActualLogicTimeScaleOverFpsRatio();
-		moveAlongWaypointPath(TheW3DFrameLengthInMsec * logicTimeScaleOverFpsRatio);
+		moveAlongWaypointPath(TheGameEngine->getLogicTimeStepMilliseconds());
 		didUpdate = true;
 	}
 	if (m_doingScriptedCameraLock)
@@ -1114,16 +1112,16 @@ void W3DView::stepView()
 		m_shakeOffset.y = 0.0f;
 	}
 
-	if (TheScriptEngine->isTimeFast()) {
-		return; // don't draw - makes it faster :) jba.
-	}
+	//if (TheScriptEngine->isTimeFast()) {
+	//	return; // don't draw - makes it faster :) jba.
+	//}
 
-	Region3D axisAlignedRegion;
-	getAxisAlignedViewRegion(axisAlignedRegion);
+	//Region3D axisAlignedRegion;
+	//getAxisAlignedViewRegion(axisAlignedRegion);
 
-	// render all of the visible Drawables
-	/// @todo this needs to use a real region partition or something
-	TheGameClient->iterateDrawablesInRegion( &axisAlignedRegion, drawDrawable, this );
+	//// render all of the visible Drawables
+	///// @todo this needs to use a real region partition or something
+	//TheGameClient->iterateDrawablesInRegion( &axisAlignedRegion, drawDrawable, this );
 }
 
 //DECLARE_PERF_TIMER(W3DView_updateView)
@@ -1411,6 +1409,16 @@ void W3DView::update(void)
   // Give the terrain a chance to refresh animaing (Seismic) regions, if any.
   TheTerrainVisual->updateSeismicSimulations();
 #endif
+
+	//if (!W3DDisplay::isTimeFrozen())
+	{
+		Region3D axisAlignedRegion;
+		getAxisAlignedViewRegion(axisAlignedRegion);
+
+		// render all of the visible Drawables
+		/// @todo this needs to use a real region partition or something
+		TheGameClient->iterateDrawablesInRegion( &axisAlignedRegion, drawDrawable, NULL );
+	}
 }
 
 //-------------------------------------------------------------------------------------------------

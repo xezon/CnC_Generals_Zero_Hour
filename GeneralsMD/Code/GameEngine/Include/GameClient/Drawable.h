@@ -130,8 +130,8 @@ struct TWheelInfo
 	Real m_rearLeftHeightOffset;
 	Real m_rearRightHeightOffset;
 	Real m_wheelAngle;								///< Wheel angle.  0 = straight, >0 left, <0 right.
-	Int	 m_framesAirborneCounter;			///< Counter.
-	Int	 m_framesAirborne;						///< How many frames it was in the air.
+	Real m_framesAirborneCounter;			///< Counter.
+	Real m_framesAirborne;						///< How many logic frames it was in the air.
 };
 
 //-----------------------------------------------------------------------------
@@ -406,7 +406,7 @@ public:
 
 	const Matrix3D *getTransformMatrix( void ) const;	///< return the world transform
 
-	void draw( View *view );													///< render the drawable to the given view
+	void draw();													///< render the drawable to the given view
 	void updateDrawable();														///< update the drawable
 
 	void drawIconUI( void );													///< draw "icon"(s) needed on drawable (health bars, veterency, etc)

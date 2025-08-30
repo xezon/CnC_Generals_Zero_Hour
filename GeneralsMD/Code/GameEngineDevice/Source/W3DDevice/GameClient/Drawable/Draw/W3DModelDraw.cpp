@@ -38,6 +38,7 @@
 
 #include "Common/crc.h"
 #include "Common/CRCDebug.h"
+#include "Common/GameEngine.h"
 #include "Common/GameState.h"
 #include "Common/GlobalData.h"
 #include "Common/PerfTimer.h"

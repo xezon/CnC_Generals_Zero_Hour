@@ -33,6 +33,7 @@
 #include "Common/Thing.h"
 #include "Common/ThingFactory.h"
 #include "Common/GameAudio.h"
+#include "Common/GameEngine.h"
 #include "Common/ThingTemplate.h"
 #include "Common/Xfer.h"
 #include "GameLogic/Weapon.h"
@@ -312,10 +313,10 @@ void W3DTankDraw::doDrawModule(const Matrix3D* transformMtx)
 {
 	const Real DEBRIS_THRESHOLD = 0.00001f;
 
- 	Bool frozen = TheTacticalView->isTimeFrozen() && !TheTacticalView->isCameraMovementFinished();
- 	frozen = frozen || TheScriptEngine->isTimeFrozenDebug() || TheScriptEngine->isTimeFrozenScript();
-	if (frozen)
-		return;
+ //	Bool frozen = TheTacticalView->isTimeFrozen() && !TheTacticalView->isCameraMovementFinished();
+ //	frozen = frozen || TheScriptEngine->isTimeFrozenDebug() || TheScriptEngine->isTimeFrozenScript();
+	//if (frozen)
+	//	return;
 	if (getRenderObject()==NULL) return;
 	if (getRenderObject() != m_prevRenderObj) {
 		updateTreadObjects();
@@ -330,6 +331,8 @@ void W3DTankDraw::doDrawModule(const Matrix3D* transformMtx)
 	PhysicsBehavior *physics = obj->getPhysics();
 	if (physics == NULL)
 		return;
+
+	const Real timeScale = TheGameEngine->getActualLogicTimeScaleOverFpsRatio();
 
 	const Coord3D *vel = physics->getVelocity();
 
@@ -366,7 +369,7 @@ void W3DTankDraw::doDrawModule(const Matrix3D* transformMtx)
 	{
 		PhysicsTurningType turn=physics->getTurning();
 		Real offset_u;
-		Real treadScrollSpeed=getW3DTankDrawModuleData()->m_treadAnimationRate;
+		Real treadScrollSpeed=getW3DTankDrawModuleData()->m_treadAnimationRate * timeScale;
 		TreadObjectInfo *pTread=m_treads;
 		Real maxSpeed=obj->getAIUpdateInterface()->getCurLocomotorSpeed();
 

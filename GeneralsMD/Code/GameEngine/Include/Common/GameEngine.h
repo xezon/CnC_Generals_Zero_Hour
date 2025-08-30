@@ -76,6 +76,8 @@ public:
 	Real getUpdateTime(); ///< Get the last engine update delta time.
 	Real getUpdateFps(); ///< Get the last engine update fps.
 
+	Bool isTimeFrozen();
+
 	virtual void setLogicTimeScaleFps( Int fps ); ///< Set the logic time scale fps and therefore scale the simulation time. Is capped by the max render fps and does not apply to network matches.
 	virtual Int getLogicTimeScaleFps(); ///< Get the raw logic time scale fps value.
 	virtual void enableLogicTimeScale( Bool enable ); ///< Enable the logic time scale setup. If disabled, the simulation time scale is bound to the render frame time or network update time.
@@ -83,6 +85,8 @@ public:
 	Int  getActualLogicTimeScaleFps(); ///< Get the real logic time scale fps, depending on the max render fps, network state and enabled state.
 	Real getActualLogicTimeScaleRatio(); ///< Get the real logic time scale ratio, depending on the max render fps, network state and enabled state.
 	Real getActualLogicTimeScaleOverFpsRatio(); ///< Get the real logic time scale over render fps ratio, used to scale down steps in render updates to match logic updates.
+	Real getLogicTimeStepSeconds(); ///< Get the logic time step in seconds
+	Real getLogicTimeStepMilliseconds(); ///< Get the logic time step in milliseconds
 
 	virtual void setQuitting( Bool quitting );				///< set quitting status
 	virtual Bool getQuitting(void);						///< is app getting ready to quit.
@@ -95,6 +99,8 @@ public:
 protected:
 
 	virtual void resetSubsystems( void );
+
+	Bool tickLogic();
 
 	virtual FileSystem *createFileSystem( void );								///< Factory for FileSystem classes
 	virtual LocalFileSystem *createLocalFileSystem( void ) = 0;	///< Factory for LocalFileSystem classes

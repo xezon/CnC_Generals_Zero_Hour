@@ -168,6 +168,7 @@ public:
 	** By calling the Sync function, the application can move the ww3d library time forward.  This
 	** will control things like animated uv-offset mappers and render object animations.
 	*/
+	static void Add_Frame_Time(float milliseconds);
 	static void					Sync( unsigned int sync_time );
 	static unsigned int		Get_Sync_Time(void) { return SyncTime; }
    static unsigned int     Get_Frame_Time(void) { return SyncTime - PreviousSyncTime; }
@@ -320,6 +321,8 @@ private:
 	static void					Update_Pixel_Center(void);
 	static void					Allocate_Debug_Resources(void);
 	static void					Release_Debug_Resources(void);
+
+	static float FractionalSyncMs;
 
 	// Timing info:
    // The absolute synchronized frame time (in milliseconds) supplied by the

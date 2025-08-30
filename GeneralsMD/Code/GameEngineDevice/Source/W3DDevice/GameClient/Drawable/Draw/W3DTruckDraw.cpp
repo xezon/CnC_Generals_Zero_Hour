@@ -32,6 +32,7 @@
 #include "Common/Thing.h"
 #include "Common/ThingFactory.h"
 #include "Common/GameAudio.h"
+#include "Common/GameEngine.h"
 #include "Common/GlobalData.h"
 #include "Common/ThingTemplate.h"
 #include "Common/Xfer.h"
@@ -391,10 +392,10 @@ void W3DTruckDraw::doDrawModule(const Matrix3D* transformMtx)
 	const W3DTruckDrawModuleData *moduleData = getW3DTruckDrawModuleData();
 	if (moduleData==NULL) return; // shouldn't ever happen.
 
- 	Bool frozen = TheTacticalView->isTimeFrozen() && !TheTacticalView->isCameraMovementFinished();
- 	frozen = frozen || TheScriptEngine->isTimeFrozenDebug() || TheScriptEngine->isTimeFrozenScript();
-	if (frozen)
-		return;
+ //	Bool frozen = TheTacticalView->isTimeFrozen() && !TheTacticalView->isCameraMovementFinished();
+ //	frozen = frozen || TheScriptEngine->isTimeFrozenDebug() || TheScriptEngine->isTimeFrozenScript();
+	//if (frozen)
+	//	return;
 
 	const Real ACCEL_THRESHOLD = 0.01f;
 	const Real SIZE_CAP = 2.0f;
@@ -413,6 +414,8 @@ void W3DTruckDraw::doDrawModule(const Matrix3D* transformMtx)
 	PhysicsBehavior *physics = obj->getPhysics();
 	if (physics == NULL)
 		return;
+
+	const Real timeScale = TheGameEngine->getActualLogicTimeScaleOverFpsRatio();
 
 	const Coord3D *vel = physics->getVelocity();
 	Real speed = physics->getVelocityMagnitude();
@@ -451,7 +454,7 @@ void W3DTruckDraw::doDrawModule(const Matrix3D* transformMtx)
 			desiredAngle = -wheelInfo->m_wheelAngle*moduleData->m_trailerRotationFactor;
 			Real deltaAngle = desiredAngle - m_curTrailerRotation;
 			deltaAngle *= moduleData->m_rotationDampingFactor;
-			m_curTrailerRotation += deltaAngle;
+			m_curTrailerRotation += deltaAngle * timeScale;
 			cabXfrm.Make_Identity();
 			cabXfrm.Rotate_Z(m_curTrailerRotation);
 			getRenderObject()->Capture_Bone( m_trailerBone );
@@ -461,7 +464,7 @@ void W3DTruckDraw::doDrawModule(const Matrix3D* transformMtx)
 
 	if (m_frontLeftTireBone || m_rearLeftTireBone)
 	{
-		Real powerslideRotationAddition = moduleData->m_powerslideRotationAddition;
+		Real powerslideRotationAddition = moduleData->m_powerslideRotationAddition * m_isPowersliding;
 		if (ai) {
 			Locomotor *loco = ai->getCurLocomotor();
 			if (loco) {
@@ -471,16 +474,12 @@ void W3DTruckDraw::doDrawModule(const Matrix3D* transformMtx)
 				}
 			}
 		}
+
 		const Real rotationFactor = moduleData->m_rotationSpeedMultiplier;
-		m_frontWheelRotation += rotationFactor*speed;
-		if (m_isPowersliding)
-		{
-			m_rearWheelRotation += rotationFactor*(speed + powerslideRotationAddition);
-		}
-		else
-		{
-			m_rearWheelRotation += rotationFactor*speed;
-		}
+		m_frontWheelRotation += rotationFactor*speed * timeScale;
+		m_rearWheelRotation += rotationFactor*(speed + powerslideRotationAddition) * timeScale;
+		m_frontWheelRotation = WWMath::Normalize_Angle(m_frontWheelRotation);
+		m_rearWheelRotation = WWMath::Normalize_Angle(m_rearWheelRotation);
 
 		// For now, just use the same values for mid wheels -- may want to do independent calcs later...
 		m_midFrontWheelRotation = m_frontWheelRotation;
@@ -592,9 +591,9 @@ void W3DTruckDraw::doDrawModule(const Matrix3D* transformMtx)
 			m_dustEffect->setSizeMultiplier(speed);
 		}
 		if (m_dirtEffect) {
-			if (wheelInfo && wheelInfo->m_framesAirborne>3) {
-				Real factor = 1 + wheelInfo->m_framesAirborne/16;
-				if (factor>2.0) factor = 2.0;
+			if (wheelInfo && wheelInfo->m_framesAirborne>3.0f) {
+				Real factor = 1 + wheelInfo->m_framesAirborne/16.0f;
+				if (factor>2.0f) factor = 2.0f;
 				m_dustEffect->setSizeMultiplier(factor*SIZE_CAP);
 				m_dustEffect->trigger();
 				m_landingSound.setObjectID(obj->getID());

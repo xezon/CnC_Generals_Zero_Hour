@@ -332,6 +332,21 @@ Real GameEngine::getUpdateFps()
 }
 
 //-------------------------------------------------------------------------------------------------
+Bool GameEngine::isTimeFrozen()
+{
+	if (TheTacticalView != NULL && TheTacticalView->isTimeFrozen() && !TheTacticalView->isCameraMovementFinished())
+		return true;
+
+	if (TheScriptEngine != NULL && (TheScriptEngine->isTimeFrozenDebug() || TheScriptEngine->isTimeFrozenScript()))
+		return true;
+
+	if (TheGameLogic != NULL && TheGameLogic->isGamePaused())
+		return true;
+
+	return false;
+}
+
+//-------------------------------------------------------------------------------------------------
 void GameEngine::setLogicTimeScaleFps( Int fps )
 {
 	m_logicTimeScaleFPS = fps;
@@ -358,24 +373,27 @@ Bool GameEngine::isLogicTimeScaleEnabled()
 //-------------------------------------------------------------------------------------------------
 Int GameEngine::getActualLogicTimeScaleFps( void )
 {
+	if (isTimeFrozen())
+	{
+		return 0;
+	}
+
 	if (TheNetwork != NULL)
 	{
 		return TheNetwork->getFrameRate();
 	}
+
+	const Bool enabled = isLogicTimeScaleEnabled();
+	const Int logicTimeScaleFps = getLogicTimeScaleFps();
+	const Int maxFps = getFramesPerSecondLimit();
+
+	if (!enabled || logicTimeScaleFps >= maxFps)
+	{
+		return getFramesPerSecondLimit();
+	}
 	else
 	{
-		const Bool enabled = isLogicTimeScaleEnabled();
-		const Int logicTimeScaleFps = getLogicTimeScaleFps();
-		const Int maxFps = getFramesPerSecondLimit();
-
-		if (!enabled || logicTimeScaleFps >= maxFps)
-		{
-			return getFramesPerSecondLimit();
-		}
-		else
-		{
-			return logicTimeScaleFps;
-		}
+		return logicTimeScaleFps;
 	}
 }
 
@@ -391,6 +409,16 @@ Real GameEngine::getActualLogicTimeScaleOverFpsRatio()
 	// TheSuperHackers @info Clamps ratio to min 1, because the logic
 	// frame rate is (typically) capped by the render frame rate.
 	return min(1.0f, (Real)getActualLogicTimeScaleFps() / getUpdateFps());
+}
+
+Real GameEngine::getLogicTimeStepSeconds()
+{
+	return SECONDS_PER_LOGICFRAME_REAL * getActualLogicTimeScaleOverFpsRatio();
+}
+
+Real GameEngine::getLogicTimeStepMilliseconds()
+{
+	return MSEC_PER_LOGICFRAME_REAL * getActualLogicTimeScaleOverFpsRatio();
 }
 
 /** -----------------------------------------------------------------------------------------------
@@ -867,6 +895,54 @@ void GameEngine::resetSubsystems( void )
 }
 
 /// -----------------------------------------------------------------------------------------------
+Bool GameEngine::tickLogic()
+{
+	if (TheNetwork != NULL)
+	{
+		if (TheNetwork->isFrameDataReady())
+		{
+			return true;
+		}
+	}
+	else
+	{
+		if (!TheGameLogic->isGamePaused())
+		{
+			const Bool enabled = isLogicTimeScaleEnabled();
+			const Int logicTimeScaleFps = getLogicTimeScaleFps();
+			const Int maxRenderFps = getFramesPerSecondLimit();
+
+#if defined(_ALLOW_DEBUG_CHEATS_IN_RELEASE)
+			Bool useFastMode = TheGlobalData->m_TiVOFastMode;
+#else	//always allow this cheat key if we're in a replay game.
+			Bool useFastMode = TheGlobalData->m_TiVOFastMode && TheGameLogic->isInReplayGame();
+#endif
+
+			if (useFastMode || !enabled || logicTimeScaleFps >= maxRenderFps)
+			{
+				// Logic time scale is uncapped or larger equal Render FPS. Update straight away.
+				return true;
+			}
+			else
+			{
+				// TheSuperHackers @tweak xezon 06/08/2025
+				// The logic time step is now decoupled from the render update.
+				const Real targetFrameTime = 1.0f / logicTimeScaleFps;
+				m_logicTimeAccumulator += min(m_updateTime, targetFrameTime);
+
+				if (m_logicTimeAccumulator >= targetFrameTime)
+				{
+					m_logicTimeAccumulator -= targetFrameTime;
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+/// -----------------------------------------------------------------------------------------------
 DECLARE_PERF_TIMER(GameEngine_update)
 
 /** -----------------------------------------------------------------------------------------------
@@ -878,9 +954,7 @@ void GameEngine::update( void )
 {
 	USE_PERF_TIMER(GameEngine_update)
 	{
-
 		{
-
 			// VERIFY CRC needs to be in this code block.  Please to not pull TheGameLogic->update() inside this block.
 			VERIFY_CRC
 
@@ -902,50 +976,56 @@ void GameEngine::update( void )
 
 		TheGameLogic->preUpdate();
 
-		if (TheNetwork != NULL)
+		if (tickLogic())
 		{
-			if (TheNetwork->isFrameDataReady())
-			{
-				TheGameClient->step();
-				TheGameLogic->UPDATE();
-			}
+			TheGameClient->step();
+			TheGameLogic->UPDATE();
 		}
-		else
-		{
-			if (!TheGameLogic->isGamePaused())
-			{
-				const Bool enabled = isLogicTimeScaleEnabled();
-				const Int logicTimeScaleFps = getLogicTimeScaleFps();
-				const Int maxRenderFps = getFramesPerSecondLimit();
 
-#if defined(_ALLOW_DEBUG_CHEATS_IN_RELEASE)
-				Bool useFastMode = TheGlobalData->m_TiVOFastMode;
-#else	//always allow this cheat key if we're in a replay game.
-				Bool useFastMode = TheGlobalData->m_TiVOFastMode && TheGameLogic->isInReplayGame();
-#endif
-
-				if (useFastMode || !enabled || logicTimeScaleFps >= maxRenderFps)
-				{
-					// Logic time scale is uncapped or larger equal Render FPS. Update straight away.
-					TheGameClient->step();
-					TheGameLogic->UPDATE();
-				}
-				else
-				{
-					// TheSuperHackers @tweak xezon 06/08/2025
-					// The logic time step is now decoupled from the render update.
-					const Real targetFrameTime = 1.0f / logicTimeScaleFps;
-					m_logicTimeAccumulator += min(m_updateTime, targetFrameTime);
-
-					if (m_logicTimeAccumulator >= targetFrameTime)
-					{
-						m_logicTimeAccumulator -= targetFrameTime;
-						TheGameClient->step();
-						TheGameLogic->UPDATE();
-					}
-				}
-			}
-		}
+//		if (TheNetwork != NULL)
+//		{
+//			if (TheNetwork->isFrameDataReady())
+//			{
+//				//TheGameClient->step();
+//				TheGameLogic->UPDATE();
+//			}
+//		}
+//		else
+//		{
+//			if (!TheGameLogic->isGamePaused())
+//			{
+//				const Bool enabled = isLogicTimeScaleEnabled();
+//				const Int logicTimeScaleFps = getLogicTimeScaleFps();
+//				const Int maxRenderFps = getFramesPerSecondLimit();
+//
+//#if defined(_ALLOW_DEBUG_CHEATS_IN_RELEASE)
+//				Bool useFastMode = TheGlobalData->m_TiVOFastMode;
+//#else	//always allow this cheat key if we're in a replay game.
+//				Bool useFastMode = TheGlobalData->m_TiVOFastMode && TheGameLogic->isInReplayGame();
+//#endif
+//
+//				if (useFastMode || !enabled || logicTimeScaleFps >= maxRenderFps)
+//				{
+//					// Logic time scale is uncapped or larger equal Render FPS. Update straight away.
+//					//TheGameClient->step();
+//					TheGameLogic->UPDATE();
+//				}
+//				else
+//				{
+//					// TheSuperHackers @tweak xezon 06/08/2025
+//					// The logic time step is now decoupled from the render update.
+//					const Real targetFrameTime = 1.0f / logicTimeScaleFps;
+//					m_logicTimeAccumulator += min(m_updateTime, targetFrameTime);
+//
+//					if (m_logicTimeAccumulator >= targetFrameTime)
+//					{
+//						m_logicTimeAccumulator -= targetFrameTime;
+//						//TheGameClient->step();
+//						TheGameLogic->UPDATE();
+//					}
+//				}
+//			}
+//		}
 
 	}	// end perfGather
 

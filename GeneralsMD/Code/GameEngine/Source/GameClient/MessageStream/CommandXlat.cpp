@@ -3450,9 +3450,7 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 		}
 		case GameMessage::MSG_META_TOGGLE_PAUSE:
 		{
-#if !defined(_ALLOW_DEBUG_CHEATS_IN_RELEASE)//may be defined in GameCommon.h
-			if (TheGameLogic->isInReplayGame())
-#endif
+			if (!TheGameLogic->isInMultiplayerGame())
 			{
 				if (TheGameLogic->isGamePaused())
 				{
@@ -3470,9 +3468,7 @@ GameMessageDisposition CommandTranslator::translateGameMessage(const GameMessage
 		}
 		case GameMessage::MSG_META_STEP_FRAME:
 		{
-#if !defined(_ALLOW_DEBUG_CHEATS_IN_RELEASE)//may be defined in GameCommon.h
-			if (TheGameLogic->isInReplayGame())
-#endif
+			if (!TheGameLogic->isInMultiplayerGame())
 			{
 				TheGameLogic->setGamePaused(FALSE);
 				TheGameLogic->setGamePausedInFrame(TheGameLogic->getFrame() + 1);

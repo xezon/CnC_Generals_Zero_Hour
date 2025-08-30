@@ -40,6 +40,7 @@
 #include "GameLogic/Object.h"
 #include "GameLogic/Module/ContainModule.h"
 #include "W3DDevice/GameClient/Module/W3DOverlordAircraftDraw.h"
+#include "W3DDevice/GameClient/W3DDisplay.h"
 
 
 
@@ -101,7 +102,8 @@ void W3DOverlordAircraftDraw::doDrawModule(const Matrix3D* transformMtx)
         riderDraw->setColorTintEnvelope( *env );
 
       riderDraw->notifyDrawableDependencyCleared();
-		  riderDraw->draw( NULL );// What the hell?  This param isn't used for anything
+      //if (!W3DDisplay::isTimeFrozen())
+        riderDraw->draw();
     }
     DEBUG_ASSERTCRASH( riderDraw, ("OverlordAircraftDraw finds no rider's drawable") );
 

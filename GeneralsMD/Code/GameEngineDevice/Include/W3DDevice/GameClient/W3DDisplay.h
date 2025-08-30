@@ -152,6 +152,8 @@ public:
 	virtual Real getCurrentFPS( void );						///< return the current FPS.
 	virtual Int getLastFrameDrawCalls( void );				///< returns the number of draw calls issued in the previous frame
 
+	static Bool isTimeFrozen();
+
 protected:
 
 	void initAssets( void );									///< init assets for WW3D
@@ -163,7 +165,6 @@ protected:
 	void calculateTerrainLOD(void);						///< Calculate terrain LOD.
 	void renderLetterBox(UnsignedInt time);							///< draw letter box border
 	void updateAverageFPS(void);	///< figure out the average fps over the last 30 frames.
-	static Bool isTimeFrozen();
 
 	Byte m_initialized;												///< TRUE when system is initialized
 	LightClass *m_myLight[LightEnvironmentClass::MAX_LIGHTS];										///< light hack for now

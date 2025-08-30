@@ -1699,29 +1699,29 @@ Bool W3DDisplay::isTimeFrozen()
 void W3DDisplay::step()
 {
 	// TheSuperHackers @info This will wrap in 1205 hours at 30 fps logic step.
-	static UnsignedInt syncTime = 0;
+	//static UnsignedInt syncTime = 0;
 
-	extern HWND ApplicationHWnd;
-	if (ApplicationHWnd && ::IsIconic(ApplicationHWnd)) {
-		return;
-	}
+	//extern HWND ApplicationHWnd;
+	//if (ApplicationHWnd && ::IsIconic(ApplicationHWnd)) {
+	//	return;
+	//}
 
-	if (TheGlobalData->m_headless)
-		return;
+	//if (TheGlobalData->m_headless)
+	//	return;
 
-	Bool freezeTime = isTimeFrozen();
+	//Bool freezeTime = isTimeFrozen();
 
-	if (!freezeTime)
-	{
-		syncTime += (UnsignedInt)TheW3DFrameLengthInMsec;
+	//if (!freezeTime)
+	//{
+	//	syncTime += (UnsignedInt)TheW3DFrameLengthInMsec;
 
-		if (TheScriptEngine->isTimeFast())
-		{
-			return;
-		}
-	}
+	//	if (TheScriptEngine->isTimeFast())
+	//	{
+	//		return;
+	//	}
+	//}
 
-	WW3D::Sync( syncTime );
+	//WW3D::Sync( syncTime );
 
 	stepViews();
 }
@@ -1822,9 +1822,9 @@ AGAIN:
 	Bool freezeTime = isTimeFrozen();
 
 	// hack to let client spin fast in network games but still do effects at the same pace. -MDC
-	static UnsignedInt lastFrame = ~0;
-	freezeTime = freezeTime || (TheNetwork != NULL && lastFrame == TheGameClient->getFrame());
-	lastFrame = TheGameClient->getFrame();
+	//static UnsignedInt lastFrame = ~0;
+	//freezeTime = freezeTime || (TheNetwork != NULL && lastFrame == TheGameClient->getFrame());
+	//lastFrame = TheGameClient->getFrame();
 
 	/// @todo: I'm assuming the first view is our main 3D view.
 	W3DView *primaryW3DView=(W3DView *)getFirstView();
@@ -1859,6 +1859,20 @@ AGAIN:
 			}
 		}
 	}
+
+	//UnsignedInt deltaSyncMs;
+
+	//if (freezeTime)
+	//{
+	//	deltaSyncMs = 0;
+	//}
+	//else
+	//{
+	const Real logicTimeStepMs = TheGameEngine->getLogicTimeStepMilliseconds();
+		//deltaSyncMs = max((UnsignedInt)ms, 1u);
+	//}
+
+	WW3D::Add_Frame_Time(logicTimeStepMs);
 
 	static Int now;
 	now=timeGetTime();

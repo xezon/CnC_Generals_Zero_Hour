@@ -1383,17 +1383,6 @@ void Drawable::flashAsSelected( const RGBColor *color ) ///< drawable takes care
 //-------------------------------------------------------------------------------------------------
 void Drawable::applyPhysicsXform(Matrix3D* mtx)
 {
-	const Object *obj = getObject();
-
-	if( !obj ||	obj->isDisabledByType( DISABLED_HELD ) || !TheGlobalData->m_showClientPhysics )
-	{
-		return;
-	}
-
- 	Bool frozen = TheTacticalView->isTimeFrozen() && !TheTacticalView->isCameraMovementFinished();
- 	frozen = frozen || TheScriptEngine->isTimeFrozenDebug() || TheScriptEngine->isTimeFrozenScript();
-	if (frozen)
-		return;
 	PhysicsXformInfo info;
 	if (calcPhysicsXform(info))
 	{
@@ -1401,7 +1390,6 @@ void Drawable::applyPhysicsXform(Matrix3D* mtx)
 		mtx->Rotate_Y( info.m_totalPitch );
 		mtx->Rotate_X( -info.m_totalRoll );
 		mtx->Rotate_Z( info.m_totalYaw );
-
 	}
 }
 
@@ -1688,6 +1676,8 @@ void Drawable::calcPhysicsXformTreads( const Locomotor *locomotor, PhysicsXformI
 	if (physics == NULL)
 		return;
 
+	//TheGameEngine->getActualLogicTimeScaleOverFpsRatio()
+
 	// get our position and direction vector
 	const Coord3D *pos = getPosition();
 	const Coord3D *dir = getUnitDirectionVector2D();
@@ -1919,7 +1909,6 @@ void Drawable::calcPhysicsXformWheels( const Locomotor *locomotor, PhysicsXformI
 
 	const Real ACCEL_PITCH_LIMIT = locomotor->getAccelPitchLimit();
 	const Real DECEL_PITCH_LIMIT = locomotor->getDecelPitchLimit();
-	const Real BOUNCE_ANGLE_KICK = locomotor->getBounceKick();
 	const Real PITCH_STIFFNESS = locomotor->getPitchStiffness();
 	const Real ROLL_STIFFNESS =  locomotor->getRollStiffness();
 	const Real PITCH_DAMPING = locomotor->getPitchDamping();
@@ -1947,6 +1936,8 @@ void Drawable::calcPhysicsXformWheels( const Locomotor *locomotor, PhysicsXformI
 	PhysicsBehavior *physics = obj->getPhysics();
 	if (physics == NULL)
 		return ;
+
+	const Real timeScale = TheGameEngine->getActualLogicTimeScaleOverFpsRatio();
 
 	// get our position and direction vector
 	const Coord3D *pos = getPosition();
@@ -1977,16 +1968,16 @@ void Drawable::calcPhysicsXformWheels( const Locomotor *locomotor, PhysicsXformI
 		{
 			// Wheels extend when airborne.
 			m_locoInfo->m_wheelInfo.m_framesAirborne = 0;
-			m_locoInfo->m_wheelInfo.m_framesAirborneCounter++;
+			m_locoInfo->m_wheelInfo.m_framesAirborneCounter += timeScale;
 			if (pos->z - hheight > -MAX_SUSPENSION_EXTENSION)
 			{
-				m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset += (MAX_SUSPENSION_EXTENSION - m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset)/2.0f;
-				m_locoInfo->m_wheelInfo.m_rearRightHeightOffset += (MAX_SUSPENSION_EXTENSION - m_locoInfo->m_wheelInfo.m_rearRightHeightOffset)/2.0f;
+				m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset += ((MAX_SUSPENSION_EXTENSION - m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset)/2.0f) * timeScale;
+				m_locoInfo->m_wheelInfo.m_rearRightHeightOffset += ((MAX_SUSPENSION_EXTENSION - m_locoInfo->m_wheelInfo.m_rearRightHeightOffset)/2.0f) * timeScale;
 			}
 			else
 			{
-				m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset += (0 - m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset)/2.0f;
-				m_locoInfo->m_wheelInfo.m_rearRightHeightOffset += (0 - m_locoInfo->m_wheelInfo.m_rearRightHeightOffset)/2.0f;
+				m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset += ((0 - m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset)/2.0f) * timeScale;
+				m_locoInfo->m_wheelInfo.m_rearRightHeightOffset += ((0 - m_locoInfo->m_wheelInfo.m_rearRightHeightOffset)/2.0f) * timeScale;
 			}
 		}
 		// Calculate suspension info.
@@ -1998,89 +1989,83 @@ void Drawable::calcPhysicsXformWheels( const Locomotor *locomotor, PhysicsXformI
 		return; // maintain the same orientation while we fly through the air.
 	}
 
-	// Bouncy.
-	Real curSpeed = physics->getVelocityMagnitude();
-#if 1
-	Real maxSpeed = ai->getCurLocomotorSpeed();
-	if (!airborne && curSpeed > maxSpeed/10)
+	if (timeScale > 0.0f)
 	{
-		Real factor = curSpeed/maxSpeed;
-		if (fabs(m_locoInfo->m_pitchRate)<factor*BOUNCE_ANGLE_KICK/4 && fabs(m_locoInfo->m_rollRate)<factor*BOUNCE_ANGLE_KICK/8)
+#if 1
+		const Real BOUNCE_ANGLE_KICK = locomotor->getBounceKick();
+		// Bouncy.
+		Real curSpeed = physics->getVelocityMagnitude();
+		Real maxSpeed = ai->getCurLocomotorSpeed();
+		if (!airborne && curSpeed > maxSpeed/10)
 		{
-			// do the bouncy.
-			switch (GameClientRandomValue(0,3))
+			Real factor = curSpeed/maxSpeed;
+			if (fabs(m_locoInfo->m_pitchRate)<factor*BOUNCE_ANGLE_KICK/4 && fabs(m_locoInfo->m_rollRate)<factor*BOUNCE_ANGLE_KICK/8)
 			{
-			case 0:
-				m_locoInfo->m_pitchRate -= BOUNCE_ANGLE_KICK*factor;
-				m_locoInfo->m_rollRate -= BOUNCE_ANGLE_KICK*factor/2;
-				break;
-			case 1:
-				m_locoInfo->m_pitchRate += BOUNCE_ANGLE_KICK*factor;
-				m_locoInfo->m_rollRate -= BOUNCE_ANGLE_KICK*factor/2;
-				break;
-			case 2:
-				m_locoInfo->m_pitchRate -= BOUNCE_ANGLE_KICK*factor;
-				m_locoInfo->m_rollRate += BOUNCE_ANGLE_KICK*factor/2;
-				break;
-			case 3:
-				m_locoInfo->m_pitchRate += BOUNCE_ANGLE_KICK*factor;
-				m_locoInfo->m_rollRate += BOUNCE_ANGLE_KICK*factor/2;
-				break;
+				// do the bouncy.
+				switch (GameClientRandomValue(0,3))
+				{
+				case 0:
+					m_locoInfo->m_pitchRate -= (BOUNCE_ANGLE_KICK*factor) * timeScale;
+					m_locoInfo->m_rollRate -= (BOUNCE_ANGLE_KICK*factor/2) * timeScale;
+					break;
+				case 1:
+					m_locoInfo->m_pitchRate += (BOUNCE_ANGLE_KICK*factor) * timeScale;
+					m_locoInfo->m_rollRate -= (BOUNCE_ANGLE_KICK*factor/2) * timeScale;
+					break;
+				case 2:
+					m_locoInfo->m_pitchRate -= (BOUNCE_ANGLE_KICK*factor) * timeScale;
+					m_locoInfo->m_rollRate += (BOUNCE_ANGLE_KICK*factor/2) * timeScale;
+					break;
+				case 3:
+					m_locoInfo->m_pitchRate += (BOUNCE_ANGLE_KICK*factor) * timeScale;
+					m_locoInfo->m_rollRate += (BOUNCE_ANGLE_KICK*factor/2) * timeScale;
+					break;
+				}
 			}
 		}
-	}
-
 #endif
 
-	// process chassis suspension dynamics - damp back towards groundPitch
+		// process chassis suspension dynamics - damp back towards groundPitch
 
-	// the ground can only push back if we're touching it
-	if (!airborne)
-	{
-		m_locoInfo->m_pitchRate += ((-PITCH_STIFFNESS * (m_locoInfo->m_pitch - groundPitch)) + (-PITCH_DAMPING * m_locoInfo->m_pitchRate));		// spring/damper
-		if (m_locoInfo->m_pitchRate > 0.0f)
-			m_locoInfo->m_pitchRate *= 0.5f;
+		// the ground can only push back if we're touching it
+		if (!airborne)
+		{
+			m_locoInfo->m_pitchRate += ((-PITCH_STIFFNESS * (m_locoInfo->m_pitch - groundPitch)) + (-PITCH_DAMPING * m_locoInfo->m_pitchRate)) * timeScale;		// spring/damper
+			if (m_locoInfo->m_pitchRate > 0.0f)
+				m_locoInfo->m_pitchRate *= 1.0f - (0.5f * timeScale);
 
-		m_locoInfo->m_rollRate += ((-ROLL_STIFFNESS * (m_locoInfo->m_roll - groundRoll)) + (-ROLL_DAMPING * m_locoInfo->m_rollRate));		// spring/damper
+			m_locoInfo->m_rollRate += ((-ROLL_STIFFNESS * (m_locoInfo->m_roll - groundRoll)) + (-ROLL_DAMPING * m_locoInfo->m_rollRate)) * timeScale;		// spring/damper
+		}
+
+		// process chassis acceleration dynamics - damp back towards zero
+
+		m_locoInfo->m_accelerationPitchRate += ((-PITCH_STIFFNESS * (m_locoInfo->m_accelerationPitch)) + (-PITCH_DAMPING * m_locoInfo->m_accelerationPitchRate)) * timeScale;		// spring/damper
+		m_locoInfo->m_accelerationRollRate += ((-ROLL_STIFFNESS * m_locoInfo->m_accelerationRoll) + (-ROLL_DAMPING * m_locoInfo->m_accelerationRollRate)) * timeScale;		// spring/damper
+
+		if (physics->isMotive())
+		{
+			// cause the chassis to pitch & roll in reaction to acceleration/deceleration
+			Real forwardAccel = dir->x * accel->x + dir->y * accel->y;
+			m_locoInfo->m_accelerationPitchRate += -(FORWARD_ACCEL_COEFF * forwardAccel) * timeScale;
+
+			Real lateralAccel = -dir->y * accel->x + dir->x * accel->y;
+			m_locoInfo->m_accelerationRollRate += -(LATERAL_ACCEL_COEFF * lateralAccel) * timeScale;
+		}
+
+		m_locoInfo->m_pitch += m_locoInfo->m_pitchRate * UNIFORM_AXIAL_DAMPING * timeScale;
+		m_locoInfo->m_roll += m_locoInfo->m_rollRate * UNIFORM_AXIAL_DAMPING * timeScale;
+		m_locoInfo->m_accelerationPitch += m_locoInfo->m_accelerationPitchRate * timeScale;
+		m_locoInfo->m_accelerationRoll += m_locoInfo->m_accelerationRollRate * timeScale;
+
+		// limit acceleration pitch and roll
+
+		m_locoInfo->m_accelerationPitch = clamp(-ACCEL_PITCH_LIMIT, m_locoInfo->m_accelerationPitch, DECEL_PITCH_LIMIT);
+		m_locoInfo->m_accelerationRoll = clamp(-ACCEL_PITCH_LIMIT, m_locoInfo->m_accelerationRoll, DECEL_PITCH_LIMIT);
 	}
-
-	m_locoInfo->m_pitch += m_locoInfo->m_pitchRate * UNIFORM_AXIAL_DAMPING;
-	m_locoInfo->m_roll += m_locoInfo->m_rollRate   * UNIFORM_AXIAL_DAMPING;
-
-	// process chassis acceleration dynamics - damp back towards zero
-
-	m_locoInfo->m_accelerationPitchRate += ((-PITCH_STIFFNESS * (m_locoInfo->m_accelerationPitch)) + (-PITCH_DAMPING * m_locoInfo->m_accelerationPitchRate));		// spring/damper
-	m_locoInfo->m_accelerationPitch += m_locoInfo->m_accelerationPitchRate;
-
-	m_locoInfo->m_accelerationRollRate += ((-ROLL_STIFFNESS * m_locoInfo->m_accelerationRoll) + (-ROLL_DAMPING * m_locoInfo->m_accelerationRollRate));		// spring/damper
-	m_locoInfo->m_accelerationRoll += m_locoInfo->m_accelerationRollRate;
 
 	// compute total pitch and roll of tank
 	info.m_totalPitch = m_locoInfo->m_pitch + m_locoInfo->m_accelerationPitch;
 	info.m_totalRoll = m_locoInfo->m_roll + m_locoInfo->m_accelerationRoll;
-
-	if (physics->isMotive())
-	{
-		// cause the chassis to pitch & roll in reaction to acceleration/deceleration
-		Real forwardAccel = dir->x * accel->x + dir->y * accel->y;
-		m_locoInfo->m_accelerationPitchRate += -(FORWARD_ACCEL_COEFF * forwardAccel);
-
-		Real lateralAccel = -dir->y * accel->x + dir->x * accel->y;
-		m_locoInfo->m_accelerationRollRate += -(LATERAL_ACCEL_COEFF * lateralAccel);
-	}
-
-	// limit acceleration pitch and roll
-
-	if (m_locoInfo->m_accelerationPitch > DECEL_PITCH_LIMIT)
-		m_locoInfo->m_accelerationPitch = DECEL_PITCH_LIMIT;
-	else if (m_locoInfo->m_accelerationPitch < -ACCEL_PITCH_LIMIT)
-		m_locoInfo->m_accelerationPitch = -ACCEL_PITCH_LIMIT;
-
-	if (m_locoInfo->m_accelerationRoll > DECEL_PITCH_LIMIT)
-		m_locoInfo->m_accelerationRoll = DECEL_PITCH_LIMIT;
-	else if (m_locoInfo->m_accelerationRoll < -ACCEL_PITCH_LIMIT)
-		m_locoInfo->m_accelerationRoll = -ACCEL_PITCH_LIMIT;
-
 	info.m_totalZ = 0;
 
 	// Calculate suspension info.
@@ -2116,8 +2101,8 @@ void Drawable::calcPhysicsXformWheels( const Locomotor *locomotor, PhysicsXformI
 		// etc, this smaller angle we'll be adding covers the constant wheel shifting
 		// left and right when moving in a relatively straight line
 		//
-		#define WHEEL_SMOOTHNESS 10.0f  // higher numbers add smaller angles, make it more "smooth"
-		m_locoInfo->m_wheelInfo.m_wheelAngle += (newInfo.m_wheelAngle - m_locoInfo->m_wheelInfo.m_wheelAngle)/WHEEL_SMOOTHNESS;
+		CONSTEXPR const Real WHEEL_SMOOTHNESS = 10.0f;  // higher numbers add smaller angles, make it more "smooth"
+		m_locoInfo->m_wheelInfo.m_wheelAngle += (newInfo.m_wheelAngle - m_locoInfo->m_wheelInfo.m_wheelAngle)/WHEEL_SMOOTHNESS * timeScale;
 
 		const Real SPRING_FACTOR = 0.9f;
 		if (pitchHeight<0) {	// Front raising up
@@ -2125,44 +2110,44 @@ void Drawable::calcPhysicsXformWheels( const Locomotor *locomotor, PhysicsXformI
 			newInfo.m_frontRightHeightOffset = SPRING_FACTOR*(pitchHeight/3+pitchHeight/2);
 			newInfo.m_rearLeftHeightOffset = -pitchHeight/2 + pitchHeight/4;
 			newInfo.m_rearRightHeightOffset = -pitchHeight/2 + pitchHeight/4;
-		}	else {	// Back rasing up.
+		}	else {	// Back raising up.
 			newInfo.m_frontLeftHeightOffset = (-pitchHeight/4+pitchHeight/2);
 			newInfo.m_frontRightHeightOffset = (-pitchHeight/4+pitchHeight/2);
 			newInfo.m_rearLeftHeightOffset = SPRING_FACTOR*(-pitchHeight/2 + -pitchHeight/3);
 			newInfo.m_rearRightHeightOffset = SPRING_FACTOR*(-pitchHeight/2 + -pitchHeight/3);
 		}
 		if (rollHeight>0) {	// Right raising up
-			newInfo.m_frontRightHeightOffset += -SPRING_FACTOR*(rollHeight/3+rollHeight/2);
-			newInfo.m_rearRightHeightOffset += -SPRING_FACTOR*(rollHeight/3+rollHeight/2);
-			newInfo.m_rearLeftHeightOffset += rollHeight/2 - rollHeight/4;
-			newInfo.m_frontLeftHeightOffset += rollHeight/2 - rollHeight/4;
-		}	else {	// Left rasing up.
-			newInfo.m_frontRightHeightOffset += -rollHeight/2 + rollHeight/4;
-			newInfo.m_rearRightHeightOffset += -rollHeight/2 + rollHeight/4;
-			newInfo.m_rearLeftHeightOffset += SPRING_FACTOR*(rollHeight/3+rollHeight/2);
-			newInfo.m_frontLeftHeightOffset += SPRING_FACTOR*(rollHeight/3+rollHeight/2);
+			newInfo.m_frontRightHeightOffset += -SPRING_FACTOR*(rollHeight/3+rollHeight/2) * timeScale;
+			newInfo.m_rearRightHeightOffset += -SPRING_FACTOR*(rollHeight/3+rollHeight/2) * timeScale;
+			newInfo.m_rearLeftHeightOffset += (rollHeight/2 - rollHeight/4) * timeScale;
+			newInfo.m_frontLeftHeightOffset += (rollHeight/2 - rollHeight/4) * timeScale;
+		}	else {	// Left raising up.
+			newInfo.m_frontRightHeightOffset += (-rollHeight/2 + rollHeight/4) * timeScale;
+			newInfo.m_rearRightHeightOffset += (-rollHeight/2 + rollHeight/4) * timeScale;
+			newInfo.m_rearLeftHeightOffset += SPRING_FACTOR*(rollHeight/3+rollHeight/2) * timeScale;
+			newInfo.m_frontLeftHeightOffset += SPRING_FACTOR*(rollHeight/3+rollHeight/2) * timeScale;
 		}
 		if (newInfo.m_frontLeftHeightOffset < m_locoInfo->m_wheelInfo.m_frontLeftHeightOffset) {
 			// If it's going down, dampen the movement a bit
-			m_locoInfo->m_wheelInfo.m_frontLeftHeightOffset += (newInfo.m_frontLeftHeightOffset - m_locoInfo->m_wheelInfo.m_frontLeftHeightOffset)/2.0f;
+			m_locoInfo->m_wheelInfo.m_frontLeftHeightOffset += ((newInfo.m_frontLeftHeightOffset - m_locoInfo->m_wheelInfo.m_frontLeftHeightOffset)/2.0f) * timeScale;
 		}	else {
 			m_locoInfo->m_wheelInfo.m_frontLeftHeightOffset = newInfo.m_frontLeftHeightOffset;
 		}
 		if (newInfo.m_frontRightHeightOffset < m_locoInfo->m_wheelInfo.m_frontRightHeightOffset) {
 			// If it's going down, dampen the movement a bit
-			m_locoInfo->m_wheelInfo.m_frontRightHeightOffset += (newInfo.m_frontRightHeightOffset - m_locoInfo->m_wheelInfo.m_frontRightHeightOffset)/2.0f;
+			m_locoInfo->m_wheelInfo.m_frontRightHeightOffset += ((newInfo.m_frontRightHeightOffset - m_locoInfo->m_wheelInfo.m_frontRightHeightOffset)/2.0f) * timeScale;
 		}	else {
 			m_locoInfo->m_wheelInfo.m_frontRightHeightOffset = newInfo.m_frontRightHeightOffset;
 		}
 		if (newInfo.m_rearLeftHeightOffset < m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset) {
 			// If it's going down, dampen the movement a bit
-			m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset += (newInfo.m_rearLeftHeightOffset - m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset)/2.0f;
+			m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset += ((newInfo.m_rearLeftHeightOffset - m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset)/2.0f) * timeScale;
 		}	else {
 			m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset = newInfo.m_rearLeftHeightOffset;
 		}
 		if (newInfo.m_rearRightHeightOffset < m_locoInfo->m_wheelInfo.m_rearRightHeightOffset) {
 			// If it's going down, dampen the movement a bit
-			m_locoInfo->m_wheelInfo.m_rearRightHeightOffset += (newInfo.m_rearRightHeightOffset - m_locoInfo->m_wheelInfo.m_rearRightHeightOffset)/2.0f;
+			m_locoInfo->m_wheelInfo.m_rearRightHeightOffset += ((newInfo.m_rearRightHeightOffset - m_locoInfo->m_wheelInfo.m_rearRightHeightOffset)/2.0f) * timeScale;
 		}	else {
 			m_locoInfo->m_wheelInfo.m_rearRightHeightOffset = newInfo.m_rearRightHeightOffset;
 		}
@@ -2243,6 +2228,8 @@ void Drawable::calcPhysicsXformMotorcycle( const Locomotor *locomotor, PhysicsXf
 	if (physics == NULL)
 		return ;
 
+	const Real timeScale = TheGameEngine->getActualLogicTimeScaleOverFpsRatio();
+
 	// get our position and direction vector
 	const Coord3D *pos = getPosition();
 	const Coord3D *dir = getUnitDirectionVector2D();
@@ -2272,15 +2259,15 @@ void Drawable::calcPhysicsXformMotorcycle( const Locomotor *locomotor, PhysicsXf
 		{
 			// Wheels extend when airborne.
 			m_locoInfo->m_wheelInfo.m_framesAirborne = 0;
-			m_locoInfo->m_wheelInfo.m_framesAirborneCounter++;
+			m_locoInfo->m_wheelInfo.m_framesAirborneCounter += timeScale;
 			if (pos->z - hheight > -MAX_SUSPENSION_EXTENSION)
 			{
-				m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset += (MAX_SUSPENSION_EXTENSION - m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset)/2.0f;
+				m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset += ((MAX_SUSPENSION_EXTENSION - m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset)/2.0f) * timeScale;
 				m_locoInfo->m_wheelInfo.m_rearRightHeightOffset = m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset;
 			}
 			else
 			{
-				m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset += (0 - m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset)/2.0f;
+				m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset += ((0 - m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset)/2.0f) * timeScale;
 				m_locoInfo->m_wheelInfo.m_rearRightHeightOffset = m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset;
 			}
 		}
@@ -2306,20 +2293,20 @@ void Drawable::calcPhysicsXformMotorcycle( const Locomotor *locomotor, PhysicsXf
 			switch (GameClientRandomValue(0,3))
 			{
 			case 0:
-				m_locoInfo->m_pitchRate -= BOUNCE_ANGLE_KICK*factor;
-				m_locoInfo->m_rollRate -= BOUNCE_ANGLE_KICK*factor/2;
+				m_locoInfo->m_pitchRate -= BOUNCE_ANGLE_KICK*factor * timeScale;
+				m_locoInfo->m_rollRate -= BOUNCE_ANGLE_KICK*factor/2 * timeScale;
 				break;
 			case 1:
-				m_locoInfo->m_pitchRate += BOUNCE_ANGLE_KICK*factor;
-				m_locoInfo->m_rollRate -= BOUNCE_ANGLE_KICK*factor/2;
+				m_locoInfo->m_pitchRate += BOUNCE_ANGLE_KICK*factor * timeScale;
+				m_locoInfo->m_rollRate -= BOUNCE_ANGLE_KICK*factor/2 * timeScale;
 				break;
 			case 2:
-				m_locoInfo->m_pitchRate -= BOUNCE_ANGLE_KICK*factor;
-				m_locoInfo->m_rollRate += BOUNCE_ANGLE_KICK*factor/2;
+				m_locoInfo->m_pitchRate -= BOUNCE_ANGLE_KICK*factor * timeScale;
+				m_locoInfo->m_rollRate += BOUNCE_ANGLE_KICK*factor/2 * timeScale;
 				break;
 			case 3:
-				m_locoInfo->m_pitchRate += BOUNCE_ANGLE_KICK*factor;
-				m_locoInfo->m_rollRate += BOUNCE_ANGLE_KICK*factor/2;
+				m_locoInfo->m_pitchRate += BOUNCE_ANGLE_KICK*factor * timeScale;
+				m_locoInfo->m_rollRate += BOUNCE_ANGLE_KICK*factor/2 * timeScale;
 				break;
 			}
 		}
@@ -2332,61 +2319,51 @@ void Drawable::calcPhysicsXformMotorcycle( const Locomotor *locomotor, PhysicsXf
 	// the ground can only push back if we're touching it
 	if (!airborne)
 	{
-		m_locoInfo->m_pitchRate += ((-PITCH_STIFFNESS * (m_locoInfo->m_pitch - groundPitch)) + (-PITCH_DAMPING * m_locoInfo->m_pitchRate));		// spring/damper
-		m_locoInfo->m_rollRate += ((-ROLL_STIFFNESS * (m_locoInfo->m_roll - groundRoll)) + (-ROLL_DAMPING * m_locoInfo->m_rollRate));		// spring/damper
+		m_locoInfo->m_pitchRate += ((-PITCH_STIFFNESS * (m_locoInfo->m_pitch - groundPitch)) + (-PITCH_DAMPING * m_locoInfo->m_pitchRate)) * timeScale;		// spring/damper
+		m_locoInfo->m_rollRate += ((-ROLL_STIFFNESS * (m_locoInfo->m_roll - groundRoll)) + (-ROLL_DAMPING * m_locoInfo->m_rollRate)) * timeScale;		// spring/damper
 	}
 	else
 	{
 		//Autolevel
-		m_locoInfo->m_pitchRate += ( (-PITCH_STIFFNESS * m_locoInfo->m_pitch) + (-PITCH_DAMPING * m_locoInfo->m_pitchRate) );		// spring/damper
-		m_locoInfo->m_rollRate += ( (-ROLL_STIFFNESS * m_locoInfo->m_roll) + (-ROLL_DAMPING * m_locoInfo->m_rollRate) );		// spring/damper
+		m_locoInfo->m_pitchRate += ( (-PITCH_STIFFNESS * m_locoInfo->m_pitch) + (-PITCH_DAMPING * m_locoInfo->m_pitchRate) ) * timeScale;		// spring/damper
+		m_locoInfo->m_rollRate += ( (-ROLL_STIFFNESS * m_locoInfo->m_roll) + (-ROLL_DAMPING * m_locoInfo->m_rollRate) ) * timeScale;		// spring/damper
 	}
-
-	m_locoInfo->m_pitch += m_locoInfo->m_pitchRate * UNIFORM_AXIAL_DAMPING;
-	m_locoInfo->m_roll += m_locoInfo->m_rollRate   * UNIFORM_AXIAL_DAMPING;
 
 	// process chassis acceleration dynamics - damp back towards zero
 
-	m_locoInfo->m_accelerationPitchRate += ((-PITCH_STIFFNESS * (m_locoInfo->m_accelerationPitch)) + (-PITCH_DAMPING * m_locoInfo->m_accelerationPitchRate));		// spring/damper
-	m_locoInfo->m_accelerationPitch += m_locoInfo->m_accelerationPitchRate;
-
-	m_locoInfo->m_accelerationRollRate += ((-ROLL_STIFFNESS * m_locoInfo->m_accelerationRoll) + (-ROLL_DAMPING * m_locoInfo->m_accelerationRollRate));		// spring/damper
-	m_locoInfo->m_accelerationRoll += m_locoInfo->m_accelerationRollRate;
-
-	// compute total pitch and roll of tank
-	info.m_totalPitch = m_locoInfo->m_pitch + m_locoInfo->m_accelerationPitch;
-
-
-  // THis logic had recently been added to Drawable::applyPhysicsXform(), which was naughty, since it clamped the roll in every drawable in the game
-  // Now only motorcycles enjoy this constraint
-  Real unclampedRoll = m_locoInfo->m_roll + m_locoInfo->m_accelerationRoll;
-  info.m_totalRoll = (unclampedRoll > 0.5f && unclampedRoll < -0.5f ? unclampedRoll : 0.0f);
-
-	if( airborne )
-	{
-	}
+	m_locoInfo->m_accelerationPitchRate += ((-PITCH_STIFFNESS * (m_locoInfo->m_accelerationPitch)) + (-PITCH_DAMPING * m_locoInfo->m_accelerationPitchRate)) * timeScale;		// spring/damper
+	m_locoInfo->m_accelerationRollRate += ((-ROLL_STIFFNESS * m_locoInfo->m_accelerationRoll) + (-ROLL_DAMPING * m_locoInfo->m_accelerationRollRate)) * timeScale;		// spring/damper
 
 	if (physics->isMotive())
 	{
 		// cause the chassis to pitch & roll in reaction to acceleration/deceleration
 		Real forwardAccel = dir->x * accel->x + dir->y * accel->y;
-		m_locoInfo->m_accelerationPitchRate += -(FORWARD_ACCEL_COEFF * forwardAccel);
+		m_locoInfo->m_accelerationPitchRate += -(FORWARD_ACCEL_COEFF * forwardAccel) * timeScale;
 
 		Real lateralAccel = -dir->y * accel->x + dir->x * accel->y;
-		m_locoInfo->m_accelerationRollRate += -(LATERAL_ACCEL_COEFF * lateralAccel);
+		m_locoInfo->m_accelerationRollRate += -(LATERAL_ACCEL_COEFF * lateralAccel) * timeScale;
 	}
 
-	// limit acceleration pitch and roll
+	if (timeScale > 0.0f)
+	{
+		m_locoInfo->m_pitch += m_locoInfo->m_pitchRate * UNIFORM_AXIAL_DAMPING;
+		m_locoInfo->m_roll += m_locoInfo->m_rollRate * UNIFORM_AXIAL_DAMPING;
+		m_locoInfo->m_accelerationPitch += m_locoInfo->m_accelerationPitchRate;
+		m_locoInfo->m_accelerationRoll += m_locoInfo->m_accelerationRollRate;
 
-	if (m_locoInfo->m_accelerationPitch > DECEL_PITCH_LIMIT)
-		m_locoInfo->m_accelerationPitch = DECEL_PITCH_LIMIT;
-	else if (m_locoInfo->m_accelerationPitch < -ACCEL_PITCH_LIMIT)
-		m_locoInfo->m_accelerationPitch = -ACCEL_PITCH_LIMIT;
+		// limit acceleration pitch and roll
 
-	if (m_locoInfo->m_accelerationRoll > DECEL_PITCH_LIMIT)
-		m_locoInfo->m_accelerationRoll = DECEL_PITCH_LIMIT;
-	else if (m_locoInfo->m_accelerationRoll < -ACCEL_PITCH_LIMIT)
-		m_locoInfo->m_accelerationRoll = -ACCEL_PITCH_LIMIT;
+		m_locoInfo->m_accelerationPitch = clamp(-ACCEL_PITCH_LIMIT, m_locoInfo->m_accelerationPitch, DECEL_PITCH_LIMIT);
+		m_locoInfo->m_accelerationRoll = clamp(-ACCEL_PITCH_LIMIT, m_locoInfo->m_accelerationRoll, DECEL_PITCH_LIMIT);
+	}
+
+	// compute total pitch and roll of tank
+	info.m_totalPitch = m_locoInfo->m_pitch + m_locoInfo->m_accelerationPitch;
+
+	// This logic had recently been added to Drawable::applyPhysicsXform(), which was naughty, since it clamped the roll in every drawable in the game
+	// Now only motorcycles enjoy this constraint
+	Real unclampedRoll = m_locoInfo->m_roll + m_locoInfo->m_accelerationRoll;
+	info.m_totalRoll = (unclampedRoll > 0.5f && unclampedRoll < -0.5f ? unclampedRoll : 0.0f);
 
 	info.m_totalZ = 0;
 
@@ -2423,8 +2400,8 @@ void Drawable::calcPhysicsXformMotorcycle( const Locomotor *locomotor, PhysicsXf
 		// etc, this smaller angle we'll be adding covers the constant wheel shifting
 		// left and right when moving in a relatively straight line
 		//
-		#define WHEEL_SMOOTHNESS 10.0f  // higher numbers add smaller angles, make it more "smooth"
-		m_locoInfo->m_wheelInfo.m_wheelAngle += (newInfo.m_wheelAngle - m_locoInfo->m_wheelInfo.m_wheelAngle)/WHEEL_SMOOTHNESS;
+		CONSTEXPR const Real WHEEL_SMOOTHNESS = 10.0f;  // higher numbers add smaller angles, make it more "smooth"
+		m_locoInfo->m_wheelInfo.m_wheelAngle += (newInfo.m_wheelAngle - m_locoInfo->m_wheelInfo.m_wheelAngle)/WHEEL_SMOOTHNESS * timeScale;
 
 		const Real SPRING_FACTOR = 0.9f;
 		if (pitchHeight<0)
@@ -2455,7 +2432,7 @@ void Drawable::calcPhysicsXformMotorcycle( const Locomotor *locomotor, PhysicsXf
 		if (newInfo.m_frontLeftHeightOffset < m_locoInfo->m_wheelInfo.m_frontLeftHeightOffset)
 		{
 			// If it's going down, dampen the movement a bit
-			m_locoInfo->m_wheelInfo.m_frontLeftHeightOffset += (newInfo.m_frontLeftHeightOffset - m_locoInfo->m_wheelInfo.m_frontLeftHeightOffset)/2.0f;
+			m_locoInfo->m_wheelInfo.m_frontLeftHeightOffset += (newInfo.m_frontLeftHeightOffset - m_locoInfo->m_wheelInfo.m_frontLeftHeightOffset)/2.0f * timeScale;
 			m_locoInfo->m_wheelInfo.m_frontRightHeightOffset = m_locoInfo->m_wheelInfo.m_frontLeftHeightOffset;
 		}
 		else
@@ -2466,7 +2443,7 @@ void Drawable::calcPhysicsXformMotorcycle( const Locomotor *locomotor, PhysicsXf
 		if (newInfo.m_rearLeftHeightOffset < m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset)
 		{
 			// If it's going down, dampen the movement a bit
-			m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset += (newInfo.m_rearLeftHeightOffset - m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset)/2.0f;
+			m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset += (newInfo.m_rearLeftHeightOffset - m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset)/2.0f * timeScale;
 			m_locoInfo->m_wheelInfo.m_rearRightHeightOffset = m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset;
 		}
 		else
@@ -2629,9 +2606,8 @@ void Drawable::setStealthLook(StealthLookType look)
 //-------------------------------------------------------------------------------------------------
 /** default draw is to just call the database defined draw */
 //-------------------------------------------------------------------------------------------------
-void Drawable::draw( View *view )
+void Drawable::draw()
 {
-
   if ( testTintStatus( TINT_STATUS_FRENZY ) == FALSE )
   {
     if ( getObject() && getObject()->isEffectivelyDead() )
@@ -2666,7 +2642,10 @@ void Drawable::draw( View *view )
 #endif
 	}
 
-	applyPhysicsXform(&transformMtx);
+	if (TheGlobalData->m_showClientPhysics && getObject() && !getObject()->isDisabledByType( DISABLED_HELD ))
+	{
+		applyPhysicsXform(&transformMtx);
+	}
 
 	for (DrawModule** dm = getDrawModules(); *dm; ++dm)
 	{
@@ -5142,8 +5121,18 @@ void Drawable::xfer( Xfer *xfer )
 		xfer->xferReal( &m_locoInfo->m_wheelInfo.m_rearLeftHeightOffset );
 		xfer->xferReal( &m_locoInfo->m_wheelInfo.m_rearRightHeightOffset );
 		xfer->xferReal( &m_locoInfo->m_wheelInfo.m_wheelAngle );
-		xfer->xferInt( &m_locoInfo->m_wheelInfo.m_framesAirborneCounter );
-		xfer->xferInt( &m_locoInfo->m_wheelInfo.m_framesAirborne );
+
+#if RETAIL_COMPATIBLE_XFER_SAVE
+		Int framesAirborneCounter = m_locoInfo->m_wheelInfo.m_framesAirborneCounter;
+		Int framesAirborne = m_locoInfo->m_wheelInfo.m_framesAirborne;
+		xfer->xferInt( &framesAirborneCounter );
+		xfer->xferInt( &framesAirborne );
+		m_locoInfo->m_wheelInfo.m_framesAirborneCounter = framesAirborneCounter;
+		m_locoInfo->m_wheelInfo.m_framesAirborne = framesAirborne;
+#else
+		xfer->xferReal( &m_locoInfo->m_wheelInfo.m_framesAirborneCounter );
+		xfer->xferReal( &m_locoInfo->m_wheelInfo.m_framesAirborne );
+#endif
 	}
 
 	// modules

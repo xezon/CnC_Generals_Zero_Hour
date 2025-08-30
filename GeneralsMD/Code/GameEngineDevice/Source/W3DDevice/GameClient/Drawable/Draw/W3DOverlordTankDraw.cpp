@@ -34,6 +34,7 @@
 #include "GameLogic/Object.h"
 #include "GameLogic/Module/ContainModule.h"
 #include "W3DDevice/GameClient/Module/W3DOverlordTankDraw.h"
+#include "W3DDevice/GameClient/W3DDisplay.h"
 
 //-------------------------------------------------------------------------------------------------
 W3DOverlordTankDrawModuleData::W3DOverlordTankDrawModuleData()
@@ -88,7 +89,8 @@ void W3DOverlordTankDraw::doDrawModule(const Matrix3D* transformMtx)
 		riderDraw->setColorTintEnvelope( *getDrawable()->getColorTintEnvelope() );
 
 		riderDraw->notifyDrawableDependencyCleared();
-		riderDraw->draw( NULL );// What the hell?  This param isn't used for anything
+		//if (!W3DDisplay::isTimeFrozen())
+			riderDraw->draw();
 	}
 }
 

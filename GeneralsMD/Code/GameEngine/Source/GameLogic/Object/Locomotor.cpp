@@ -1436,7 +1436,7 @@ void Locomotor::moveTowardsPositionWheels(Object* obj, PhysicsBehavior *physics,
 		if (m_brakingFactor>MAX_BRAKING_FACTOR) {
 			m_brakingFactor = MAX_BRAKING_FACTOR;
 		}
-		m_brakingFactor = 1.0f;
+		//m_brakingFactor = 1.0f;
 		if (slowDownDist>onPathDistToGoal) {
 			goalSpeed = actualSpeed-getBraking();
 			if (goalSpeed<0.0f) goalSpeed= 0.0f;

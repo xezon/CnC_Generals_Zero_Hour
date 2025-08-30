@@ -32,6 +32,7 @@
 #include "Common/Thing.h"
 #include "Common/ThingFactory.h"
 #include "Common/GameAudio.h"
+#include "Common/GameEngine.h"
 #include "Common/GlobalData.h"
 #include "Common/ThingTemplate.h"
 #include "Common/Xfer.h"
@@ -515,10 +516,10 @@ void W3DTankTruckDraw::doDrawModule(const Matrix3D* transformMtx)
 	if (!TheGlobalData->m_showClientPhysics)
 		return;
 
- 	Bool frozen = TheTacticalView->isTimeFrozen() && !TheTacticalView->isCameraMovementFinished();
- 	frozen = frozen || TheScriptEngine->isTimeFrozenDebug() || TheScriptEngine->isTimeFrozenScript();
-	if (frozen)
-		return;
+ //	Bool frozen = TheTacticalView->isTimeFrozen() && !TheTacticalView->isCameraMovementFinished();
+ //	frozen = frozen || TheScriptEngine->isTimeFrozenDebug() || TheScriptEngine->isTimeFrozenScript();
+	//if (frozen)
+	//	return;
 
 	const Real ACCEL_THRESHOLD = 0.01f;
 	const Real SIZE_CAP = 2.0f;
@@ -537,24 +538,22 @@ void W3DTankTruckDraw::doDrawModule(const Matrix3D* transformMtx)
 	if (physics == NULL)
 		return;
 
+	const Real timeScale = TheGameEngine->getActualLogicTimeScaleOverFpsRatio();
+
 	const Coord3D *vel = physics->getVelocity();
 	Real speed = physics->getVelocityMagnitude();
-
 
 	const TWheelInfo *wheelInfo = getDrawable()->getWheelInfo();	// note, can return null!
 	if (wheelInfo && (m_frontLeftTireBone || m_rearLeftTireBone))
 	{
-		static Real rotation = 0;
 		const Real rotationFactor = getW3DTankTruckDrawModuleData()->m_rotationSpeedMultiplier;
-		m_frontWheelRotation += rotationFactor*speed;
-		if (m_isPowersliding)
-		{
-			m_rearWheelRotation += rotationFactor*(speed+getW3DTankTruckDrawModuleData()->m_powerslideRotationAddition);
-		}
-		else
-		{
-			m_rearWheelRotation += rotationFactor*speed;
-		}
+		const Real powerslideRotationAddition = getW3DTankTruckDrawModuleData()->m_powerslideRotationAddition * m_isPowersliding;
+
+		m_frontWheelRotation += rotationFactor*speed * timeScale;
+		m_rearWheelRotation += rotationFactor*(speed+powerslideRotationAddition) * timeScale;
+		m_frontWheelRotation = WWMath::Normalize_Angle(m_frontWheelRotation);
+		m_rearWheelRotation = WWMath::Normalize_Angle(m_rearWheelRotation);
+
 		Matrix3D wheelXfrm(1);
 		if (m_frontLeftTireBone)
 		{
@@ -638,9 +637,9 @@ void W3DTankTruckDraw::doDrawModule(const Matrix3D* transformMtx)
 			m_dustEffect->setSizeMultiplier(speed);
 		}
 		if (m_dirtEffect) {
-			if (wheelInfo && wheelInfo->m_framesAirborne>3) {
-				Real factor = 1 + wheelInfo->m_framesAirborne/16;
-				if (factor>2.0) factor = 2.0;
+			if (wheelInfo && wheelInfo->m_framesAirborne>3.0f) {
+				Real factor = 1 + wheelInfo->m_framesAirborne/16.0f;
+				if (factor>2.0f) factor = 2.0f;
 				m_dustEffect->setSizeMultiplier(factor*SIZE_CAP);
 				m_dustEffect->trigger();
 				m_landingSound.setPosition(obj->getPosition());
@@ -714,7 +713,7 @@ void W3DTankTruckDraw::doDrawModule(const Matrix3D* transformMtx)
 	if (m_treadCount)
 	{
 		Real offset_u;
-		Real treadScrollSpeed=getW3DTankTruckDrawModuleData()->m_treadAnimationRate;
+		Real treadScrollSpeed=getW3DTankTruckDrawModuleData()->m_treadAnimationRate * timeScale;
 		TreadObjectInfo *pTread=m_treads;
 		Real maxSpeed=obj->getAIUpdateInterface()->getCurLocomotorSpeed();
 /* Commented out because these vehicles are presumed not to turn via treads.
