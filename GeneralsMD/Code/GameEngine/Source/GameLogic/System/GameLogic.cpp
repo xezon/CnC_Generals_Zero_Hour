@@ -2029,7 +2029,8 @@ void GameLogic::startNewGame( Bool loadingSaveGame )
 	// update the loadscreen
 	updateLoadProgress(LOAD_PROGRESS_POST_PRELOAD_ASSETS);
 
-	TheTacticalView->setAngleAndPitchToDefault();
+	TheTacticalView->setAngleToDefault();
+	TheTacticalView->setPitchToDefault();
 	TheTacticalView->setZoomToDefault();
 
 	if( TheRecorder )
@@ -2074,8 +2075,9 @@ void GameLogic::startNewGame( Bool loadingSaveGame )
 	}
 
 	// Set up the camera height based on the map height & globalData.
-	TheTacticalView->initHeightForMap();
-	TheTacticalView->setAngleAndPitchToDefault();
+	TheTacticalView->resetPivotToGround();
+	TheTacticalView->setAngleToDefault();
+	TheTacticalView->setPitchToDefault();
 	TheTacticalView->setZoomToDefault();
 
 	// update the loadscreen

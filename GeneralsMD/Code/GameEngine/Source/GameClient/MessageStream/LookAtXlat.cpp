@@ -136,6 +136,7 @@ LookAtTranslator::LookAtTranslator() :
 	m_isScrolling(false),
 	m_isRotating(false),
 	m_isPitching(false),
+	m_isDefaultPitching(false),
 	m_isChangingFOV(false),
 	m_middleButtonDownTimeMsec(0),
 	m_lastPlaneID(INVALID_DRAWABLE_ID),
@@ -314,7 +315,9 @@ GameMessageDisposition LookAtTranslator::translateGameMessage(const GameMessage 
 			// if middle button is "clicked", reset to "home" orientation
 			if (!didMove && elapsedMsec < CLICK_DURATION_MSEC)
 			{
-				TheTacticalView->setAngleAndPitchToDefault();
+				TheTacticalView->resetPivotToGround();
+				TheTacticalView->setAngleToDefault();
+				TheTacticalView->setPitchToDefault();
 				TheTacticalView->setZoomToDefault();
 			}
 
@@ -379,22 +382,27 @@ GameMessageDisposition LookAtTranslator::translateGameMessage(const GameMessage 
 			// rotate the view up/down
 			if (m_isPitching)
 			{
-				const Real FACTOR = 0.01f;
-
-				Real angle = FACTOR * (m_currentPos.y - m_anchor.y);
-
-				TheTacticalView->setPitch( TheTacticalView->getPitch() + angle );
+				constexpr const Real Scale = 0.01f;
+				const Real angle = Scale * (m_currentPos.y - m_anchor.y);
+				TheTacticalView->setPitch( TheTacticalView->getPitch() - angle );
 				m_anchor = msg->getArgument( 0 )->pixel;
 			}
 
 #if defined(RTS_DEBUG)
+			if (m_isDefaultPitching)
+			{
+				constexpr const Real Scale = 0.01f;
+				const Real angle = Scale * (m_currentPos.y - m_anchor.y);
+				TheTacticalView->setDefaultPitch( TheTacticalView->getDefaultPitch() - angle );
+				TheTacticalView->setPitch( TheTacticalView->getDefaultPitch() );
+				m_anchor = msg->getArgument( 0 )->pixel;
+			}
+
 			// adjust the field of view
 			if (m_isChangingFOV)
 			{
-				const Real FACTOR = 0.01f;
-
-				Real angle = FACTOR * (m_currentPos.y - m_anchor.y);
-
+				constexpr const Real Scale = 0.01f;
+				const Real angle = Scale * (m_currentPos.y - m_anchor.y);
 				TheTacticalView->setFieldOfView( TheTacticalView->getFieldOfView() + angle );
 				m_anchor = msg->getArgument( 0 )->pixel;
 			}
@@ -556,6 +564,7 @@ GameMessageDisposition LookAtTranslator::translateGameMessage(const GameMessage 
 		{
 			DEBUG_ASSERTCRASH(!m_isPitching, ("hmm, mismatched m_isPitching"));
 			m_isPitching = true;
+			m_anchor = m_currentPos;
 			disp = DESTROY_MESSAGE;
 			break;
 		}
@@ -567,6 +576,29 @@ GameMessageDisposition LookAtTranslator::translateGameMessage(const GameMessage 
 		{
 			DEBUG_ASSERTCRASH(m_isPitching, ("hmm, mismatched m_isPitching"));
 			m_isPitching = false;
+			disp = DESTROY_MESSAGE;
+			break;
+		}
+#endif // #if defined(RTS_DEBUG)
+
+		// ------------------------------------------------------------------------
+#if defined(RTS_DEBUG)
+		case GameMessage::MSG_META_DEMO_BEGIN_ADJUST_DEFAULTPITCH:
+		{
+			DEBUG_ASSERTCRASH(!m_isDefaultPitching, ("hmm, mismatched m_isDefaultPitching"));
+			m_isDefaultPitching = true;
+			m_anchor = m_currentPos;
+			disp = DESTROY_MESSAGE;
+			break;
+		}
+#endif // #if defined(RTS_DEBUG)
+
+		// ------------------------------------------------------------------------
+#if defined(RTS_DEBUG)
+		case GameMessage::MSG_META_DEMO_END_ADJUST_DEFAULTPITCH:
+		{
+			DEBUG_ASSERTCRASH(m_isDefaultPitching, ("hmm, mismatched m_isDefaultPitching"));
+			m_isDefaultPitching = false;
 			disp = DESTROY_MESSAGE;
 			break;
 		}
@@ -611,6 +643,7 @@ GameMessageDisposition LookAtTranslator::translateGameMessage(const GameMessage 
 			//DEBUG_ASSERTCRASH(!m_isChangingFOV, ("hmm, mismatched m_isChangingFOV"));
 			m_isChangingFOV = true;
 			m_anchor = m_currentPos;
+			disp = DESTROY_MESSAGE;
 			break;
 		}
 #endif // #if defined(RTS_DEBUG)
@@ -621,6 +654,7 @@ GameMessageDisposition LookAtTranslator::translateGameMessage(const GameMessage 
 		{
 		//	DEBUG_ASSERTCRASH(m_isChangingFOV, ("hmm, mismatched m_isChangingFOV"));
 			m_isChangingFOV = false;
+			disp = DESTROY_MESSAGE;
 			break;
 		}
 #endif // #if defined(RTS_DEBUG)
@@ -741,5 +775,6 @@ void LookAtTranslator::resetModes()
 	m_isScrolling = FALSE;
 	m_isRotating = FALSE;
 	m_isPitching = FALSE;
+	m_isDefaultPitching = FALSE;
 	m_isChangingFOV = FALSE;
 }

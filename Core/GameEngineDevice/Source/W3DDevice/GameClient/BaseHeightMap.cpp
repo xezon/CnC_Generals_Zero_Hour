@@ -671,7 +671,7 @@ This is a quick version that just checks every polygon inside
 a 2D bounding rectangle of the ray projected onto the heightfield plane.
 For most of our view-picking cases the ray in almost perpendicular to the
 map plane so this is very quick (small bounding box).  But it can become slow
-for arbitrary rays such as those used in AI visbility checks.(2 units on
+for arbitrary rays such as those used in AI visibility checks. (2 units on
 opposite corners of the map would check every polygon in the map).
 */
 //=============================================================================
@@ -2397,7 +2397,7 @@ rendered portion of the terrain.  Only a 96x96 section is rendered at any time,
 even though maps can be up to 1024x1024.  This function determines which subset
 is rendered. */
 //=============================================================================
-void BaseHeightMapRenderObjClass::updateCenter(CameraClass *camera , RefRenderObjListIterator *pLightsIterator)
+void BaseHeightMapRenderObjClass::updateCenter(CameraClass *camera, Vector3* cameraPivot, RefRenderObjListIterator *pLightsIterator)
 {
 	if (m_map==NULL) {
 		return;

@@ -2042,7 +2042,11 @@ void WbView3d::redraw(void)
 		++m_updateCount;
 		Int curTicks = GetTickCount();
 		RefRenderObjListIterator lightListIt(&m_lightList);
-		m_heightMapRenderObj->updateCenter(m_camera, &lightListIt);
+		Vector3 cameraPivot;
+		cameraPivot.X = m_centerPt.X * MAP_XY_FACTOR;
+		cameraPivot.Y = m_centerPt.Y * MAP_XY_FACTOR;
+		cameraPivot.Z = m_heightMapRenderObj ? getHeightAroundPos(m_heightMapRenderObj, cameraPivot.X, cameraPivot.Y) : 0;
+		m_heightMapRenderObj->updateCenter(m_camera, &cameraPivot, &lightListIt);
 		m_heightMapRenderObj->On_Frame_Update();
 		--m_updateCount;
 

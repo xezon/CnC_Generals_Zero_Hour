@@ -221,6 +221,8 @@ public:
 	/// set the shroud level at shroud cell x,y
 	virtual void setShroudLevel( Int x, Int y, CellShroudStatus setting ) = 0;
 
+	virtual void notifyViewChanged() {} ///< signals that the camera view has changed
+
 protected:
 
 	// snapshot methods

@@ -67,6 +67,7 @@
 
 #include "GameLogic/AIPathfind.h"
 #include "GameLogic/TerrainLogic.h"
+#include "W3DDevice/Common/W3DCameraUtility.h"
 #include "W3DDevice/GameClient/TerrainTex.h"
 #include "W3DDevice/GameClient/W3DDynamicLight.h"
 #include "W3DDevice/GameClient/W3DScene.h"
@@ -1588,16 +1589,23 @@ void HeightMapRenderObjClass::staticLightingChanged( void )
 #define WIDE_STEP 32
 
 static Int visMinX, visMinY, visMaxX, visMaxY;
-static Bool check(const FrustumClass & frustum, WorldHeightMap *pMap, Int x, Int y)
+
+static Bool check(const FrustumClass & frustum, const WorldHeightMap *pMap, Int x, Int y)
 {
-	if (x<0 || y<0) return(false);
-	if (x>= pMap->getXExtent() || y>= pMap->getYExtent()) return(false);
-	if (x >= visMinX && y >= visMinY && x <=visMaxX && y <= visMaxY) {
+	if (x<0 || y<0)
+		return(false);
+
+	if (x >= pMap->getXExtent() || y >= pMap->getYExtent())
+		return(false);
+
+	if (x >= visMinX && y >= visMinY && x <= visMaxX && y <= visMaxY)
 		return(true);
-	}
+
 	Int height = pMap->getHeight(x, y);
 	Vector3 loc((x-pMap->getBorderSizeInline())*MAP_XY_FACTOR, (y-pMap->getBorderSizeInline())*MAP_XY_FACTOR, height*MAP_HEIGHT_SCALE);
-	if (CollisionMath::Overlap_Test(frustum,loc) == CollisionMath::INSIDE) {
+
+	if (CollisionMath::Overlap_Test(frustum,loc) == CollisionMath::INSIDE)
+	{
 		if (x<visMinX) visMinX=x;
 		if (x>visMaxX) visMaxX=x;
 		if (y<visMinY) visMinY=y;
@@ -1607,11 +1615,11 @@ static Bool check(const FrustumClass & frustum, WorldHeightMap *pMap, Int x, Int
 	return(false);
 }
 
-static void calcVis(const FrustumClass & frustum, WorldHeightMap *pMap, Int minX, Int minY, Int maxX, Int maxY, Int limit)
+static void calcVis(const FrustumClass & frustum, const WorldHeightMap *pMap, Int minX, Int minY, Int maxX, Int maxY, Int limit)
 {
 	if (maxX-minX<2) return;
 	if (maxY-minY<2) return;
-	if (minX >=visMinX && minY >= visMinY && maxX <=visMaxX && maxY <= visMaxY) {
+	if (minX >= visMinX && minY >= visMinY && maxX <= visMaxX && maxY <= visMaxY) {
 		return;
 	}
 	Int midX = (minX+maxX)/2;
@@ -1621,11 +1629,11 @@ static void calcVis(const FrustumClass & frustum, WorldHeightMap *pMap, Int minX
 	Bool recurse3 = recurse1;
 	Bool recurse4 = recurse1;
 	/* boxes are:
-
-			1     2
-
-
-			3			4 */
+	 *
+	 *  1   2
+	 *
+	 *  3   4
+	 */
 
 	if (check(frustum, pMap, midX, maxY)) {
 		recurse1=true;
@@ -1671,12 +1679,11 @@ static void calcVis(const FrustumClass & frustum, WorldHeightMap *pMap, Int minX
 // HeightMapRenderObjClass::updateCenter
 //=============================================================================
 /** Updates the positioning of the drawn portion of the height map in the
-heightmap.  As the view slides around, this determines what is the actually
-rendered portion of the terrain.  Only a 96x96 section is rendered at any time,
-even though maps can be up to 1024x1024.  This function determines which subset
-is rendered. */
+heightmap. As the view slides around, this determines what is the actually
+rendered portion of the terrain. Only a small section is rendered at any time.
+*/
 //=============================================================================
-void HeightMapRenderObjClass::updateCenter(CameraClass *camera , RefRenderObjListIterator *pLightsIterator)
+void HeightMapRenderObjClass::updateCenter(CameraClass *camera, Vector3* cameraPivot, RefRenderObjListIterator *pLightsIterator)
 {
 	if (m_map==NULL) {
 		return;
@@ -1687,11 +1694,11 @@ void HeightMapRenderObjClass::updateCenter(CameraClass *camera , RefRenderObjLis
 	if (m_vertexBufferTiles ==NULL)
 		return;		//did not initialize resources yet.
 
-	BaseHeightMapRenderObjClass::updateCenter(camera, pLightsIterator);
+	BaseHeightMapRenderObjClass::updateCenter(camera, cameraPivot, pLightsIterator);
 
 	m_updating = true;
 	if (m_needFullUpdate)
-  {
+	{
 		m_needFullUpdate = false;
 		updateBlock(0, 0, m_x-1, m_y-1, m_map, pLightsIterator);
 		m_updating = false;
@@ -1699,7 +1706,7 @@ void HeightMapRenderObjClass::updateCenter(CameraClass *camera , RefRenderObjLis
 	}
 
 	if (m_x >= m_map->getXExtent() && m_y >= m_map->getYExtent())
-  {
+	{
 		m_updating = false;
 		return; // no need to center.
 	}
@@ -1708,8 +1715,13 @@ void HeightMapRenderObjClass::updateCenter(CameraClass *camera , RefRenderObjLis
 	if (HALF_RES_MESH) {
 		cellOffset = 2;
 	}
+
+
+#define ORIGINAL_CODE 1
+
+#if ORIGINAL_CODE
 	// determine the ray corresponding to the camera and distance to projection plane
-	Matrix3D camera_matrix = camera->Get_Transform();
+	const Matrix3D& camera_matrix = camera->Get_Transform();
 
 	Vector3 camera_location  = camera->Get_Position();
 
@@ -1731,7 +1743,7 @@ void HeightMapRenderObjClass::updateCenter(CameraClass *camera , RefRenderObjLis
 		}
 	}
 	intersectionZ = (float)minHt;
-//	float aspect = camera->Get_Aspect_Ratio();
+	//float aspect = camera->Get_Aspect_Ratio();
 
 	Vector2 min,max;
 	camera->Get_View_Plane(min,max);
@@ -1794,25 +1806,102 @@ void HeightMapRenderObjClass::updateCenter(CameraClass *camera , RefRenderObjLis
 		limit=WIDE_STEP/2;
 	}
 	calcVis(frustum, m_map, minX-WIDE_STEP/2, minY-WIDE_STEP/2, maxX+WIDE_STEP/2, maxY+WIDE_STEP/2, limit);
+#endif
+
+
 
 	if (m_map) {
+
 		Int newOrgX;
+		Int newOrgY;
+
+
+
+#if ORIGINAL_CODE
 		if (visMaxX-visMinX > m_x) {
-			newOrgX = (maxX+minX)/2-m_x/2.0;
+			newOrgX = (maxX+minX)/2 - m_x/2.0;
 		} else {
-			newOrgX = (visMaxX+visMinX)/2-m_x/2.0;
+			newOrgX = (visMaxX+visMinX)/2 - m_x/2.0;
 		}
 
-		Int newOrgY;
 		if (visMaxY - visMinY > m_y) {
 			newOrgY = visMinY+1;
 		}	else {
-			newOrgY = (visMaxY+visMinY)/2-m_y/2.0;
+			newOrgY = (visMaxY+visMinY)/2 - m_y/2.0;
 		}
+
 		if (TheTacticalView->getFieldOfView() != 0) {
-			newOrgX = (visMaxX+visMinX)/2-m_x/2.0;
-			newOrgY = (visMaxY+visMinY)/2-m_y/2.0;
+			newOrgX = (visMaxX+visMinX)/2 - m_x/2.0;
+			newOrgY = (visMaxY+visMinY)/2 - m_y/2.0;
 		}
+#endif
+
+
+#if 0
+		//  1-------2
+		//   \     /
+		//    4---3
+		Coord3D box[4];
+		W3DViewCornersToWorldAtZ(box[0], box[1], box[2], box[3], *camera, m_map->getMinHeightValue() /*cameraPivot->Z*/);
+		//const Real viewRegion = 1.0f;
+		//W3DViewPointToWorldAtZ(box[0], *camera, Vector2(-viewRegion, viewRegion), cameraPivot->Z);
+		//W3DViewPointToWorldAtZ(box[1], *camera, Vector2(viewRegion, viewRegion), cameraPivot->Z);
+		//W3DViewPointToWorldAtZ(box[2], *camera, Vector2(viewRegion, -viewRegion), cameraPivot->Z);
+		//W3DViewPointToWorldAtZ(box[3], *camera, Vector2(-viewRegion, -viewRegion), cameraPivot->Z);
+
+		//  +-------+
+		//  |       |
+		//  +-------+
+		Region3D bbox;
+		bbox.setFromPointsNoZ(box, ARRAY_SIZE(box));
+		bbox.lo.z = cameraPivot->Z;
+		bbox.hi.z = cameraPivot->Z;
+
+		const Coord3D bboxCenter = bbox.getCenter();
+
+		newOrgX = WWMath::Round(bboxCenter.x/MAP_XY_FACTOR) - m_x/2 + m_map->getBorderSizeInline();
+		newOrgY = WWMath::Round(bboxCenter.y/MAP_XY_FACTOR) - m_y/2 + m_map->getBorderSizeInline();
+#elif 0
+		//Coord3D box[4];
+		//W3DViewCornersToWorldAtZ(box[0], box[1], box[2], box[3], *camera, m_map->getMinHeightValue());
+
+		//Region3D bbox;
+		//bbox.setFromPointsNoZ(box, ARRAY_SIZE(box));
+		//bbox.lo.z = cameraPivot->Z;
+		//bbox.hi.z = cameraPivot->Z;
+		//const Coord3D bboxCenter = bbox.getCenter();
+
+
+		//Vector2 shift1;
+		//shift1.X = bboxCenter.x - cameraPivot->X;
+		//shift1.Y = bboxCenter.y - cameraPivot->Y;
+		//shift1.X *= 1.0f - viewDir.X;
+		//shift1.Y *= 1.0f - viewDir.Y;
+
+		// TheSuperHackers @fix Very fast approximation.
+		// Works perfectly with top down view, good enough with regular view and alright with ground view.
+		// If drawn terrain area is not large enough, can increase NORMAL_DRAW_WIDTH, NORMAL_DRAW_HEIGHT.
+		const Real visibleTerrainEdgeLen = (m_x+m_y)/2 * MAP_XY_FACTOR;
+		const Real magicEdgeLenScale = 0.25f;
+		Vector3 viewDir = *cameraPivot - camera->Get_Position();
+		viewDir.Normalize();
+		Vector2 shiftPivot;
+		shiftPivot.X = viewDir.X * visibleTerrainEdgeLen * magicEdgeLenScale;
+		shiftPivot.Y = viewDir.Y * visibleTerrainEdgeLen * magicEdgeLenScale;
+		newOrgX = WWMath::Round((cameraPivot->X + shiftPivot.X)/MAP_XY_FACTOR) - m_x/2 + m_map->getBorderSizeInline();
+		newOrgY = WWMath::Round((cameraPivot->Y + shiftPivot.Y)/MAP_XY_FACTOR) - m_y/2 + m_map->getBorderSizeInline();
+#elif 0
+		const Real visibleTerrainEdgeLen = (m_x+m_y)/2 * MAP_XY_FACTOR;
+		const Real edgeLenScale = 0.25f;
+		Vector3 viewDir = *cameraPivot - camera->Get_Position();
+		viewDir.Normalize();
+		Vector2 shift2;
+		shift2.X = cameraPivot->X + viewDir.X * visibleTerrainEdgeLen * edgeLenScale;
+		shift2.Y = cameraPivot->Y + viewDir.Y * visibleTerrainEdgeLen * edgeLenScale;
+		newOrgX = WWMath::Round(shift2.X/MAP_XY_FACTOR) - m_x/2 + m_map->getBorderSizeInline();
+		newOrgY = WWMath::Round(shift2.Y/MAP_XY_FACTOR) - m_y/2 + m_map->getBorderSizeInline();
+#endif
+
 		if (HALF_RES_MESH) {
 			newOrgX &= 0xFFFFFFFE;
 			newOrgY &= 0xFFFFFFFE;
@@ -1854,7 +1943,7 @@ void HeightMapRenderObjClass::updateCenter(CameraClass *camera , RefRenderObjLis
 						updateBlock(0, minY, m_x-1, maxY, m_map, pLightsIterator);
 					}
 				}
-				// It is much more efficient to update a cople of columns one frame, and then
+				// It is much more efficient to update a couple of columns one frame, and then
 				// a couple of rows.  So if we aren't "jumping" to a new view, and have done X
 				// recently, return.
 				if (abs(deltaX) < BIG_JUMP && !m_doXNextTime) {
@@ -1874,7 +1963,7 @@ void HeightMapRenderObjClass::updateCenter(CameraClass *camera , RefRenderObjLis
 					if (m_originX >= m_x-1) m_originX -= m_x-1;
 					if (deltaX<0) {
 						minX = m_originX;
-						maxX = m_originX-deltaX;
+						maxX = m_originX - deltaX;
 					} else {
 						minX = m_originX - deltaX;
 						maxX = m_originX;

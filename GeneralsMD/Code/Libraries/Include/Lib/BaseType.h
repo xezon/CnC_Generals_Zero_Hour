@@ -228,6 +228,7 @@ struct Region2D
 
 	Real width( void ) const { return hi.x - lo.x; }
 	Real height( void ) const { return hi.y - lo.y; }
+	Bool isInRegion( Real x, Real y ) const { return (lo.x < x) && (x < hi.x) && (lo.y < y) && (y < hi.y); }
 };
 
 struct IRegion2D
@@ -236,6 +237,7 @@ struct IRegion2D
 
 	Int width( void ) const { return hi.x - lo.x; }
 	Int height( void ) const { return hi.y - lo.y; }
+	Bool isInRegion( Int x, Int y ) const { return (lo.x < x) && (x < hi.x) && (lo.y < y) && (y < hi.y); }
 };
 
 
@@ -252,9 +254,7 @@ struct Coord3D
 
 		if( len != 0 )
 		{
-			x /= len;
-			y /= len;
-			z /= len;
+			div(len);
 		}
 	}
 
@@ -284,6 +284,20 @@ struct Coord3D
 		x -= a->x;
 		y -= a->y;
 		z -= a->z;
+	}
+
+	void mul( Real s )
+	{
+		x *= s;
+		y *= s;
+		z *= s;
+	}
+
+	void div( Real s )
+	{
+		x /= s;
+		y /= s;
+		z /= s;
 	}
 
 	void set( const Coord3D *a )
@@ -322,6 +336,38 @@ struct Coord3D
 	}
 };
 
+inline Coord3D operator+(const Coord3D& a, const Coord3D& b)
+{
+	Coord3D c;
+	c.set(&a);
+	c.add(&b);
+	return c;
+}
+
+inline Coord3D operator-(const Coord3D& a, const Coord3D& b)
+{
+	Coord3D c;
+	c.set(&a);
+	c.sub(&b);
+	return c;
+}
+
+inline Coord3D operator*(const Coord3D& a, Real s)
+{
+	Coord3D c;
+	c.set(&a);
+	c.mul(s);
+	return c;
+}
+
+inline Coord3D operator/(const Coord3D& a, Real s)
+{
+	Coord3D c;
+	c.set(&a);
+	c.div(s);
+	return c;
+}
+
 struct ICoord3D
 {
 	Int x, y, z;
@@ -336,6 +382,7 @@ struct ICoord3D
 	}
 };
 
+// For alternative see AABoxClass
 struct Region3D
 {
 	Coord3D lo, hi;						// axis-aligned bounding box
@@ -344,17 +391,73 @@ struct Region3D
 	Real height( void ) const { return hi.y - lo.y; }
 	Real depth( void ) const { return hi.z - lo.z; }
 
-	void zero() { lo.zero(); hi.zero(); }
+	Coord3D getSize() const
+	{
+		return hi - lo;
+	}
+
+	Coord3D getCenter() const
+	{
+		return (lo + hi) * 0.5f;
+	}
+
+	void zero()
+	{
+		lo.zero();
+		hi.zero();
+	}
+
+	void setFromPointsNoZ(Coord3D* points, Int count)
+	{
+		lo.x = points[0].x;
+		lo.y = points[0].y;
+		hi.x = points[0].x;
+		hi.y = points[0].y;
+		for (Int i = 0; i < count; ++i)
+		{
+			if (points[i].x < lo.x)
+				lo.x = points[i].x;
+			if (points[i].y < lo.y)
+				lo.y = points[i].y;
+			if (points[i].x > hi.x)
+				hi.x = points[i].x;
+			if (points[i].y > hi.y)
+				hi.y = points[i].y;
+		}
+	}
+
+	void setFromPoints(Coord3D* points, Int count)
+	{
+		lo = points[0];
+		hi = points[0];
+		for (Int i = 0; i < count; ++i)
+		{
+			if (points[i].x < lo.x)
+				lo.x = points[i].x;
+			if (points[i].y < lo.y)
+				lo.y = points[i].y;
+			if (points[i].z < lo.z)
+				lo.z = points[i].z;
+			if (points[i].x > hi.x)
+				hi.x = points[i].x;
+			if (points[i].y > hi.y)
+				hi.y = points[i].y;
+			if (points[i].z > hi.z)
+				hi.z = points[i].z;
+		}
+	}
+
 	Bool isInRegionNoZ( const Coord3D *query ) const
 	{
-		return (lo.x < query->x) && (query->x < hi.x)
-						&& (lo.y < query->y) && (query->y < hi.y);
+		return (lo.x < query->x) && (query->x < hi.x) &&
+					 (lo.y < query->y) && (query->y < hi.y);
 	}
-	Bool isInRegionWithZ( const Coord3D *query ) const
+
+	Bool isInRegion( const Coord3D *query ) const
 	{
-		return (lo.x < query->x) && (query->x < hi.x)
-						&& (lo.y < query->y) && (query->y < hi.y)
-						&& (lo.z < query->z) && (query->z < hi.z);
+		return (lo.x < query->x) && (query->x < hi.x) &&
+					 (lo.y < query->y) && (query->y < hi.y) &&
+					 (lo.z < query->z) && (query->z < hi.z);
 	}
 };
 

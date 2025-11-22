@@ -119,7 +119,7 @@ protected:
 	Int m_dataSize;			///< size of m_data.
 	UnsignedByte *m_data;	///< array of z(height) values in the height map.
 
-  UnsignedByte *m_seismicUpdateFlag;  ///< array of bits to prevent ovelapping physics-update regions from doubling effects on shared cells
+  UnsignedByte *m_seismicUpdateFlag;  ///< array of bits to prevent overlapping physics-update regions from doubling effects on shared cells
   UnsignedInt   m_seismicUpdateWidth; ///< width of the array holding SeismicUpdateFlags
   Real         *m_seismicZVelocities; ///< how fast is the dirt rising/falling at this location
 
@@ -226,8 +226,8 @@ public:  // height map info.
 	UnsignedByte *getDataPtr(void) {return m_data;}
 
 
-	Int getXExtent(void) {return m_width;}	///<number of vertices in x
-	Int getYExtent(void) {return m_height;}	///<number of vertices in y
+	Int getXExtent(void) const {return m_width;}	///<number of vertices in x
+	Int getYExtent(void) const {return m_height;}	///<number of vertices in y
 
 	Int getDrawOrgX(void) {return m_drawOriginX;}
 	Int getDrawOrgY(void) {return m_drawOriginY;}
@@ -242,7 +242,7 @@ public:  // height map info.
 	UnsignedByte getDisplayHeight(Int x, Int y) { return m_data[x+m_drawOriginX+m_width*(y+m_drawOriginY)];}
 
 	/// Get height in normal coordinates.
-	UnsignedByte getHeight(Int xIndex, Int yIndex)
+	UnsignedByte getHeight(Int xIndex, Int yIndex) const
 	{
 		Int ndx = (yIndex*m_width)+xIndex;
 		if ((ndx>=0) && (ndx<m_dataSize) && m_data)

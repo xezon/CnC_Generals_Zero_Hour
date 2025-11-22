@@ -842,7 +842,7 @@ GlobalData::GlobalData()
 
 	m_cameraPitch = 0.0f;
 	m_cameraYaw = 0.0f;
-	m_cameraHeight = 0.0f;
+	m_cameraHeight = 0.0f; ///< deprecated
 	m_minCameraHeight = 100.0f;
 	m_maxCameraHeight = 300.0f;
 	m_terrainHeightAtEdgeOfMap = 0.0f;

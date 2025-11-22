@@ -429,18 +429,34 @@ void WorldHeightMap::freeListOfMapObjects(void)
  Note that there is 1 m_numBlendedTiles, which is the implied
  transparent tile for non-blended tiles.
 */
-WorldHeightMap::WorldHeightMap():
-	m_width(0), m_height(0),  m_dataSize(0), m_data(NULL), m_cellFlipState(NULL), m_seismicUpdateFlag(NULL), m_seismicZVelocities(NULL),
-	m_drawOriginX(0), m_drawOriginY(0),
-	m_numTextureClasses(0),
-	m_drawWidthX(NORMAL_DRAW_WIDTH), m_drawHeightY(NORMAL_DRAW_HEIGHT),
-	m_tileNdxes(NULL), m_blendTileNdxes(NULL), m_extraBlendTileNdxes(NULL), m_cliffInfoNdxes(NULL),
-	m_terrainTexHeight(1), m_alphaTexHeight(1),	m_cellCliffState(NULL),
+WorldHeightMap::WorldHeightMap()
+	: m_width(0)
+	, m_height(0)
+	, m_dataSize(0)
+	, m_data(NULL)
+	, m_cellFlipState(NULL)
+	, m_seismicUpdateFlag(NULL)
+	, m_seismicZVelocities(NULL)
+	, m_drawOriginX(0)
+	, m_drawOriginY(0)
+	, m_numTextureClasses(0)
+	, m_drawWidthX(NORMAL_DRAW_WIDTH)
+	, m_drawHeightY(NORMAL_DRAW_HEIGHT)
+	, m_tileNdxes(NULL)
+	, m_blendTileNdxes(NULL)
+	, m_extraBlendTileNdxes(NULL)
+	, m_cliffInfoNdxes(NULL)
+	, m_terrainTexHeight(1)
+	, m_alphaTexHeight(1)
+	, m_cellCliffState(NULL)
 #ifdef EVAL_TILING_MODES
-	m_tileMode(TILE_4x4),
+	, m_tileMode(TILE_4x4)
 #endif
-	m_numCliffInfo(1),
-	m_terrainTex(NULL), m_alphaTerrainTex(NULL), m_numBitmapTiles(0), m_numBlendedTiles(1)
+	, m_numCliffInfo(1)
+	, m_terrainTex(NULL)
+	, m_alphaTerrainTex(NULL)
+	, m_numBitmapTiles(0)
+	, m_numBlendedTiles(1)
 {
 	Int i;
 	for (i=0; i<NUM_SOURCE_TILES; i++) {
@@ -468,18 +484,34 @@ static Bool ParseFunkyTilingDataChunk(DataChunkInput &file, DataChunkInfo *info,
 *	Input: ChunkInputStream,
 *
 */
-WorldHeightMap::WorldHeightMap(ChunkInputStream *pStrm, Bool logicalDataOnly):
-	m_width(0), m_height(0),  m_dataSize(0), m_data(NULL), m_cellFlipState(NULL), m_seismicUpdateFlag(NULL), m_seismicZVelocities(NULL),
-	m_drawOriginX(0),	m_cellCliffState(NULL), m_drawOriginY(0),
-	m_numTextureClasses(0),
-	m_drawWidthX(NORMAL_DRAW_WIDTH), m_drawHeightY(NORMAL_DRAW_HEIGHT),
-	m_tileNdxes(NULL), m_blendTileNdxes(NULL), m_extraBlendTileNdxes(NULL), m_cliffInfoNdxes(NULL),
-	m_terrainTexHeight(1), m_alphaTexHeight(1),
+WorldHeightMap::WorldHeightMap(ChunkInputStream *pStrm, Bool logicalDataOnly)
+	: m_width(0)
+	, m_height(0)
+	, m_dataSize(0)
+	, m_data(NULL)
+	, m_cellFlipState(NULL)
+	, m_seismicUpdateFlag(NULL)
+	, m_seismicZVelocities(NULL)
+	, m_drawOriginX(0)
+	, m_cellCliffState(NULL)
+	, m_drawOriginY(0)
+	, m_numTextureClasses(0)
+	, m_drawWidthX(NORMAL_DRAW_WIDTH)
+	, m_drawHeightY(NORMAL_DRAW_HEIGHT)
+	, m_tileNdxes(NULL)
+	, m_blendTileNdxes(NULL)
+	, m_extraBlendTileNdxes(NULL)
+	, m_cliffInfoNdxes(NULL)
+	, m_terrainTexHeight(1)
+	, m_alphaTexHeight(1)
 #ifdef EVAL_TILING_MODES
-	m_tileMode(TILE_4x4),
+	, m_tileMode(TILE_4x4)
 #endif
-	m_numCliffInfo(1),
-	m_terrainTex(NULL), m_alphaTerrainTex(NULL), m_numBitmapTiles(0), m_numBlendedTiles(1)
+	, m_numCliffInfo(1)
+	, m_terrainTex(NULL)
+	, m_alphaTerrainTex(NULL)
+	, m_numBitmapTiles(0)
+	, m_numBlendedTiles(1)
 {
 
 	int i;

@@ -157,12 +157,14 @@ public:
 
 	virtual void forceRedraw();
 
-	virtual void setAngle( Real angle );										///< Rotate the view around the up axis by the given angle
-	virtual void setPitch( Real angle );											///< Rotate the view around the horizontal axis to the given angle
-	virtual void setAngleAndPitchToDefault( void );							///< Set the view angle back to default
+	virtual void setAngle( Real radians );									///< Rotate the view around the up axis by the given angle (yaw)
+	virtual void setPitch( Real radians );									///< Rotate the view around the horizontal axis to the given angle (pitch)
+	virtual void setDefaultPitch( Real radians );						///< Set new default camera pitch. It affects the camera distance to the ground
+	virtual void setAngleToDefault( void );									///< Set the view angle back to default
+	virtual void setPitchToDefault( void );									///< Set the view angle back to default
 
 	virtual void lookAt( const Coord3D *o );											///< Center the view on the given coordinate
-	virtual void initHeightForMap( void );												///<  Init the camera height for the map at the current position.
+	virtual void resetPivotToGround( void );												///< Set the camera pivot to the terrain height at the current position
 	virtual void moveCameraTo(const Coord3D *o, Int miliseconds,  Int shutter, Bool orient, Real easeIn, Real easeOut);
 	virtual void moveCameraAlongWaypointPath(Waypoint *pWay, Int frames, Int shutter, Bool orient, Real easeIn, Real easeOut);
 	virtual Bool isCameraMovementFinished(void);
@@ -201,7 +203,6 @@ public:
 	virtual void setFieldOfView( Real angle );							///< Set the horizontal field of view angle
 
   virtual WorldToScreenReturn worldToScreenTriReturn( const Coord3D *w, ICoord2D *s );	///< Transform world coordinate "w" into screen coordinate "s"
-	virtual void screenToWorld( const ICoord2D *s, Coord3D *w );	///< Transform screen coordinate "s" into world coordinate "w"
 	virtual void screenToTerrain( const ICoord2D *screen, Coord3D *world );  ///< transform screen coord to a point on the 3D terrain
 	virtual void screenToWorldAtZ( const ICoord2D *s, Coord3D *w, Real z );  ///< transform screen point to world point at the specified world Z value
 
@@ -226,7 +227,7 @@ public:
 	virtual void set3DWireFrameMode(Bool enable);	///<enables custom wireframe rendering of 3D viewport
 
 	Bool updateCameraMovements(void);
-	virtual void forceCameraConstraintRecalc(void) { calcCameraConstraints(); }
+	virtual void forceCameraAreaConstraintRecalc(void) { m_cameraAreaConstraintsValid = false; }
 
 	virtual void setGuardBandBias( const Coord2D *gb ) { m_guardBandBias.x = gb->x; m_guardBandBias.y = gb->y; }
 
@@ -276,12 +277,24 @@ private:
 
 	Real m_groundLevel;															///< height of ground.
 
-	Region2D m_cameraConstraint;										///< m_pos should be constrained to be within this area
-	Bool m_cameraConstraintValid;										///< if f, recalc cam constraints
+	Region2D m_cameraAreaConstraints; ///< Camera should be constrained to be within this area
+	Bool m_cameraAreaConstraintsValid; ///< If false, recalculates the camera area constraints in the next render update
+	Bool m_recalcCameraConstraintsAfterScrolling; ///< Recalculates the camera area constraints after the user has moved the camera
+	Bool m_recalcCamera; ///< Recalculates the camera transform in the next render update
 
+	Real getCameraOffsetZ() const;
+	Real getDesiredHeight() const;
+	Real getDesiredZoom() const;
 	void setCameraTransform( void );								///< set the transform matrix of m_3DCamera, based on m_pos & m_angle
-	void buildCameraTransform( Matrix3D *transform ) ;			///< calculate (but do not set) the transform matrix of m_3DCamera, based on m_pos & m_angle
-	void calcCameraConstraints() ;			///< recalc m_cameraConstraint
+	void buildCameraPosition( Vector3& sourcePos, Vector3& targetPos );
+	void buildCameraTransform( Matrix3D *transform );			///< calculate (but do not set) the transform matrix of m_3DCamera, based on m_pos & m_angle
+	Bool movePivotToGround();
+	void updateCameraAreaConstraints();
+	void calcCameraAreaConstraints();			///< Recalculates the camera area constraints
+	Real calcCameraAreaOffset(Real maxEdgeZ, Bool isLookingDown);
+	void clipCameraIntoAreaConstraints();
+	Bool isWithinCameraAreaConstraints() const;
+	Bool isWithinCameraHeightConstraints() const;
 	void moveAlongWaypointPath(Real milliseconds); ///< Move camera along path.
 	void getPickRay(const ICoord2D *screen, Vector3 *rayStart, Vector3 *rayEnd);	///<returns a line segment (ray) originating at the given screen position
 	void setupWaypointPath(Bool orient);					///< Calculates distances & angles for moving along a waypoint path.
@@ -290,6 +303,7 @@ private:
 	void pitchCameraOneFrame(void);							///< Do one frame of a pitch camera movement.
 	void getAxisAlignedViewRegion(Region3D &axisAlignedRegion);	///< Find 3D Region enclosing all possible drawables.
 	void calcDeltaScroll(Coord2D &screenDelta);
+	void updateTerrain();
 
 	// (gth) C&C3 animation controlled camera feature
 	Bool				m_isCameraSlaved;
