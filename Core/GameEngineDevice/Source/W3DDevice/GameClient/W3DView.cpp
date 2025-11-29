@@ -165,6 +165,7 @@ W3DView::W3DView()
 	m_shakeOffset.x = 0.0f;
 	m_shakeOffset.y = 0.0f;
 	m_shakeIntensity = 0.0f;
+	m_isControlledByUser = true;
 	m_FXPitch = 1.0f;
 	m_freezeTimeForCameraMovement = false;
 	m_cameraHasMovedSinceRequest = true;
@@ -743,6 +744,8 @@ void W3DView::init( void )
 	m_2DCamera->Set_Clip_Planes( 0.995f, 2.0f );
 
 	m_scrollAmountCutoff = TheGlobalData->m_scrollAmountCutoff;
+
+	m_isControlledByUser = true;
 
 	m_cameraAreaConstraintsValid = false;
 	m_recalcCameraConstraintsAfterScrolling = false;
@@ -1393,10 +1396,16 @@ void W3DView::update(void)
 			m_recalcCamera = true;
 		}
 	} else {
-		if (m_doingRotateCamera || m_doingMoveCameraOnWaypointPath || m_doingPitchCamera || m_doingZoomCamera || m_doingScriptedCameraLock) {
+		if (isDoingScriptedCamera()) {
 			didScriptedMovement = true; // don't mess up the scripted movement
 		}
 	}
+
+	if (!m_isControlledByUser)
+	{
+		didScriptedMovement = true;
+	}
+
 	//
 	// Process camera shake
 	//
@@ -1909,6 +1918,7 @@ void W3DView::setSnapMode( CameraLockType lockType, Real lockDist )
 {
 	View::setSnapMode(lockType, lockDist);
 	m_doingScriptedCameraLock = TRUE;
+	m_isControlledByUser = false;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1956,8 +1966,6 @@ void W3DView::scrollBy( Coord2D *delta )
 		setPosition(&pos);
 
 		//m_cameraConstraintValid = false;	// pos change does NOT invalidate cam constraints
-
-		m_doingRotateCamera = false;
 		m_recalcCamera = true;
 	}
 
@@ -1978,13 +1986,6 @@ void W3DView::setAngle( Real radians )
 {
 	View::setAngle( radians );
 
-	m_doingMoveCameraOnWaypointPath = false;
-	m_CameraArrivedAtWaypointOnPathFlag = false;
-
-	m_doingRotateCamera = false;
-	m_doingPitchCamera = false;
-	m_doingZoomCamera = false;
-	m_doingScriptedCameraLock = false;
 	m_recalcCamera = true;
 }
 
@@ -1995,11 +1996,6 @@ void W3DView::setPitch( Real radians )
 {
 	View::setPitch( radians );
 
-	m_doingMoveCameraOnWaypointPath = false;
-	m_doingRotateCamera = false;
-	m_doingPitchCamera = false;
-	m_doingZoomCamera = false;
-	m_doingScriptedCameraLock = false;
 	// TheSuperHackers @tweak Now recalculates the camera constraints because
 	// the camera pitch can change the camera distance towards the map border.
 	m_cameraAreaConstraintsValid = false;
@@ -2012,11 +2008,6 @@ void W3DView::setDefaultPitch( Real radians )
 {
 	View::setDefaultPitch( radians );
 
-	m_doingMoveCameraOnWaypointPath = false;
-	m_doingRotateCamera = false;
-	m_doingPitchCamera = false;
-	m_doingZoomCamera = false;
-	m_doingScriptedCameraLock = false;
 	m_cameraAreaConstraintsValid = false;
 	m_recalcCamera = true;
 }
@@ -2064,12 +2055,6 @@ void W3DView::setHeightAboveGround(Real z)
 {
 	View::setHeightAboveGround(z);
 
-	m_doingMoveCameraOnWaypointPath = false;
-	m_CameraArrivedAtWaypointOnPathFlag = false;
-	m_doingRotateCamera = false;
-	m_doingPitchCamera = false;
-	m_doingZoomCamera = false;
-	m_doingScriptedCameraLock = false;
 	m_cameraAreaConstraintsValid = false;
 	m_recalcCamera = true;
 }
@@ -2084,12 +2069,6 @@ void W3DView::setZoom(Real z)
 {
 	View::setZoom(z);
 
-	m_doingMoveCameraOnWaypointPath = false;
-	m_CameraArrivedAtWaypointOnPathFlag = false;
-	m_doingRotateCamera = false;
-	m_doingPitchCamera = false;
-	m_doingZoomCamera = false;
-	m_doingScriptedCameraLock = false;
 	m_cameraAreaConstraintsValid = false;
 	m_recalcCamera = true;
 }
@@ -2103,12 +2082,6 @@ void W3DView::setZoomToDefault( void )
 	m_zoom = 1.0f;
 	m_heightAboveGround = m_maxHeightAboveGround;
 
-	m_doingMoveCameraOnWaypointPath = false;
-	m_CameraArrivedAtWaypointOnPathFlag = false;
-	m_doingRotateCamera = false;
-	m_doingPitchCamera = false;
-	m_doingZoomCamera = false;
-	m_doingScriptedCameraLock = false;
 	m_cameraAreaConstraintsValid = false;
 	m_recalcCamera = true;
 }
@@ -2459,12 +2432,8 @@ void W3DView::lookAt( const Coord3D *o )
 	}
 	pos.z = 0;
 	setPosition(&pos);
-	m_doingRotateCamera = false;
-	m_doingMoveCameraOnWaypointPath = false;
-	m_CameraArrivedAtWaypointOnPathFlag = false;
-	m_doingScriptedCameraLock = false;
-	m_recalcCamera = true;
 
+	m_recalcCamera = true;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -2507,6 +2476,7 @@ void W3DView::moveCameraTo(const Coord3D *o, Int milliseconds, Int shutter, Bool
 		moveAlongWaypointPath(1);
 		m_doingMoveCameraOnWaypointPath = true;
 		m_CameraArrivedAtWaypointOnPathFlag = false;
+		m_isControlledByUser = false;
 	}
 }
 
@@ -2525,6 +2495,7 @@ void W3DView::rotateCamera(Real rotations, Int milliseconds, Real easeIn, Real e
 	}
 	m_rcInfo.curFrame = 0;
 	m_doingRotateCamera = true;
+	m_isControlledByUser = false;
 	m_rcInfo.angle.startAngle = m_angle;
 	m_rcInfo.angle.endAngle = m_angle + 2*PI*rotations;
 	m_rcInfo.startTimeMultiplier = m_timeMultiplier;
@@ -2554,6 +2525,7 @@ void W3DView::rotateCameraTowardObject(ObjectID id, Int milliseconds, Int holdMi
 	}
 	m_rcInfo.curFrame = 0;
 	m_doingRotateCamera = true;
+	m_isControlledByUser = false;
 	m_rcInfo.target.targetObjectID = id;
 	m_rcInfo.startTimeMultiplier = m_timeMultiplier;
 	m_rcInfo.endTimeMultiplier = m_timeMultiplier;
@@ -2598,6 +2570,7 @@ void W3DView::rotateCameraTowardPosition(const Coord3D *pLoc, Int milliseconds, 
 
 	m_rcInfo.curFrame = 0;
 	m_doingRotateCamera = true;
+	m_isControlledByUser = false;
 	m_rcInfo.angle.startAngle = m_angle;
 	// TheSuperHackers @todo Investigate if the non Generals code is correct for Zero Hour.
 	// It certainly is incorrect for Generals: Seen in GLA mission 1 opening cut scene.
@@ -2625,6 +2598,7 @@ void W3DView::zoomCamera( Real finalZoom, Int milliseconds, Real easeIn, Real ea
 	}
 	m_zcInfo.curFrame = 0;
 	m_doingZoomCamera = TRUE;
+	m_isControlledByUser = false;
 	m_zcInfo.startZoom = m_zoom;
 	m_zcInfo.endZoom = finalZoom;
 	m_zcInfo.ease.setEaseTimes(easeIn/milliseconds, easeOut/milliseconds);
@@ -2641,6 +2615,7 @@ void W3DView::pitchCamera( Real finalPitch, Int milliseconds, Real easeIn, Real 
 	}
 	m_pcInfo.curFrame = 0;
 	m_doingPitchCamera = TRUE;
+	m_isControlledByUser = false;
 	m_pcInfo.startPitch = m_FXPitch;
 	m_pcInfo.endPitch = finalPitch;
 	m_pcInfo.ease.setEaseTimes(easeIn/milliseconds, easeOut/milliseconds);
@@ -2742,6 +2717,7 @@ void W3DView::cameraModLookToward(Coord3D *pLoc)
 			moveAlongWaypointPath(1);
 			m_doingMoveCameraOnWaypointPath = true;
 			m_CameraArrivedAtWaypointOnPathFlag = false;
+			m_isControlledByUser = false;
 		}
 	}
 }
@@ -2910,12 +2886,9 @@ Bool W3DView::isCameraMovementFinished(void)
 
 Bool W3DView::isCameraMovementAtWaypointAlongPath(void)
 {
-	// WWDEBUG_SAY((( "MBL: Polling W3DView::isCameraMovementAtWaypointAlongPath" )));
-
-	Bool return_value = m_CameraArrivedAtWaypointOnPathFlag;
-	#pragma message( "MBL: Clearing variable after polling - for scripting - see Adam.\n" )
+	Bool returnValue = m_CameraArrivedAtWaypointOnPathFlag;
 	m_CameraArrivedAtWaypointOnPathFlag = false;
-	return( return_value );
+	return returnValue;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -3170,6 +3143,34 @@ void W3DView::pitchCameraOneFrame(void)
 		m_doingPitchCamera = false;
 		m_FXPitch = m_pcInfo.endPitch;
 	}
+}
+
+// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
+Bool W3DView::isDoingScriptedCamera()
+{
+	Bool scripted = m_doingRotateCamera;
+	scripted |= m_doingPitchCamera;
+	scripted |= m_doingZoomCamera;
+	scripted |= m_doingScriptedCameraLock;
+	scripted |= m_doingMoveCameraOnWaypointPath;
+	return scripted;
+}
+
+// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
+void W3DView::stopDoingScriptedCamera()
+{
+	//if (m_viewLockedUntilFrame > TheGameClient->getFrame())
+	//	return;
+
+	m_doingRotateCamera = false;
+	m_doingPitchCamera = false;
+	m_doingZoomCamera = false;
+	m_doingScriptedCameraLock = false;
+	m_doingMoveCameraOnWaypointPath = false;
+
+	m_isControlledByUser = true;
 }
 
 // ------------------------------------------------------------------------------------------------

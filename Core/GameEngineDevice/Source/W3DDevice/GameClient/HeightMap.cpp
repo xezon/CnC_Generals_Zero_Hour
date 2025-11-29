@@ -1169,8 +1169,7 @@ void HeightMapRenderObjClass::adjustTerrainLOD(Int adj)
 											m_map->getDrawHeight(), m_map, NULL);
 	staticLightingChanged();
 	if (TheTacticalView) {
-		TheTacticalView->setAngle(TheTacticalView->getAngle() + 1);
-		TheTacticalView->setAngle(TheTacticalView->getAngle() - 1);
+		TheTacticalView->forceRedraw();
 	}
 #endif
 }

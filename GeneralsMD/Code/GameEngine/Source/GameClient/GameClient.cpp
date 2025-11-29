@@ -611,6 +611,7 @@ void GameClient::update( void )
     if ( draw )
     {
       const Coord3D *pos = draw->getPosition();
+      TheTacticalView->stopDoingScriptedCamera();
       TheTacticalView->lookAt( pos );
     }
     else

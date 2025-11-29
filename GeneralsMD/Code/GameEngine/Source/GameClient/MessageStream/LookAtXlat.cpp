@@ -315,6 +315,7 @@ GameMessageDisposition LookAtTranslator::translateGameMessage(const GameMessage 
 			// if middle button is "clicked", reset to "home" orientation
 			if (!didMove && elapsedMsec < CLICK_DURATION_MSEC)
 			{
+				TheTacticalView->stopDoingScriptedCamera();
 				TheTacticalView->resetPivotToGround();
 				TheTacticalView->setAngleToDefault();
 				TheTacticalView->setPitchToDefault();
@@ -375,6 +376,7 @@ GameMessageDisposition LookAtTranslator::translateGameMessage(const GameMessage 
 					targetAngle = WWMath::Round(targetAngle / snapRadians) * snapRadians;
 				}
 
+				TheTacticalView->stopDoingScriptedCamera();
 				TheTacticalView->setAngle(targetAngle);
 				m_anchor = msg->getArgument( 0 )->pixel;
 			}
@@ -384,6 +386,7 @@ GameMessageDisposition LookAtTranslator::translateGameMessage(const GameMessage 
 			{
 				constexpr const Real Scale = 0.01f;
 				const Real angle = Scale * (m_currentPos.y - m_anchor.y);
+				TheTacticalView->stopDoingScriptedCamera();
 				TheTacticalView->setPitch( TheTacticalView->getPitch() - angle );
 				m_anchor = msg->getArgument( 0 )->pixel;
 			}
@@ -393,6 +396,7 @@ GameMessageDisposition LookAtTranslator::translateGameMessage(const GameMessage 
 			{
 				constexpr const Real Scale = 0.01f;
 				const Real angle = Scale * (m_currentPos.y - m_anchor.y);
+				TheTacticalView->stopDoingScriptedCamera();
 				TheTacticalView->setDefaultPitch( TheTacticalView->getDefaultPitch() - angle );
 				TheTacticalView->setPitch( TheTacticalView->getDefaultPitch() );
 				m_anchor = msg->getArgument( 0 )->pixel;
@@ -403,6 +407,7 @@ GameMessageDisposition LookAtTranslator::translateGameMessage(const GameMessage 
 			{
 				constexpr const Real Scale = 0.01f;
 				const Real angle = Scale * (m_currentPos.y - m_anchor.y);
+				TheTacticalView->stopDoingScriptedCamera();
 				TheTacticalView->setFieldOfView( TheTacticalView->getFieldOfView() + angle );
 				m_anchor = msg->getArgument( 0 )->pixel;
 			}
@@ -417,6 +422,7 @@ GameMessageDisposition LookAtTranslator::translateGameMessage(const GameMessage 
 
 			Int spin = msg->getArgument( 1 )->integer;
 
+			TheTacticalView->stopDoingScriptedCamera();
 			if (spin > 0)
 			{
 				for ( ; spin > 0; spin--)
@@ -536,6 +542,7 @@ GameMessageDisposition LookAtTranslator::translateGameMessage(const GameMessage 
 				}
 
 				TheInGameUI->setScrollAmount(offset);
+				TheTacticalView->stopDoingScriptedCamera();
 				TheTacticalView->scrollBy( &offset );
 			}
 			else	//not scrolling so reset amount
@@ -694,6 +701,7 @@ GameMessageDisposition LookAtTranslator::translateGameMessage(const GameMessage 
 			Int slot = t - GameMessage::MSG_META_VIEW_VIEW1 + 1;
 			if ( slot > 0 && slot <= MAX_VIEW_LOCS )
 			{
+				TheTacticalView->stopDoingScriptedCamera();
 				TheTacticalView->setLocation( &m_viewLocation[slot-1] );
 			}
 			disp = DESTROY_MESSAGE;

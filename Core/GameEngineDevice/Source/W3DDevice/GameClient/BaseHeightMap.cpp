@@ -374,8 +374,7 @@ void BaseHeightMapRenderObjClass::adjustTerrainLOD(Int adj)
 		newROBJ->m_roadBuffer->loadRoads();
 	}
 	if (TheTacticalView) {
-		TheTacticalView->setAngle(TheTacticalView->getAngle() + 1);
-		TheTacticalView->setAngle(TheTacticalView->getAngle() - 1);
+		TheTacticalView->forceRedraw();
 	}
 }
 

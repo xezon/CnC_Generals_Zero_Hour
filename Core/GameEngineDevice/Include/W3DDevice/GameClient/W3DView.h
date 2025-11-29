@@ -157,6 +157,9 @@ public:
 
 	virtual void forceRedraw();
 
+	virtual Bool isDoingScriptedCamera();
+	virtual void stopDoingScriptedCamera();
+
 	virtual void setAngle( Real radians );									///< Rotate the view around the up axis by the given angle (yaw)
 	virtual void setPitch( Real radians );									///< Rotate the view around the horizontal axis to the given angle (pitch)
 	virtual void setDefaultPitch( Real radians );						///< Set new default camera pitch. It affects the camera distance to the ground
@@ -231,7 +234,6 @@ public:
 
 	virtual void setGuardBandBias( const Coord2D *gb ) { m_guardBandBias.x = gb->x; m_guardBandBias.y = gb->y; }
 
-
 private:
 
 	CameraClass *m_3DCamera;												///< camera representation for 3D scene
@@ -257,6 +259,8 @@ private:
 	Bool m_doingZoomCamera;
 
 	Bool m_doingScriptedCameraLock;									///< True if we are following a unit via script
+
+	Bool m_isControlledByUser; //< True if the user moved the camera last, false if the scripted camera moved the camera last
 
 	Real		m_FXPitch;															///< Camera effects pitch.  0 = flat, infinite = look down, 1 = normal.
 

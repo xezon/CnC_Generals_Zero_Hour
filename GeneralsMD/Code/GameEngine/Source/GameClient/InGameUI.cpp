@@ -2003,19 +2003,23 @@ void InGameUI::update( void )
 
 		if( m_cameraRotatingLeft && !m_cameraRotatingRight )
 		{
+			TheTacticalView->stopDoingScriptedCamera();
 			TheTacticalView->setAngle( TheTacticalView->getAngle() - rotateAngle );
 		}
 		else if( m_cameraRotatingRight && !m_cameraRotatingLeft )
 		{
+			TheTacticalView->stopDoingScriptedCamera();
 			TheTacticalView->setAngle( TheTacticalView->getAngle() + rotateAngle );
 		}
 
 		if( m_cameraZoomingIn && !m_cameraZoomingOut )
 		{
+			TheTacticalView->stopDoingScriptedCamera();
 			TheTacticalView->zoom( -zoomHeight );
 		}
 		else if( m_cameraZoomingOut && !m_cameraZoomingIn )
 		{
+			TheTacticalView->stopDoingScriptedCamera();
 			TheTacticalView->zoom( +zoomHeight );
 		}
 	}
@@ -4405,6 +4409,7 @@ Bool InGameUI::areSelectedObjectsControllable() const
 //------------------------------------------------------------------------------
 void InGameUI::resetCamera()
 {
+	TheTacticalView->stopDoingScriptedCamera();
 	TheTacticalView->resetPivotToGround();
 	TheTacticalView->setAngleToDefault();
 	TheTacticalView->setPitchToDefault();
@@ -5807,6 +5812,7 @@ void InGameUI::selectNextIdleWorker( void )
 				}*/
 
 		// center on the unit
+		TheTacticalView->stopDoingScriptedCamera();
 		TheTacticalView->lookAt(selectThisObject->getPosition());
 	}
 }
