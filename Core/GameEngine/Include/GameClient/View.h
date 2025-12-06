@@ -132,6 +132,7 @@ public:
 	virtual void forceRedraw() = 0;
 
 	virtual void lookAt( const Coord3D *o );														///< Center the view on the given coordinate
+	virtual void initHeightForMap( void ) {};														///<  Init the camera height for the map at the current position.
 	virtual void resetPivotToGround( void ) {};													///< Set the camera pivot to the terrain height at the current position
 	virtual void scrollBy( Coord2D *delta );														///< Shift the view by the given delta
 

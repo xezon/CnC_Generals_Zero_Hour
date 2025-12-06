@@ -701,8 +701,12 @@ GameMessageDisposition LookAtTranslator::translateGameMessage(const GameMessage 
 			Int slot = t - GameMessage::MSG_META_VIEW_VIEW1 + 1;
 			if ( slot > 0 && slot <= MAX_VIEW_LOCS )
 			{
-				TheTacticalView->stopDoingScriptedCamera();
-				TheTacticalView->setLocation( &m_viewLocation[slot-1] );
+				const ViewLocation& location = m_viewLocation[slot-1];
+				if ( location.isValid() )
+				{
+					TheTacticalView->stopDoingScriptedCamera();
+					TheTacticalView->setLocation( &location );
+				}
 			}
 			disp = DESTROY_MESSAGE;
 			break;

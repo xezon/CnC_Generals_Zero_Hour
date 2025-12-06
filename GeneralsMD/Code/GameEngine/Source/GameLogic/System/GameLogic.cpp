@@ -2075,7 +2075,7 @@ void GameLogic::startNewGame( Bool loadingSaveGame )
 	}
 
 	// Set up the camera height based on the map height & globalData.
-	TheTacticalView->resetPivotToGround();
+	TheTacticalView->initHeightForMap();
 	TheTacticalView->setAngleToDefault();
 	TheTacticalView->setPitchToDefault();
 	TheTacticalView->setZoomToDefault();

@@ -4604,9 +4604,12 @@ void ScriptActions::doCameraStopTetherNamed(void)
 //-------------------------------------------------------------------------------------------------
 void ScriptActions::doCameraSetDefault(Real pitch, Real angle, Real maxHeight)
 {
-	// TheSuperHackers @tweak The camera pitch code in the tactical view was changed.
-	// Must now modify script pitch value to retain legacy behavior.
+#if PRESERVE_RETAIL_SCRIPTED_CAMERA
+	// TheSuperHackers @tweak xezon 06/12/2025 It is necessary to modify the script pitch value here
+	// to retain the original behavior, because the camera pitch setup in the tactical view has
+	// changed.
 	pitch = -pitch + TheTacticalView->getDefaultPitch();
+#endif
 
 	TheTacticalView->setDefaultView(pitch, angle, maxHeight);
 }

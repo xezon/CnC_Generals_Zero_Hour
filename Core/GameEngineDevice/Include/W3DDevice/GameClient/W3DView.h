@@ -167,6 +167,7 @@ public:
 	virtual void setPitchToDefault( void );									///< Set the view angle back to default
 
 	virtual void lookAt( const Coord3D *o );											///< Center the view on the given coordinate
+	virtual void initHeightForMap( void );												///<  Init the camera height for the map at the current position.
 	virtual void resetPivotToGround( void );												///< Set the camera pivot to the terrain height at the current position
 	virtual void moveCameraTo(const Coord3D *o, Int miliseconds,  Int shutter, Bool orient, Real easeIn, Real easeOut);
 	virtual void moveCameraAlongWaypointPath(Waypoint *pWay, Int frames, Int shutter, Bool orient, Real easeIn, Real easeOut);
@@ -280,18 +281,26 @@ private:
 	Real m_scrollAmountCutoff;											///< scroll speed at which we do not adjust height
 
 	Real m_groundLevel;															///< height of ground.
+#if PRESERVE_RETAIL_SCRIPTED_CAMERA
+	Real m_initialGroundLevel;															///< height of ground.
+#endif
 
 	Region2D m_cameraAreaConstraints; ///< Camera should be constrained to be within this area
 	Bool m_cameraAreaConstraintsValid; ///< If false, recalculates the camera area constraints in the next render update
 	Bool m_recalcCameraConstraintsAfterScrolling; ///< Recalculates the camera area constraints after the user has moved the camera
 	Bool m_recalcCamera; ///< Recalculates the camera transform in the next render update
 
+	Real getHeightAroundPos(Real x, Real y) const;
 	Real getCameraOffsetZ() const;
-	Real getDesiredHeight() const;
-	Real getDesiredZoom() const;
+	Real getDesiredHeight(Real x, Real y) const;
+	Real getDesiredZoom(Real x, Real y) const;
+	Real getMaxHeight(Real x, Real y) const;
+	Real getMaxZoom(Real x, Real y) const;
 	void setCameraTransform( void );								///< set the transform matrix of m_3DCamera, based on m_pos & m_angle
 	void buildCameraPosition( Vector3& sourcePos, Vector3& targetPos );
 	void buildCameraTransform( Matrix3D *transform );			///< calculate (but do not set) the transform matrix of m_3DCamera, based on m_pos & m_angle
+	void setControlledByUser(Bool value);
+	Bool zoomCameraToDesiredHeight();
 	Bool movePivotToGround();
 	void updateCameraAreaConstraints();
 	void calcCameraAreaConstraints();			///< Recalculates the camera area constraints
