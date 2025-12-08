@@ -150,6 +150,8 @@ public: \
 	inline void operator delete(void *p) { freeFromW3DMemPool(getClassMemoryPool(), p); } \
 	inline void* operator new(size_t s, const char* msg, int unused) { return allocateFromW3DMemPool(getClassMemoryPool(), s, msg, unused); } \
 	inline void operator delete(void *p, const char* msg, int unused) { freeFromW3DMemPool(getClassMemoryPool(), p); } \
+	inline void* operator new(size_t s, void* placement) noexcept { return placement; } \
+	inline void operator delete(void* p, void* placement) noexcept { }
 
 // ----------------------------------------------------------------------------
 class W3DMPO

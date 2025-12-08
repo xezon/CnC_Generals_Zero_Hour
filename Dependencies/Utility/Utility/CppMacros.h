@@ -28,6 +28,7 @@
 #define REGISTER
 #define FALLTHROUGH [[fallthrough]]
 #else
+#define noexcept
 #define NOEXCEPT_17
 #define REGISTER register
 #define FALLTHROUGH
