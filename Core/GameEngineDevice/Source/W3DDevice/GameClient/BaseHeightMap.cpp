@@ -559,8 +559,7 @@ void BaseHeightMapRenderObjClass::doTheLight(VERTEX_FORMAT *vb, Vector3*light, V
 			pLight->Get_Diffuse(&diffuse);
 			Vector3 ambient;
 			pLight->Get_Ambient(&ambient);
-			if (shade > 1.0) shade = 1.0;
-			if(shade < 0.0f) shade = 0.0f;
+			shade = WWMath::Clamp(shade,0.0f,1.0f);
 			shadeR += shade*diffuse.X;
 			shadeG += shade*diffuse.Y;
 			shadeB += shade*diffuse.Z;
@@ -575,20 +574,16 @@ void BaseHeightMapRenderObjClass::doTheLight(VERTEX_FORMAT *vb, Vector3*light, V
 	for (Int lightIndex=0; lightIndex < TheGlobalData->m_numGlobalLights; lightIndex++)
 	{
 		shade = Vector3::Dot_Product(light[lightIndex], *normal);
-		if (shade > 1.0) shade = 1.0;
-		if(shade < 0.0f) shade = 0.0f;
+		shade = WWMath::Clamp(shade,0.0f,1.0f);
 		terrainDiffuse=&TheGlobalData->m_terrainDiffuse[lightIndex];
 		shadeR += shade*terrainDiffuse->red;
 		shadeG += shade*terrainDiffuse->green;
 		shadeB += shade*terrainDiffuse->blue;
 	}
 
-	if (shadeR > 1.0) shadeR = 1.0;
-	if(shadeR < 0.0f) shadeR = 0.0f;
-	if (shadeG > 1.0) shadeG = 1.0;
-	if(shadeG < 0.0f) shadeG = 0.0f;
-	if (shadeB > 1.0) shadeB = 1.0;
-	if(shadeB < 0.0f) shadeB = 0.0f;
+	shadeR = WWMath::Clamp(shadeR,0.0f,1.0f);
+	shadeG = WWMath::Clamp(shadeG,0.0f,1.0f);
+	shadeB = WWMath::Clamp(shadeB,0.0f,1.0f);
 
 	if (m_useDepthFade && vb->z <= TheGlobalData->m_waterPositionZ)
 	{	//height is below water level
