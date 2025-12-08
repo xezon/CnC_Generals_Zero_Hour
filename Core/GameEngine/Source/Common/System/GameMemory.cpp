@@ -275,20 +275,25 @@ static void sysFree(void* p)
 
 // ----------------------------------------------------------------------------
 /**
-	fills memory with a 32-bit value (note: assumes the ptr is 4-byte-aligned)
+	fills memory with a 32-bit value (note: assumes the ptr is at least 4-byte-aligned)
 */
+static_assert(sizeof(void*) >= 4, "4 byte munkee cpu");
+
 static void memset32(void* ptr, Int value, Int bytesToFill)
 {
-	Int wordsToFill = bytesToFill>>2;
-	bytesToFill -= (wordsToFill<<2);
+	Int wordsToFill = bytesToFill >> 2;
+	Int* p = (Int*)ptr;
 
-	Int *p = (Int*)ptr;
-	for (++wordsToFill; --wordsToFill; )
-		*p++ = value;
+	// compiler can vectorize this
+	size_t i = 0;
+	for (; i < wordsToFill; ++i)
+		p[i] = value;
 
-	Byte *b = (Byte *)p;
-	for (++bytesToFill; --bytesToFill; )
-		*b++ = (Byte)value;
+	// fill the remaining bytes
+	i *= sizeof(Int);
+	Byte* b = (Byte*)p;
+	for (; i < bytesToFill; ++i)
+		b[i] = (Byte)value;
 }
 
 #ifdef MEMORYPOOL_STACKTRACE
