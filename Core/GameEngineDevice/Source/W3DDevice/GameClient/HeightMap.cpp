@@ -369,8 +369,8 @@ Int HeightMapRenderObjClass::updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *
 				Bool flipForBlend = false;			 // True if the blend needs the triangles flipped.
 
 				if (pMap) {
-					pMap->getUVData(mapX,mapY,U, V, HALF_RES_MESH);
-					pMap->getAlphaUVData(mapX,mapY, UA, VA, alpha, &flipForBlend, HALF_RES_MESH);
+					pMap->getUVData(mapX+pMap->getDrawOrgX(), mapY+pMap->getDrawOrgY(), U, V, HALF_RES_MESH);
+					pMap->getAlphaUVData(mapX+pMap->getDrawOrgX(), mapY+pMap->getDrawOrgY(), UA, VA, alpha, &flipForBlend, HALF_RES_MESH);
 				}
 
 

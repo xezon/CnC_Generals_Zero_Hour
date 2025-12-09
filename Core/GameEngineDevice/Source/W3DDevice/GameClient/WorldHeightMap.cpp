@@ -1689,8 +1689,6 @@ Bool WorldHeightMap::getUVData(Int xIndex, Int yIndex, float U[4], float V[4], B
 #if SHOW_THE_TEXTURE_FOR_DEBUG
 		// This is debug code that just shows the generated texture laid on the terrain.
 		// For debugging ;) jba.
-		xIndex += m_drawOriginX;
-		yIndex += m_drawOriginY;
 		float nU= xIndex;
 		float xU = xIndex+1;
 		float nV = 48-yIndex-1;
@@ -1705,8 +1703,6 @@ Bool WorldHeightMap::getUVData(Int xIndex, Int yIndex, float U[4], float V[4], B
 		V[0] = xV; V[1] = xV; V[2] = nV; V[3] = nV;
 		return(true);
 #else
-	xIndex += m_drawOriginX;
-	yIndex += m_drawOriginY;
 	Int ndx = (yIndex*m_width)+xIndex;
 	if ((ndx<m_dataSize) && m_tileNdxes) {
 		Short tileNdx = m_tileNdxes[ndx];
@@ -2069,8 +2065,6 @@ Bool WorldHeightMap::getExtraAlphaUVData(Int xIndex, Int yIndex, float U[4], flo
 void WorldHeightMap::getAlphaUVData(Int xIndex, Int yIndex, float U[4], float V[4],
 																		UnsignedByte alpha[4], Bool *flip, Bool fullTile)
 {
-	xIndex += m_drawOriginX;
-	yIndex += m_drawOriginY;
 	Int ndx = (yIndex*m_width)+xIndex;
 	Bool stretchedForCliff = false;
 	Bool needFlip = false;
