@@ -96,7 +96,7 @@
 #define no_OPTIMIZED_HEIGHTMAP_LIGHTING	01
 // Doesn't work well.  jba.
 
-const Bool HALF_RES_MESH = false;
+constexpr const Bool HALF_RES_MESH = false;
 
 HeightMapRenderObjClass *TheHeightMap = NULL;
 //-----------------------------------------------------------------------------
@@ -310,7 +310,7 @@ Int HeightMapRenderObjClass::updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *
 	Int	vertsPerRow=(VERTEX_BUFFER_TILE_LENGTH)*4;	//vertices per row of VB
 
 	Int cellOffset = 1;
-	if (HALF_RES_MESH) {
+	if constexpr (HALF_RES_MESH) {
 		cellOffset = 2;
 	}
 
@@ -331,7 +331,7 @@ Int HeightMapRenderObjClass::updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *
 		for (j=y0; j<y1; j++)
 		{
 			VERTEX_FORMAT *vb = vBase;
-			if (HALF_RES_MESH) {
+			if constexpr (HALF_RES_MESH) {
 				if (j&1) continue;
 				vb += ((j-originY)/2)*vertsPerRow/2;	//skip to correct row in vertex buffer
 				vb += ((x0-originX)/2)*4;		//skip to correct vertex in row.
@@ -350,7 +350,7 @@ Int HeightMapRenderObjClass::updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *
 			yCoord = mapY+pMap->getDrawOrgY();
 			for (i=x0; i<x1; i++)
 			{
-				if (HALF_RES_MESH) {
+				if constexpr (HALF_RES_MESH) {
 					if (i&1) continue;
 				}
 				const Int mapX = getXWithOrigin(i);
@@ -584,7 +584,7 @@ Int HeightMapRenderObjClass::updateVBForLight(DX8VertexBufferClass	*pVB, VERTEX_
 
 		for (j=y0; j<y1; j++)
 		{
-			if (HALF_RES_MESH) {
+			if constexpr (HALF_RES_MESH) {
 				if (j&1) continue;
 			}
 			const Int mapY = getYWithOrigin(j);
@@ -612,7 +612,7 @@ Int HeightMapRenderObjClass::updateVBForLight(DX8VertexBufferClass	*pVB, VERTEX_
 
 			for (i=x0; i<x1; i++)
 			{
-				if (HALF_RES_MESH) {
+				if constexpr (HALF_RES_MESH) {
 					if (i&1) continue;
 				}
 				const Int mapX = getXWithOrigin(i);
@@ -637,7 +637,7 @@ Int HeightMapRenderObjClass::updateVBForLight(DX8VertexBufferClass	*pVB, VERTEX_
 				}
 				// vb is the pointer to the vertex in the hardware dx8 vertex buffer.
 				Int offset = (j-originY)*vertsPerRow+4*(i-originX);
-				if (HALF_RES_MESH) {
+				if constexpr (HALF_RES_MESH) {
 					offset = (j-originY)*vertsPerRow/4+2*(i-originX);
 				}
 				vb = vBase + offset;	//skip to correct row in vertex buffer
@@ -742,7 +742,7 @@ Int HeightMapRenderObjClass::updateVBForLightOptimized(DX8VertexBufferClass	*pVB
 		Int quad_below_offset;
 		Int quad_below_right_offset;
 
-		if (HALF_RES_MESH == false) {
+		if constexpr (HALF_RES_MESH == false) {
 			// offset = (j-originY)*vertsPerRow+4*(i-originX);
 			quad_right_offset = 4;
 			quad_below_offset = vertsPerRow;
@@ -761,7 +761,7 @@ Int HeightMapRenderObjClass::updateVBForLightOptimized(DX8VertexBufferClass	*pVB
 		//
 		for (j=y0; j<y1; j++)
 		{
-			if (HALF_RES_MESH) {
+			if constexpr (HALF_RES_MESH) {
 				if (j&1) continue;
 			}
 			const Int mapY = getYWithOrigin(j);
@@ -789,7 +789,7 @@ Int HeightMapRenderObjClass::updateVBForLightOptimized(DX8VertexBufferClass	*pVB
 
 			for (i=x0; i<x1; i++)
 			{
-				if (HALF_RES_MESH) {
+				if constexpr (HALF_RES_MESH) {
 					if (i&1) continue;
 				}
 				const Int mapX = getXWithOrigin(i);
@@ -814,7 +814,7 @@ Int HeightMapRenderObjClass::updateVBForLightOptimized(DX8VertexBufferClass	*pVB
 				}
 				// vb is the pointer to the vertex in the hardware dx8 vertex buffer.
 				Int offset = (j-originY)*vertsPerRow+4*(i-originX);
-				if (HALF_RES_MESH) {
+				if constexpr (HALF_RES_MESH) {
 					offset = (j-originY)*vertsPerRow/4+2*(i-originX);
 				}
 				vb = vBase + offset;	//skip to correct row in vertex buffer
@@ -1714,7 +1714,7 @@ void HeightMapRenderObjClass::updateCenter(CameraClass *camera, Vector3* cameraP
 	}
 
 	Int cellOffset = 1;
-	if (HALF_RES_MESH) {
+	if constexpr (HALF_RES_MESH) {
 		cellOffset = 2;
 	}
 
@@ -1904,7 +1904,7 @@ void HeightMapRenderObjClass::updateCenter(CameraClass *camera, Vector3* cameraP
 		newOrgY = WWMath::Round(shift2.Y/MAP_XY_FACTOR) - m_y/2 + m_map->getBorderSizeInline();
 #endif
 
-		if (HALF_RES_MESH) {
+		if constexpr (HALF_RES_MESH) {
 			newOrgX &= 0xFFFFFFFE;
 			newOrgY &= 0xFFFFFFFE;
 		}
@@ -2160,7 +2160,7 @@ void HeightMapRenderObjClass::Render(RenderInfoClass & rinfo)
 				count++;
 				Int numPolys = VERTEX_BUFFER_TILE_LENGTH*VERTEX_BUFFER_TILE_LENGTH*2;
 				Int numVertex = (VERTEX_BUFFER_TILE_LENGTH*2)*(VERTEX_BUFFER_TILE_LENGTH*2);
-				if (HALF_RES_MESH) {
+				if constexpr (HALF_RES_MESH) {
 					numPolys /= 4;
 					numVertex /= 4;
 				}
@@ -2298,7 +2298,7 @@ void HeightMapRenderObjClass::renderTerrainPass(CameraClass *pCamera)
 			count++;
 			Int numPolys = VERTEX_BUFFER_TILE_LENGTH*VERTEX_BUFFER_TILE_LENGTH*2;
 			Int numVertex = (VERTEX_BUFFER_TILE_LENGTH*2)*(VERTEX_BUFFER_TILE_LENGTH*2);
-			if (HALF_RES_MESH) {
+			if constexpr (HALF_RES_MESH) {
 				numPolys /= 4;
 				numVertex /= 4;
 			}
