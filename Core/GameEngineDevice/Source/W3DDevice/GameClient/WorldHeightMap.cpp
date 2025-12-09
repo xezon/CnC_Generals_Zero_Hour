@@ -1607,7 +1607,7 @@ Int WorldHeightMap::updateTileTexturePositions(Int *edgeHeight)
 	return maxHeight;
 }
 
-/** getUVData - Gets the texture coordinates to use.  See getTerrainTexture.
+/** getUVForNdx - Gets the texture coordinates to use.  See getTerrainTexture.
 */
 void WorldHeightMap::getUVForNdx(Int tileNdx, float *minU, float *minV, float *maxU, float*maxV, Bool fullTile)
 {
@@ -1656,7 +1656,7 @@ void WorldHeightMap::getUVForNdx(Int tileNdx, float *minU, float *minV, float *m
 	}
 }
 
-/** getUVData - Gets the texture coordinates to use.  See getTerrainTexture.
+/** getUVForBlend - Gets the texture coordinates to use.  See getTerrainTexture.
 */
 void WorldHeightMap::getUVForBlend(Int edgeClass, Region2D *range)
 {
@@ -1678,10 +1678,10 @@ Bool WorldHeightMap::isCliffMappedTexture(Int x, Int y) {
 };
 
 /** getUVData - Gets the texture coordinates to use.  See getTerrainTexture.
-		xIndex and yIndex are the integer coorddinates into the height map.
-		U and V are the texture coordiantes for the 4 corners of a height map cell.
+		xIndex and yIndex are the integer coordinates into the height map.
+		U and V are the texture coordinates for the 4 corners of a height map cell.
 		fullTile is true if we are doing 1/2 resolution height map, and require a full
-		tile to texture  a cell.  Otherwise, we use quarter tiles per cell.
+		tile to texture a cell.  Otherwise, we use quarter tiles per cell.
 */
 Bool WorldHeightMap::getUVData(Int xIndex, Int yIndex, float U[4], float V[4], Bool fullTile)
 {
@@ -1719,9 +1719,9 @@ Bool WorldHeightMap::getUVData(Int xIndex, Int yIndex, float U[4], float V[4], B
 /** getUVForTileIndex - Gets the texture coordinates to use.  See getTerrainTexture.
 		ndx is the index into the linear height array.
 		tileNdx is the index into the texture tiles array.
-		U and V are the texture coordiantes for the 4 corners of a height map cell.
+		U and V are the texture coordinates for the 4 corners of a height map cell.
 		fullTile is true if we are doing 1/2 resolution height map, and require a full
-		tile to texture  a cell.  Otherwise, we use quarter tiles per cell.
+		tile to texture a cell.  Otherwise, we use quarter tiles per cell.
 */
 
 Bool WorldHeightMap::getUVForTileIndex(Int ndx, Short tileNdx, float U[4], float V[4], Bool fullTile)
@@ -1782,7 +1782,7 @@ Bool WorldHeightMap::getUVForTileIndex(Int ndx, Short tileNdx, float U[4], float
 #ifdef DO_OLD_UV
 // old uv adjustment for cliffs
 		static Real STRETCH_LIMIT = 1.5f;	 // If it is stretching less than this, don't adjust.
-		static Real TILE_LIMIT = 4.0;			// Our tiles are currently 4 cells wide & tall, so dont'
+		static Real TILE_LIMIT = 4.0;			// Our tiles are currently 4 cells wide & tall, so don't
 																			// adjust to more than 4.0.
 
 		static Real TALL_STRETCH_LIMIT = 2.0f;
@@ -2058,9 +2058,9 @@ Bool WorldHeightMap::getExtraAlphaUVData(Int xIndex, Int yIndex, float U[4], flo
 	return TRUE;
 }
 
-/** getUVData - Gets the texture coordinates to use with the alpha texture.
-		xIndex and yIndex are the integer coorddinates into the height map.
-		U and V are the texture coordiantes for the 4 corners of a height map cell.
+/** getAlphaUVData - Gets the texture coordinates to use with the alpha texture.
+		xIndex and yIndex are the integer coordinates into the height map.
+		U and V are the texture coordinates for the 4 corners of a height map cell.
 		fullTile is true if we are doing 1/2 resolution height map, and require a full
 		tile to texture  a cell.  Otherwise, we use quarter tiles per cell.
 		flip is set if we need to flip the diagonal across the cell to make the
@@ -2146,7 +2146,7 @@ void WorldHeightMap::getAlphaUVData(Int xIndex, Int yIndex, float U[4], float V[
 		}
 	}
 	if (stretchedForCliff) {
-		// If we had to stretch for clif, check heights.
+		// If we had to stretch for cliff, check heights.
 		Int p0=getHeight(xIndex, yIndex);
 		Int p1=getHeight(xIndex+1, yIndex);
 		Int p2=getHeight(xIndex+1, yIndex+1);

@@ -227,7 +227,6 @@ public:  // height map info.
 
 	UnsignedByte *getDataPtr(void) {return m_data;}
 
-
 	Int getXExtent(void) const {return m_width;}	///<number of vertices in x
 	Int getYExtent(void) const {return m_height;}	///<number of vertices in y
 
@@ -287,14 +286,13 @@ public:  // tile and texture info.
 	AsciiString getTerrainNameAt(Real x, Real y);
 	Bool isCliffMappedTexture(Int xIndex, Int yIndex);
 
-
-  Bool getSeismicUpdateFlag(Int xIndex, Int yIndex) const;
-  void setSeismicUpdateFlag(Int xIndex, Int yIndex, Bool value);
-  void clearSeismicUpdateFlags(void) ;
-  virtual Real getSeismicZVelocity(Int xIndex, Int yIndex) const;
-  virtual void setSeismicZVelocity(Int xIndex, Int yIndex, Real value);
-  void fillSeismicZVelocities( Real value );
-  virtual Real getBilinearSampleSeismicZVelocity( Int x, Int y);
+	Bool getSeismicUpdateFlag(Int xIndex, Int yIndex) const;
+	void setSeismicUpdateFlag(Int xIndex, Int yIndex, Bool value);
+	void clearSeismicUpdateFlags(void) ;
+	virtual Real getSeismicZVelocity(Int xIndex, Int yIndex) const;
+	virtual void setSeismicZVelocity(Int xIndex, Int yIndex, Real value);
+	void fillSeismicZVelocities( Real value );
+	virtual Real getBilinearSampleSeismicZVelocity( Int x, Int y);
 
 
 
