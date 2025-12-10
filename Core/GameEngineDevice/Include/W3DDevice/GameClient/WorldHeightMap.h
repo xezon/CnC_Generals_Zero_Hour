@@ -182,6 +182,36 @@ protected:
 	Int m_drawWidthX;
 	Int m_drawHeightY;
 
+	struct UVData
+	{
+		float U[4];
+		float V[4];
+		Bool stretchedForCliff;
+	};
+
+	struct AlphaUVData
+	{
+		UnsignedByte alpha[4];
+		float U[4];
+		float V[4];
+		Bool flipForBlend; // True if the blend needs the triangles flipped.
+	};
+
+	struct ExtraAlphaUVData
+	{
+		UnsignedByte alpha[4];
+		float U[4];
+		float V[4];
+		Bool flipForBlend; // True if the blend needs the triangles flipped.
+		Bool stretchedForCliff;
+		Bool exists;
+	};
+
+	UVData *m_UVDataCache;
+	AlphaUVData *m_alphaUVDataCache;
+	ExtraAlphaUVData *m_extraAlphaUVDataCache;
+	Bool m_fullTile;
+
 	/// Tiles that hold the alpha channel info.
 	static TileData *m_alphaTiles[NUM_ALPHA_TILES];
 
@@ -190,8 +220,8 @@ protected:
 	TileData *getSourceTile(UnsignedInt ndx) { if (ndx<NUM_SOURCE_TILES) return(m_sourceTiles[ndx]); return(NULL); };
 	TileData *getEdgeTile(UnsignedInt ndx) { if (ndx<NUM_SOURCE_TILES) return(m_edgeTiles[ndx]); return(NULL); };
 	/// UV mapping data for a cell to map into the terrain texture.
-	void getUVForNdx(Int ndx, float *minU, float *minV, float *maxU, float*maxV, Bool fullTile);
-	Bool getUVForTileIndex(Int ndx, Short tileNdx, float U[4], float V[4], Bool fullTile);
+	void getUVForNdx(Int ndx, float *minU, float *minV, float *maxU, float*maxV, Bool fullTile) const;
+	Bool getUVForTileIndex(Int ndx, Short tileNdx, float U[4], float V[4], Bool fullTile) const;
 	Int getTextureClassFromNdx(Int tileNdx);
 	void readTexClass(TXTextureClass *texClass, TileData **tileData);
 	Int updateTileTexturePositions(Int *edgeHeight); ///< Places each tile in the texture.
@@ -217,6 +247,11 @@ protected:
 public: // constructors/destructors
 	WorldHeightMap(ChunkInputStream *pFile, Bool bHMapOnly=false);	// read from file.
 	~WorldHeightMap(void);			// destroy.
+
+	void initHeightData();
+
+private:
+	void precomputeUVData(); ///< precomputes UV data for efficient lookups
 
 public:  // Boundary info
 	const VecICoord2D& getAllBoundaries(void) const { return m_boundaries; }
@@ -268,7 +303,8 @@ public:  // tile and texture info.
 	TextureClass *getAlphaTerrainTexture(void); //< generates if needed and returns alpha terrain texture
 	TextureClass *getEdgeTerrainTexture(void); //< generates if needed and returns blend edge texture
 	/// UV mapping data for a cell to map into the terrain texture.  Returns true if the textures had to be stretched for cliffs.
-	Bool getUVData(Int xIndex, Int yIndex, float U[4], float V[4], Bool fullTile);
+	Bool getUVData(Int xIndex, Int yIndex, float U[4], float V[4], Bool fullTile) const; ///< expensive
+	Bool getPrecomputedUVData(Int xIndex, Int yIndex, float U[4], float V[4], Bool fullTile) const;
 	Bool getFlipState(Int xIndex, Int yIndex) const;
 	///Faster version of above function without all the safety checks - For people that do checks externally.
 	Bool getQuickFlipState(Int xIndex, Int yIndex) const
@@ -279,9 +315,11 @@ public:  // tile and texture info.
 	void setFlipState(Int xIndex, Int yIndex, Bool value);
 	void clearFlipStates(void);
 	Bool getCliffState(Int xIndex, Int yIndex) const;
-	Bool getExtraAlphaUVData(Int xIndex, Int yIndex, float U[4], float V[4], UnsignedByte alpha[4], Bool *flip, Bool *cliff);
+	Bool getExtraAlphaUVData(Int xIndex, Int yIndex, float U[4], float V[4], UnsignedByte alpha[4], Bool *flip, Bool *cliff) const; ///< expensive
+	Bool getPrecomputedExtraAlphaUVData(Int xIndex, Int yIndex, float U[4], float V[4], UnsignedByte alpha[4], Bool *flip, Bool *cliff) const;
 	/// UV mapping data for a cell to map into the alpha terrain texture.
-	void getAlphaUVData(Int xIndex, Int yIndex, float U[4], float V[4], UnsignedByte alpha[4], Bool *flip, Bool fullTile);
+	void getAlphaUVData(Int xIndex, Int yIndex, float U[4], float V[4], UnsignedByte alpha[4], Bool *flip, Bool fullTile) const; ///< expensive
+	void getPrecomputedAlphaUVData(Int xIndex, Int yIndex, float U[4], float V[4], UnsignedByte alpha[4], Bool *flip, Bool fullTile) const;
 	void getTerrainColorAt(Real x, Real y, RGBColor *pColor);
 	AsciiString getTerrainNameAt(Real x, Real y);
 	Bool isCliffMappedTexture(Int xIndex, Int yIndex);
@@ -307,7 +345,10 @@ public:  // Flat tile texture info.
 public:  // modify height value
 	void setRawHeight(Int xIndex, Int yIndex, UnsignedByte height) {
 		Int ndx = (yIndex*m_width)+xIndex;
-		if ((ndx>=0) && (ndx<m_dataSize) && m_data) m_data[ndx]=height;
+		if ((ndx>=0) && (ndx<m_dataSize) && m_data) {
+			m_data[ndx]=height;
+			// TheSuperHackers @info No need to recompute UV data here.
+		}
 	};
 public: // Read tile utilities. jba [7/9/2003]
 	static Bool readTiles(InputStream *pStrm, TileData **tiles, Int numRows);

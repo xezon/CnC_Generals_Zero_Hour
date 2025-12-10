@@ -206,7 +206,7 @@ void W3DCustomEdging::loadEdgingsInVertexAndIndexBuffers(WorldHeightMap *pMap, I
 			UnsignedByte alpha[4];
 			float UA[4], VA[4];
 			Bool flipForBlend;
-			pMap->getAlphaUVData(column, row, UA, VA, alpha, &flipForBlend, false);
+			pMap->getPrecomputedAlphaUVData(column, row, UA, VA, alpha, &flipForBlend, false);
 
 
 			Int startVertex = m_curNumEdgingVertices;

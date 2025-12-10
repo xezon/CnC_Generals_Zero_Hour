@@ -1985,7 +1985,7 @@ void BaseHeightMapRenderObjClass::updateScorches(void)
 #if 0
 				UnsignedByte alpha[4];
 				float UA[4], VA[4];
-				m_map->getAlphaUVData(xNdx, yNdx, UA, VA, alpha, &flipForBlend, false);
+				m_map->getPrecomputedAlphaUVData(xNdx, yNdx, UA, VA, alpha, &flipForBlend, false);
 #endif
 				if (flipForBlend) {
 					*curIb++ = startVertex + j*yOffset + i+1;

@@ -369,8 +369,8 @@ Int HeightMapRenderObjClass::updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *
 				Bool flipForBlend = false;			 // True if the blend needs the triangles flipped.
 
 				if (pMap) {
-					pMap->getUVData(mapX+pMap->getDrawOrgX(), mapY+pMap->getDrawOrgY(), U, V, HALF_RES_MESH);
-					pMap->getAlphaUVData(mapX+pMap->getDrawOrgX(), mapY+pMap->getDrawOrgY(), UA, VA, alpha, &flipForBlend, HALF_RES_MESH);
+					pMap->getPrecomputedUVData(mapX+pMap->getDrawOrgX(), mapY+pMap->getDrawOrgY(), U, V, HALF_RES_MESH);
+					pMap->getPrecomputedAlphaUVData(mapX+pMap->getDrawOrgX(), mapY+pMap->getDrawOrgY(), UA, VA, alpha, &flipForBlend, HALF_RES_MESH);
 				}
 
 
@@ -984,7 +984,7 @@ void HeightMapRenderObjClass::doPartialUpdate(const IRegion2D &partialRange, Wor
 			Real U[4],V[4];
 			UnsignedByte alpha[4];
 			Bool flipState,cliffState;
-			if (htMap->getExtraAlphaUVData(i,j,U,V,alpha,&flipState, &cliffState))
+			if (htMap->getPrecomputedExtraAlphaUVData(i,j,U,V,alpha,&flipState, &cliffState))
 			{	if (m_numExtraBlendTiles >= m_extraBlendTilePositionsSize)
 				{	//no more room to store extra blend tiles so enlarge the buffer.
 					Int *tempPositions=NEW Int[m_extraBlendTilePositionsSize+512];
@@ -1259,6 +1259,9 @@ shaders, and materials.*/
 //=============================================================================
 Int HeightMapRenderObjClass::initHeightData(Int x, Int y, WorldHeightMap *pMap, RefRenderObjListIterator *pLightsIterator, Bool updateExtraPassTiles)
 {
+	// TheSuperHackers @performance xezon 10/12/2025 Precomputes all UV data for fast lookups in heightmap creation and updates.
+	pMap->initHeightData();
+
 	BaseHeightMapRenderObjClass::initHeightData(x, y, pMap, pLightsIterator, updateExtraPassTiles);
 	Int i,j;
 //	Int	vertsPerRow=x*2-2;
@@ -1291,7 +1294,7 @@ Int HeightMapRenderObjClass::initHeightData(Int x, Int y, WorldHeightMap *pMap, 
 					Real U[4],V[4];
 					UnsignedByte alpha[4];
 					Bool flipState,cliffState;
-					if (pMap->getExtraAlphaUVData(i,j,U,V,alpha,&flipState, &cliffState))
+					if (pMap->getPrecomputedExtraAlphaUVData(i,j,U,V,alpha,&flipState, &cliffState))
 					{	if (m_numExtraBlendTiles >= m_extraBlendTilePositionsSize)
 						{	//no more room to store extra blend tiles so enlarge the buffer.
 							Int *tempPositions=NEW Int[m_extraBlendTilePositionsSize+512];
@@ -2383,7 +2386,7 @@ void HeightMapRenderObjClass::renderExtraBlendTiles(void)
 
 			if (x >= drawStartX && x < drawEdgeX &&
 				y >= drawStartY && y < drawEdgeY &&
-				m_map->getExtraAlphaUVData(x,y,U,V,alpha,&flipState, &cliffState))
+				m_map->getPrecomputedExtraAlphaUVData(x,y,U,V,alpha,&flipState, &cliffState))
 			{	//this tile is inside visible region and has 3rd blend layer.
 
 				Int idx = x+y*xExtent;
