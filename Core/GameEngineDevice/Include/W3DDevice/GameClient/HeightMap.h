@@ -115,4 +115,5 @@ protected:
 	Int	getNumExtraBlendTiles(Bool visible) { return visible?m_numVisibleExtraBlendTiles:m_numExtraBlendTiles;}
 	void freeIndexVertexBuffers(void);
 	void renderExtraBlendTiles(void);	///< render 3-way blend tiles that have blend of 3 textures.
+	void pushExtraBlendTileIndex(WorldHeightMap *htMap, Int x, Int y);
 };

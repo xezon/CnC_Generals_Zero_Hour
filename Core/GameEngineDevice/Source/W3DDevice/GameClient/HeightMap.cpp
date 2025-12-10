@@ -980,21 +980,9 @@ void HeightMapRenderObjClass::doPartialUpdate(const IRegion2D &partialRange, Wor
 	for (j=partialRange.lo.y; j<partialRange.hi.y; j++)
 		for (i=partialRange.lo.x; i<partialRange.hi.x; i++)
 		{
-			if (j<0 || i<0) continue;
-			if (htMap->getExtraBlendTileIndex(i,j) != 0)
-			{	if (m_numExtraBlendTiles >= m_extraBlendTilePositionsSize)
-				{	//no more room to store extra blend tiles so enlarge the buffer.
-					Int *tempPositions=NEW Int[m_extraBlendTilePositionsSize+512];
-					memcpy(tempPositions, m_extraBlendTilePositions, m_extraBlendTilePositionsSize*sizeof(Int));
-					delete [] m_extraBlendTilePositions;
-					//enlarge by more tiles to reduce memory trashing
-					m_extraBlendTilePositions = tempPositions;
-					m_extraBlendTilePositionsSize += 512;
-				}
-				//Pack x and y position into single integer since maps are limited in size
-				m_extraBlendTilePositions[m_numExtraBlendTiles]=i | (j <<16);
-				m_numExtraBlendTiles++;
-			}
+			if (j<0 || i<0)
+				continue;
+			pushExtraBlendTileIndex(htMap,i,j);
 		}
 	updateShorelineTiles(partialRange.lo.x,partialRange.lo.y,partialRange.hi.x,partialRange.hi.y,htMap);
 
@@ -1288,20 +1276,7 @@ Int HeightMapRenderObjClass::initHeightData(Int x, Int y, WorldHeightMap *pMap, 
 			for (j=0; j<(m_mapDY-1); j++)
 				for (i=0; i<(m_mapDX-1); i++)
 				{
-					if (pMap->getExtraBlendTileIndex(i,j) != 0)
-					{	if (m_numExtraBlendTiles >= m_extraBlendTilePositionsSize)
-						{	//no more room to store extra blend tiles so enlarge the buffer.
-							Int *tempPositions=NEW Int[m_extraBlendTilePositionsSize+512];
-							memcpy(tempPositions, m_extraBlendTilePositions, m_extraBlendTilePositionsSize*sizeof(Int));
-							delete [] m_extraBlendTilePositions;
-							//enlarge by more tiles to reduce memory trashing
-							m_extraBlendTilePositions = tempPositions;
-							m_extraBlendTilePositionsSize += 512;
-						}
-						//Pack x and y position into single integer since maps are limited in size
-						m_extraBlendTilePositions[m_numExtraBlendTiles]=i | (j <<16);
-						m_numExtraBlendTiles++;
-					}
+					pushExtraBlendTileIndex(pMap,i,j);
 				}
 		}
 	}
@@ -2533,4 +2508,25 @@ void HeightMapRenderObjClass::renderExtraBlendTiles(void)
 		}
   }
 }
+
+void HeightMapRenderObjClass::pushExtraBlendTileIndex(WorldHeightMap *htMap, Int x, Int y)
+{
+	if (htMap->getExtraBlendTileIndex(x, y) != 0)
+	{
+		if (m_numExtraBlendTiles >= m_extraBlendTilePositionsSize)
+		{
+			//no more room to store extra blend tiles so enlarge the buffer.
+			Int *tempPositions=NEW Int[m_extraBlendTilePositionsSize+512];
+			memcpy(tempPositions, m_extraBlendTilePositions, m_extraBlendTilePositionsSize*sizeof(Int));
+			delete [] m_extraBlendTilePositions;
+			//enlarge by more tiles to reduce memory trashing
+			m_extraBlendTilePositions = tempPositions;
+			m_extraBlendTilePositionsSize += 512;
+		}
+		//Pack x and y position into single integer since maps are limited in size
+		m_extraBlendTilePositions[m_numExtraBlendTiles]=x | (y<<16);
+		m_numExtraBlendTiles++;
+	}
+}
+
 #endif
