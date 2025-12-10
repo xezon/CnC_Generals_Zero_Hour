@@ -981,10 +981,7 @@ void HeightMapRenderObjClass::doPartialUpdate(const IRegion2D &partialRange, Wor
 		for (i=partialRange.lo.x; i<partialRange.hi.x; i++)
 		{
 			if (j<0 || i<0) continue;
-			Real U[4],V[4];
-			UnsignedByte alpha[4];
-			Bool flipState,cliffState;
-			if (htMap->getPrecomputedExtraAlphaUVData(i,j,U,V,alpha,&flipState, &cliffState))
+			if (htMap->getExtraBlendTileIndex(i,j) != 0)
 			{	if (m_numExtraBlendTiles >= m_extraBlendTilePositionsSize)
 				{	//no more room to store extra blend tiles so enlarge the buffer.
 					Int *tempPositions=NEW Int[m_extraBlendTilePositionsSize+512];
@@ -1291,10 +1288,7 @@ Int HeightMapRenderObjClass::initHeightData(Int x, Int y, WorldHeightMap *pMap, 
 			for (j=0; j<(m_mapDY-1); j++)
 				for (i=0; i<(m_mapDX-1); i++)
 				{
-					Real U[4],V[4];
-					UnsignedByte alpha[4];
-					Bool flipState,cliffState;
-					if (pMap->getPrecomputedExtraAlphaUVData(i,j,U,V,alpha,&flipState, &cliffState))
+					if (pMap->getExtraBlendTileIndex(i,j) != 0)
 					{	if (m_numExtraBlendTiles >= m_extraBlendTilePositionsSize)
 						{	//no more room to store extra blend tiles so enlarge the buffer.
 							Int *tempPositions=NEW Int[m_extraBlendTilePositionsSize+512];

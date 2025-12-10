@@ -315,6 +315,7 @@ public:  // tile and texture info.
 	void setFlipState(Int xIndex, Int yIndex, Bool value);
 	void clearFlipStates(void);
 	Bool getCliffState(Int xIndex, Int yIndex) const;
+	Short getExtraBlendTileIndex(Int xIndex, Int yIndex) const;
 	Bool getExtraAlphaUVData(Int xIndex, Int yIndex, float U[4], float V[4], UnsignedByte alpha[4], Bool *flip, Bool *cliff) const; ///< expensive
 	Bool getPrecomputedExtraAlphaUVData(Int xIndex, Int yIndex, float U[4], float V[4], UnsignedByte alpha[4], Bool *flip, Bool *cliff) const;
 	/// UV mapping data for a cell to map into the alpha terrain texture.

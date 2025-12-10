@@ -2060,6 +2060,15 @@ Bool WorldHeightMap::getUVForTileIndex(Int ndx, Short tileNdx, float U[4], float
 	return false;
 }
 
+Short WorldHeightMap::getExtraBlendTileIndex(Int xIndex, Int yIndex) const
+{
+	Int ndx = (yIndex*m_width)+xIndex;
+	if ( (ndx>=0) && (ndx<m_dataSize) && m_extraBlendTileNdxes) {
+		return m_extraBlendTileNdxes[ndx];
+	}
+	return 0;
+}
+
 ///@todo: Are the different "if" cases mutually exclusive?  If so, should add else statements.
 Bool WorldHeightMap::getExtraAlphaUVData(Int xIndex, Int yIndex, float U[4], float V[4], UnsignedByte alpha[4], Bool *needFlip, Bool *cliff) const
 {
@@ -2067,7 +2076,7 @@ Bool WorldHeightMap::getExtraAlphaUVData(Int xIndex, Int yIndex, float U[4], flo
 	*needFlip = FALSE;
 	*cliff = FALSE;
 
-	if ( (ndx>=0) && (ndx<m_dataSize) && m_tileNdxes) {
+	if ( (ndx>=0) && (ndx<m_dataSize) && m_extraBlendTileNdxes) {
 		Short blendNdx = m_extraBlendTileNdxes[ndx];
 		if (blendNdx == 0) {
 			return FALSE;
