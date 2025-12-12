@@ -464,7 +464,6 @@ WorldHeightMap::WorldHeightMap()
 	, m_UVDataCache(NULL)
 	, m_alphaUVDataCache(NULL)
 	, m_extraAlphaUVDataCache(NULL)
-	, m_fullTile(false)
 {
 	Int i;
 	for (i=0; i<NUM_SOURCE_TILES; i++) {
@@ -523,7 +522,6 @@ WorldHeightMap::WorldHeightMap(ChunkInputStream *pStrm, Bool logicalDataOnly)
 	, m_UVDataCache(NULL)
 	, m_alphaUVDataCache(NULL)
 	, m_extraAlphaUVDataCache(NULL)
-	, m_fullTile(false)
 {
 
 	int i;
@@ -1625,10 +1623,8 @@ Int WorldHeightMap::updateTileTexturePositions(Int *edgeHeight)
 	return maxHeight;
 }
 
-void WorldHeightMap::precomputeUVData(Bool fullTile)
+void WorldHeightMap::precomputeUVData()
 {
-	m_fullTile = fullTile;
-
 	// Make sure we have created textures first.
 	getTerrainTexture();
 
@@ -1651,11 +1647,11 @@ void WorldHeightMap::precomputeUVData(Bool fullTile)
 			const Int ndx = y*m_width + x;
 			{
 				UVData& data = m_UVDataCache[ndx];
-				data.stretchedForCliff = getUVData(x, y, data.U, data.V, fullTile);
+				data.stretchedForCliff = getUVData(x, y, data.U, data.V);
 			}
 			{
 				AlphaUVData& data = m_alphaUVDataCache[ndx];
-				getAlphaUVData(x, y, data.U, data.V, data.alpha, &data.flipForBlend, fullTile);
+				getAlphaUVData(x, y, data.U, data.V, data.alpha, &data.flipForBlend);
 			}
 			{
 				ExtraAlphaUVData& data = m_extraAlphaUVDataCache[ndx];
@@ -1679,7 +1675,7 @@ void WorldHeightMap::precomputeUVData(Bool fullTile)
 
 /** getUVForNdx - Gets the texture coordinates to use.  See getTerrainTexture.
 */
-void WorldHeightMap::getUVForNdx(Int tileNdx, float *minU, float *minV, float *maxU, float*maxV, Bool fullTile) const
+void WorldHeightMap::getUVForNdx(Int tileNdx, float *minU, float *minV, float *maxU, float*maxV) const
 {
 	Short baseNdx = tileNdx>>2;
 	if (m_sourceTiles[baseNdx] == NULL) {
@@ -1708,21 +1704,20 @@ void WorldHeightMap::getUVForNdx(Int tileNdx, float *minU, float *minV, float *m
 	*minV/=m_terrainTexHeight;
 	*maxU/=TEXTURE_WIDTH;
 	*maxV/=m_terrainTexHeight;
-	if (!fullTile) {
-		// Tiles are 64x64 pixels, height grids map to 32x32.
-		// So get the proper quadrant of the tile.
-		Real midX = (*minU+*maxU)/2;
-		Real midY = (*minV+*maxV)/2;
-		if (tileNdx&2) {		// y's are flipped.
-			*maxV = midY;
-		} else {
-			*minV = midY;
-		}
-		if (tileNdx&1) {
-			*minU = midX;
-		} else {
-			*maxU = midX;
-		}
+
+	// Tiles are 64x64 pixels, height grids map to 32x32.
+	// So get the proper quadrant of the tile.
+	Real midX = (*minU+*maxU)/2;
+	Real midY = (*minV+*maxV)/2;
+	if (tileNdx&2) {		// y's are flipped.
+		*maxV = midY;
+	} else {
+		*minV = midY;
+	}
+	if (tileNdx&1) {
+		*minU = midX;
+	} else {
+		*maxU = midX;
 	}
 }
 
@@ -1750,10 +1745,8 @@ Bool WorldHeightMap::isCliffMappedTexture(Int x, Int y) {
 /** getUVData - Gets the texture coordinates to use.  See getTerrainTexture.
 		xIndex and yIndex are the integer coordinates into the height map.
 		U and V are the texture coordinates for the 4 corners of a height map cell.
-		fullTile is true if we are doing 1/2 resolution height map, and require a full
-		tile to texture a cell.  Otherwise, we use quarter tiles per cell.
 */
-Bool WorldHeightMap::getUVData(Int xIndex, Int yIndex, float U[4], float V[4], Bool fullTile) const
+Bool WorldHeightMap::getUVData(Int xIndex, Int yIndex, float U[4], float V[4]) const
 {
 #define dont_SHOW_THE_TEXTURE_FOR_DEBUG 1
 #if SHOW_THE_TEXTURE_FOR_DEBUG
@@ -1776,15 +1769,14 @@ Bool WorldHeightMap::getUVData(Int xIndex, Int yIndex, float U[4], float V[4], B
 	Int ndx = (yIndex*m_width)+xIndex;
 	if ((ndx<m_dataSize) && m_tileNdxes) {
 		Short tileNdx = m_tileNdxes[ndx];
-		return getUVForTileIndex(ndx, tileNdx, U, V, fullTile);
+		return getUVForTileIndex(ndx, tileNdx, U, V);
 	}
 	return false;
 #endif
 }
 
-Bool WorldHeightMap::getPrecomputedUVData(Int xIndex, Int yIndex, float U[4], float V[4], Bool fullTile) const
+Bool WorldHeightMap::getPrecomputedUVData(Int xIndex, Int yIndex, float U[4], float V[4]) const
 {
-	DEBUG_ASSERTCRASH(m_fullTile == fullTile, ("Precomputed data does not match requested data"));
 	const Int ndx = (yIndex*m_width)+xIndex;
 	if ((ndx<m_dataSize) && m_UVDataCache)
 	{
@@ -1801,11 +1793,9 @@ Bool WorldHeightMap::getPrecomputedUVData(Int xIndex, Int yIndex, float U[4], fl
 		ndx is the index into the linear height array.
 		tileNdx is the index into the texture tiles array.
 		U and V are the texture coordinates for the 4 corners of a height map cell.
-		fullTile is true if we are doing 1/2 resolution height map, and require a full
-		tile to texture a cell.  Otherwise, we use quarter tiles per cell.
 */
 
-Bool WorldHeightMap::getUVForTileIndex(Int ndx, Short tileNdx, float U[4], float V[4], Bool fullTile) const
+Bool WorldHeightMap::getUVForTileIndex(Int ndx, Short tileNdx, float U[4], float V[4]) const
 {
 	Real nU, nV, xU, xV;
 	nU=nV=xU=xV = 0.0f;
@@ -1813,7 +1803,7 @@ Bool WorldHeightMap::getUVForTileIndex(Int ndx, Short tileNdx, float U[4], float
 	tilesPerRow *= 4;
 
 	if ((ndx<m_dataSize) && m_tileNdxes) {
-		getUVForNdx(tileNdx, &nU, &nV, &xU, &xV, fullTile);
+		getUVForNdx(tileNdx, &nU, &nV, &xU, &xV);
 		U[0] = nU; U[1] = xU; U[2] = xU; U[3] = nU;
 		V[0] = xV; V[1] = xV; V[2] = nV; V[3] = nV;
 		if (TheGlobalData && !TheGlobalData->m_adjustCliffTextures) {
@@ -1821,9 +1811,6 @@ Bool WorldHeightMap::getUVForTileIndex(Int ndx, Short tileNdx, float U[4], float
 		}
 		if (nU==0.0) {
 			return false; // missing texture.
-		}
-		if (fullTile) {
-			return false;
 		}
 		if (m_cliffInfoNdxes[ndx]) {
 			TCliffInfo info = m_cliffInfo[m_cliffInfoNdxes[ndx]];
@@ -1876,7 +1863,7 @@ Bool WorldHeightMap::getUVForTileIndex(Int ndx, Short tileNdx, float U[4], float
 		tilesPerRow *= 4;
 
 
-		getUVForNdx(tileNdx, &nU, &nV, &xU, &xV, fullTile);
+		getUVForNdx(tileNdx, &nU, &nV, &xU, &xV);
 		U[0] = nU; U[1] = xU; U[2] = xU; U[3] = nU;
 		V[0] = xV; V[1] = xV; V[2] = nV; V[3] = nV;
 		if (TheGlobalData && !TheGlobalData->m_adjustCliffTextures) {
@@ -1884,9 +1871,6 @@ Bool WorldHeightMap::getUVForTileIndex(Int ndx, Short tileNdx, float U[4], float
 		}
 		if (nU==0.0) {
 			return false; // missing texture.
-		}
-		if (fullTile) {
-			return false;
 		}
 		// check for excessive heights.
 		if (ndx < this->m_dataSize - m_width - 1) {
@@ -2081,7 +2065,7 @@ Bool WorldHeightMap::getExtraAlphaUVData(Int xIndex, Int yIndex, float U[4], flo
 		if (blendNdx == 0) {
 			return FALSE;
 		} else {
-			*cliff = getUVForTileIndex(ndx, m_blendedTiles[blendNdx].blendNdx, U, V, FALSE);
+			*cliff = getUVForTileIndex(ndx, m_blendedTiles[blendNdx].blendNdx, U, V);
 			alpha[0] = alpha[1] = alpha[2] = alpha[3] = 0;
 			if (m_blendedTiles[blendNdx].horiz) {
 				// Horizontals don't need flipping unless forced because of 3way blend
@@ -2150,7 +2134,6 @@ Bool WorldHeightMap::getExtraAlphaUVData(Int xIndex, Int yIndex, float U[4], flo
 
 Bool WorldHeightMap::getPrecomputedExtraAlphaUVData(Int xIndex, Int yIndex, float U[4], float V[4], UnsignedByte alpha[4], Bool *flip, Bool *cliff) const
 {
-	DEBUG_ASSERTCRASH(m_fullTile == fullTile, ("Precomputed data does not match requested data"));
 	const Int ndx = (yIndex*m_width)+xIndex;
 	if ((ndx<m_dataSize) && m_extraAlphaUVDataCache)
 	{
@@ -2169,13 +2152,11 @@ Bool WorldHeightMap::getPrecomputedExtraAlphaUVData(Int xIndex, Int yIndex, floa
 /** getAlphaUVData - Gets the texture coordinates to use with the alpha texture.
 		xIndex and yIndex are the integer coordinates into the height map.
 		U and V are the texture coordinates for the 4 corners of a height map cell.
-		fullTile is true if we are doing 1/2 resolution height map, and require a full
-		tile to texture  a cell.  Otherwise, we use quarter tiles per cell.
 		flip is set if we need to flip the diagonal across the cell to make the
 		alpha coordinates blend properly.  Filling a square with 2 triangles is not symmetrical :)
 */
 void WorldHeightMap::getAlphaUVData(Int xIndex, Int yIndex, float U[4], float V[4],
-																		UnsignedByte alpha[4], Bool *flip, Bool fullTile) const
+																		UnsignedByte alpha[4], Bool *flip) const
 {
 	Int ndx = (yIndex*m_width)+xIndex;
 	Bool stretchedForCliff = false;
@@ -2183,14 +2164,13 @@ void WorldHeightMap::getAlphaUVData(Int xIndex, Int yIndex, float U[4], float V[
 
 	if ((ndx<m_dataSize) && m_tileNdxes) {
 		Short blendNdx = m_blendTileNdxes[ndx];
-		if (fullTile) blendNdx = 0;
 		if (blendNdx == 0) {
-			stretchedForCliff = getUVForTileIndex(ndx, m_tileNdxes[ndx], U, V, fullTile);
+			stretchedForCliff = getUVForTileIndex(ndx, m_tileNdxes[ndx], U, V);
 			alpha[0] = alpha[1] = alpha[2] = alpha[3] = 0;
 			// No alpha blend, so never need to flip.
 			needFlip = false;
 		} else {
-			stretchedForCliff = getUVForTileIndex(ndx, m_blendedTiles[blendNdx].blendNdx, U, V, fullTile);
+			stretchedForCliff = getUVForTileIndex(ndx, m_blendedTiles[blendNdx].blendNdx, U, V);
 			alpha[0] = alpha[1] = alpha[2] = alpha[3] = 0;
 			if (m_blendedTiles[blendNdx].horiz) {
 				// Horizontals don't need flipping unless forced because of 3way blend.
@@ -2266,9 +2246,8 @@ void WorldHeightMap::getAlphaUVData(Int xIndex, Int yIndex, float U[4], float V[
 #endif
 }
 
-void WorldHeightMap::getPrecomputedAlphaUVData(Int xIndex, Int yIndex, float U[4], float V[4], UnsignedByte alpha[4], Bool *flip, Bool fullTile) const
+void WorldHeightMap::getPrecomputedAlphaUVData(Int xIndex, Int yIndex, float U[4], float V[4], UnsignedByte alpha[4], Bool *flip) const
 {
-	DEBUG_ASSERTCRASH(m_fullTile == fullTile, ("Precomputed data does not match requested data"));
 	const Int ndx = (yIndex*m_width)+xIndex;
 	if ((ndx<m_dataSize) && m_alphaUVDataCache)
 	{

@@ -210,7 +210,6 @@ protected:
 	UVData *m_UVDataCache;
 	AlphaUVData *m_alphaUVDataCache;
 	ExtraAlphaUVData *m_extraAlphaUVDataCache;
-	Bool m_fullTile;
 
 	/// Tiles that hold the alpha channel info.
 	static TileData *m_alphaTiles[NUM_ALPHA_TILES];
@@ -220,8 +219,8 @@ protected:
 	TileData *getSourceTile(UnsignedInt ndx) { if (ndx<NUM_SOURCE_TILES) return(m_sourceTiles[ndx]); return(NULL); };
 	TileData *getEdgeTile(UnsignedInt ndx) { if (ndx<NUM_SOURCE_TILES) return(m_edgeTiles[ndx]); return(NULL); };
 	/// UV mapping data for a cell to map into the terrain texture.
-	void getUVForNdx(Int ndx, float *minU, float *minV, float *maxU, float*maxV, Bool fullTile) const;
-	Bool getUVForTileIndex(Int ndx, Short tileNdx, float U[4], float V[4], Bool fullTile) const;
+	void getUVForNdx(Int ndx, float *minU, float *minV, float *maxU, float*maxV) const;
+	Bool getUVForTileIndex(Int ndx, Short tileNdx, float U[4], float V[4]) const;
 	Int getTextureClassFromNdx(Int tileNdx);
 	void readTexClass(TXTextureClass *texClass, TileData **tileData);
 	Int updateTileTexturePositions(Int *edgeHeight); ///< Places each tile in the texture.
@@ -303,8 +302,8 @@ public:  // tile and texture info.
 	TextureClass *getAlphaTerrainTexture(void); //< generates if needed and returns alpha terrain texture
 	TextureClass *getEdgeTerrainTexture(void); //< generates if needed and returns blend edge texture
 	/// UV mapping data for a cell to map into the terrain texture.  Returns true if the textures had to be stretched for cliffs.
-	Bool getUVData(Int xIndex, Int yIndex, float U[4], float V[4], Bool fullTile) const; ///< expensive
-	Bool getPrecomputedUVData(Int xIndex, Int yIndex, float U[4], float V[4], Bool fullTile) const;
+	Bool getUVData(Int xIndex, Int yIndex, float U[4], float V[4]) const; ///< expensive
+	Bool getPrecomputedUVData(Int xIndex, Int yIndex, float U[4], float V[4]) const;
 	Bool getFlipState(Int xIndex, Int yIndex) const;
 	///Faster version of above function without all the safety checks - For people that do checks externally.
 	Bool getQuickFlipState(Int xIndex, Int yIndex) const
@@ -319,8 +318,8 @@ public:  // tile and texture info.
 	Bool getExtraAlphaUVData(Int xIndex, Int yIndex, float U[4], float V[4], UnsignedByte alpha[4], Bool *flip, Bool *cliff) const; ///< expensive
 	Bool getPrecomputedExtraAlphaUVData(Int xIndex, Int yIndex, float U[4], float V[4], UnsignedByte alpha[4], Bool *flip, Bool *cliff) const;
 	/// UV mapping data for a cell to map into the alpha terrain texture.
-	void getAlphaUVData(Int xIndex, Int yIndex, float U[4], float V[4], UnsignedByte alpha[4], Bool *flip, Bool fullTile) const; ///< expensive
-	void getPrecomputedAlphaUVData(Int xIndex, Int yIndex, float U[4], float V[4], UnsignedByte alpha[4], Bool *flip, Bool fullTile) const;
+	void getAlphaUVData(Int xIndex, Int yIndex, float U[4], float V[4], UnsignedByte alpha[4], Bool *flip) const; ///< expensive
+	void getPrecomputedAlphaUVData(Int xIndex, Int yIndex, float U[4], float V[4], UnsignedByte alpha[4], Bool *flip) const;
 	void getTerrainColorAt(Real x, Real y, RGBColor *pColor);
 	AsciiString getTerrainNameAt(Real x, Real y);
 	Bool isCliffMappedTexture(Int xIndex, Int yIndex);
