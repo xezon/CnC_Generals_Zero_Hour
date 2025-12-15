@@ -342,11 +342,8 @@ Int HeightMapRenderObjClass::updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *
 				float UA[4], VA[4];
 				Bool flipForBlend = false;			 // True if the blend needs the triangles flipped.
 
-				if (pMap) {
-					pMap->getPrecomputedUVData(mapX+pMap->getDrawOrgX(), mapY+pMap->getDrawOrgY(), U, V);
-					pMap->getPrecomputedAlphaUVData(mapX+pMap->getDrawOrgX(), mapY+pMap->getDrawOrgY(), UA, VA, alpha, &flipForBlend);
-				}
-
+				pMap->getPrecomputedUVData(xCoord, yCoord, U, V);
+				pMap->getPrecomputedAlphaUVData(xCoord, yCoord, UA, VA, alpha, &flipForBlend);
 
 				for (Int lightIndex=0; lightIndex < TheGlobalData->m_numGlobalLights; lightIndex++)
 				{
@@ -446,8 +443,8 @@ Int HeightMapRenderObjClass::updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *
 					if (pCurVertices[0].y == borderHiY) {
 						border = true;
 					}
-					Bool isCliff = pMap->getCliffState(mapX+pMap->getDrawOrgX(), mapY+pMap->getDrawOrgY())
-												 || showAsVisibleCliff(mapX + pMap->getDrawOrgX(), mapY+pMap->getDrawOrgY());
+					Bool isCliff = pMap->getCliffState(xCoord, yCoord)
+												 || showAsVisibleCliff(xCoord, yCoord);
 
 					if ( isCliff || border || cliffMapped) {
 						Int cellX, cellY;
