@@ -101,7 +101,7 @@ protected:
 	Int	m_numBlockRowsInLastVB;///<a VB tile may be partially filled, this indicates how many 2x2 vertex blocks are filled.
 
 
-	UnsignedInt doTheDynamicLight(VERTEX_FORMAT *vb, VERTEX_FORMAT *vbMirror, Vector3*light, Vector3*normal, W3DDynamicLight *pLights[], Int numLights);
+	UnsignedInt doTheDynamicLight(VERTEX_FORMAT *vb, VERTEX_FORMAT *vbMirror, const Vector3*light, const Vector3*normal, W3DDynamicLight *pLights[], Int numLights);
 	Int getXWithOrigin(Int x);
 	Int getYWithOrigin(Int x);
 	///update vertex diffuse color for dynamic lights inside given rectangle

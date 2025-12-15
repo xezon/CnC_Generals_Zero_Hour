@@ -415,6 +415,7 @@ WorldHeightMap::~WorldHeightMap(void)
 	delete[] m_UVDataCache;
 	delete[] m_alphaUVDataCache;
 	delete[] m_extraAlphaUVDataCache;
+	delete[] m_texelNormals;
 }
 
 void WorldHeightMap::freeListOfMapObjects(void)
@@ -464,6 +465,7 @@ WorldHeightMap::WorldHeightMap()
 	, m_UVDataCache(NULL)
 	, m_alphaUVDataCache(NULL)
 	, m_extraAlphaUVDataCache(NULL)
+	, m_texelNormals(NULL)
 {
 	Int i;
 	for (i=0; i<NUM_SOURCE_TILES; i++) {
@@ -522,6 +524,7 @@ WorldHeightMap::WorldHeightMap(ChunkInputStream *pStrm, Bool logicalDataOnly)
 	, m_UVDataCache(NULL)
 	, m_alphaUVDataCache(NULL)
 	, m_extraAlphaUVDataCache(NULL)
+	, m_texelNormals(NULL)
 {
 
 	int i;
@@ -590,6 +593,9 @@ void WorldHeightMap::initHeightData()
 {
 	if (!m_UVDataCache)
 		precomputeUVData();
+
+	if (!m_texelNormals)
+		precomputeTexelNormals();
 }
 
 /** Optimized version of method to get triangle flip state of a terrain cell.  Use this
@@ -1671,6 +1677,55 @@ void WorldHeightMap::precomputeUVData()
 			DEBUG_ASSERTCRASH((y*m_flipStateWidth+(x>>3)) < (m_flipStateWidth * m_height), ("Bad range"));
 		}
 	}
+}
+
+void WorldHeightMap::precomputeTexelNormals()
+{
+	delete[] m_texelNormals;
+	m_texelNormals = MSGNEW("WorldHeightMap_TexelNormals") TexelNormal[m_dataSize];
+
+	Int x=0;
+	Int y=0;
+	for (y=0; y<m_height; ++y)
+	{
+		for (x=0; x<m_width; ++x)
+		{
+			precomputeTexelNormalsAt(x, y);
+		}
+	}
+}
+
+void WorldHeightMap::precomputeTexelNormalsAt(Int x, Int y)
+{
+	constexpr const Int cellOffset = 1;
+	const Int vn0 = max(0, y-cellOffset);
+	const Int vp1 = min(m_height-1, y+2*cellOffset);
+	const Int un0 = max(0, x-cellOffset);
+	const Int up1 = min(m_width-1, x+2*cellOffset);
+	const Int ndx = y*m_width + x;
+	TexelNormal& texelNormal = m_texelNormals[ndx];
+	Vector3 l2r;
+	Vector3 n2f;
+
+	//top-left sample
+	l2r.Set(2*MAP_XY_FACTOR, 0, MAP_HEIGHT_SCALE * (getQuickHeight(x+cellOffset, y) - getQuickHeight(un0, y)));
+	n2f.Set(0, 2*MAP_XY_FACTOR, MAP_HEIGHT_SCALE * (getQuickHeight(x, y+cellOffset) - getQuickHeight(x, vn0)));
+	Vector3::Normalized_Cross_Product(l2r, n2f, &texelNormal.normal[0]);
+
+	//top-right sample
+	l2r.Set(2*MAP_XY_FACTOR, 0, MAP_HEIGHT_SCALE * (getQuickHeight(up1, y) - getQuickHeight(x, y)));
+	n2f.Set(0, 2*MAP_XY_FACTOR, MAP_HEIGHT_SCALE * (getQuickHeight(x+cellOffset, y+cellOffset) - getQuickHeight(x+cellOffset, vn0)));
+	Vector3::Normalized_Cross_Product(l2r, n2f, &texelNormal.normal[1]);
+
+	//bottom-right sample
+	l2r.Set(2*MAP_XY_FACTOR, 0, MAP_HEIGHT_SCALE * (getQuickHeight(up1, y+cellOffset) - getQuickHeight(x, y+cellOffset)));
+	n2f.Set(0, 2*MAP_XY_FACTOR, MAP_HEIGHT_SCALE * (getQuickHeight(x+cellOffset, vp1) - getQuickHeight(x+cellOffset, y)));
+	Vector3::Normalized_Cross_Product(l2r, n2f, &texelNormal.normal[2]);
+
+	//bottom-left sample
+	l2r.Set(2*MAP_XY_FACTOR, 0, MAP_HEIGHT_SCALE * (getQuickHeight(x+cellOffset, y+cellOffset) - getQuickHeight(un0, y+cellOffset)));
+	n2f.Set(0, 2*MAP_XY_FACTOR, MAP_HEIGHT_SCALE * (getQuickHeight(x, vp1) - getQuickHeight(x , y)));
+	Vector3::Normalized_Cross_Product(l2r, n2f, &texelNormal.normal[3]);
 }
 
 /** getUVForNdx - Gets the texture coordinates to use.  See getTerrainTexture.

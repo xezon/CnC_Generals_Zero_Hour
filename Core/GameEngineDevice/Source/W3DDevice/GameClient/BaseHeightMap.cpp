@@ -499,7 +499,7 @@ static lights into account as well.  It is possible to just use the normal in th
 vertex and let D3D do the lighting, but it is slower to render, and can only
 handle 4 lights at this point. */
 //=============================================================================
-void BaseHeightMapRenderObjClass::doTheLight(VERTEX_FORMAT *vb, Vector3*light, Vector3*normal, RefRenderObjListIterator *pLightsIterator, UnsignedByte alpha)
+void BaseHeightMapRenderObjClass::doTheLight(VERTEX_FORMAT *vb, const Vector3*light, const Vector3*normal, RefRenderObjListIterator *pLightsIterator, UnsignedByte alpha)
 {
 #ifdef USE_NORMALS
 	vb->nx = normal->X;
@@ -2069,7 +2069,6 @@ void BaseHeightMapRenderObjClass::addScorch(Vector3 location, Real radius, Scorc
 //=============================================================================
 Int BaseHeightMapRenderObjClass::getStaticDiffuse(Int x, Int y)
 {
-
 	if (x<0) x = 0;
 	if (y<0) y = 0;
 	if (x >= m_map->getXExtent())
@@ -2081,22 +2080,6 @@ Int BaseHeightMapRenderObjClass::getStaticDiffuse(Int x, Int y)
 		return(0);
 	}
 
-	Vector3 l2r,n2f,normalAtTexel;
-	Int vn0,un0,vp1,up1;
-	const Int cellOffset = 1;
-
-	vn0 = y-cellOffset;
-	vp1 = y+cellOffset;
-	if (vp1 >= m_map->getYExtent())
-		vp1=m_map->getYExtent()-1;
-	if (vn0<0) vn0 = 0;
-	un0 = x-cellOffset;
-	up1 = x+cellOffset;
-	if (un0 < 0)
-		un0=0;
-	if (up1 >= m_map->getXExtent())
-		up1=m_map->getXExtent()-1;
-
 	Vector3 lightRay[MAX_GLOBAL_LIGHTS];
 	const Coord3D *lightPos;
 
@@ -2107,10 +2090,7 @@ Int BaseHeightMapRenderObjClass::getStaticDiffuse(Int x, Int y)
 	}
 
 	//top-left sample
-	l2r.Set(2*MAP_XY_FACTOR,0,MAP_HEIGHT_SCALE*(m_map->getHeight(up1, y) - m_map->getHeight(un0, y)));
-	n2f.Set(0,2*MAP_XY_FACTOR,MAP_HEIGHT_SCALE*(m_map->getHeight(x, vp1) - m_map->getHeight(x, vn0)));
-
-	Vector3::Normalized_Cross_Product(l2r,n2f, &normalAtTexel);
+	const WorldHeightMap::TexelNormal* texelNormal = m_map->getPrecomputedTexelNormal(x, y);
 
 	VERTEX_FORMAT vertex;
 	vertex.x=ADJUST_FROM_INDEX_TO_REAL(x);
@@ -2125,13 +2105,13 @@ Int BaseHeightMapRenderObjClass::getStaticDiffuse(Int x, Int y)
 	RTS3DScene *pMyScene = (RTS3DScene *)Scene;
 	if (pMyScene) {
 		RefRenderObjListIterator *it = pMyScene->createLightsIterator();
-		doTheLight(&vertex, lightRay, &normalAtTexel, it, 1.0f);
+		doTheLight(&vertex, lightRay, &texelNormal->normal[0], it, 1.0f);
 		if (it) {
 		 pMyScene->destroyLightsIterator(it);
 		 it = NULL;
 		}
 	} else {
-		doTheLight(&vertex, lightRay, &normalAtTexel, NULL, 1.0f);
+		doTheLight(&vertex, lightRay, &texelNormal->normal[0], NULL, 1.0f);
 	}
 	return vertex.diffuse;
 }

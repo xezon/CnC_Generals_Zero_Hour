@@ -207,9 +207,21 @@ protected:
 		Bool exists;
 	};
 
+public:
+	struct TexelNormal
+	{
+		// 0 = top left
+		// 1 = top right
+		// 2 = bottom right
+		// 3 = bottom left
+		Vector3 normal[4];
+	};
+
+protected:
 	UVData *m_UVDataCache;
 	AlphaUVData *m_alphaUVDataCache;
 	ExtraAlphaUVData *m_extraAlphaUVDataCache;
+	TexelNormal* m_texelNormals;
 
 	/// Tiles that hold the alpha channel info.
 	static TileData *m_alphaTiles[NUM_ALPHA_TILES];
@@ -251,6 +263,8 @@ public: // constructors/destructors
 
 private:
 	void precomputeUVData(); ///< precomputes UV data for efficient lookups
+	void precomputeTexelNormals(); ///< precomputes texel normals for efficient lookups
+	void precomputeTexelNormalsAt(Int x, Int y); ///< precomputes texel normals for efficient lookups
 
 public:  // Boundary info
 	const VecICoord2D& getAllBoundaries(void) const { return m_boundaries; }
@@ -273,10 +287,12 @@ public:  // height map info.
 	void setDrawHeight(Int height) {m_drawHeightY = height; if (m_drawHeightY>m_height) m_drawHeightY = m_height;}
 	virtual Int getBorderSize(void) {return m_borderSize;}
   Int getBorderSizeInline(void) const { return m_borderSize; }
+
 	/// Get height with the offset that HeightMapRenderObjClass uses built in.
 	UnsignedByte getDisplayHeight(Int x, Int y) { return m_data[x+m_drawOriginX+m_width*(y+m_drawOriginY)];}
 
 	/// Get height in normal coordinates.
+	UnsignedByte getQuickHeight(Int xIndex, Int yIndex) const { return m_data[(yIndex*m_width)+xIndex]; };
 	UnsignedByte getHeight(Int xIndex, Int yIndex) const
 	{
 		Int ndx = (yIndex*m_width)+xIndex;
@@ -323,6 +339,7 @@ public:  // tile and texture info.
 	void getTerrainColorAt(Real x, Real y, RGBColor *pColor);
 	AsciiString getTerrainNameAt(Real x, Real y);
 	Bool isCliffMappedTexture(Int xIndex, Int yIndex);
+	const TexelNormal* getPrecomputedTexelNormal(Int x, Int y) const { return m_texelNormals + y*m_width + x; }
 
 	Bool getSeismicUpdateFlag(Int xIndex, Int yIndex) const;
 	void setSeismicUpdateFlag(Int xIndex, Int yIndex, Bool value);
@@ -348,6 +365,8 @@ public:  // modify height value
 		if ((ndx>=0) && (ndx<m_dataSize) && m_data) {
 			m_data[ndx]=height;
 			// TheSuperHackers @info No need to recompute UV data here.
+			// But recompute the texel normals.
+			precomputeTexelNormalsAt(xIndex, yIndex);
 		}
 	};
 public: // Read tile utilities. jba [7/9/2003]
