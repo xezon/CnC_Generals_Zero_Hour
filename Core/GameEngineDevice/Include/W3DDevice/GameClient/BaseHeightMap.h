@@ -34,6 +34,7 @@
 #include "vertmaterial.h"
 #include "Lib/BaseType.h"
 #include "Common/GameType.h"
+#include "Common/GlobalData.h"
 #include "W3DDevice/GameClient/WorldHeightMap.h"
 
 #define MAX_ENABLED_DYNAMIC_LIGHTS 20
@@ -226,6 +227,13 @@ public:
 
 
 	virtual int updateBlock(Int x0, Int y0, Int x1, Int y1, WorldHeightMap *pMap, RefRenderObjListIterator *pLightsIterator) = 0;
+
+	struct TerrainLightRay
+	{
+		Vector3 rays[MAX_GLOBAL_LIGHTS];
+		static_assert(sizeof(rays) == sizeof(GlobalData::m_terrainLightPos), "Incorrect array size");
+	};
+	static TerrainLightRay getTerrainLightRay();
 
 protected:
 	// snapshot methods

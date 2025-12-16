@@ -419,16 +419,7 @@ Int W3DBridge::getModelVertices(VertexFormatXYZNDUV1 *destination_vb, Int curVer
 		return(0);
 	}
 
-	Vector3 lightRay[MAX_GLOBAL_LIGHTS];
-	const Coord3D *lightPos;
-
-	for (Int lightIndex=0; lightIndex < TheGlobalData->m_numGlobalLights; lightIndex++)
-	{
-		lightPos=&TheGlobalData->m_terrainLightPos[lightIndex];
-		lightRay[lightIndex].Set(-lightPos->x,-lightPos->y,	-lightPos->z);
-//		__asm {int 3}; //see if it really needs normalization!!
-		lightRay[lightIndex].Normalize();
-	}
+	BaseHeightMapRenderObjClass::TerrainLightRay lightRay = BaseHeightMapRenderObjClass::getTerrainLightRay();
 
 	const Vector2*uvs=pMesh->Peek_Model()->Get_UV_Array_By_Index(0);
 	VertexFormatXYZNDUV1 *curVb = destination_vb+curVertex;
@@ -462,7 +453,7 @@ Int W3DBridge::getModelVertices(VertexFormatXYZNDUV1 *destination_vb, Int curVer
 #else
 		normal = (normal.X) * vec + normal.Y*vecNormal + normal.Z*vecZ;
 		normal.Normalize();
-		TheTerrainRenderObject->doTheLight(&vb, lightRay, &normal, NULL, 1.0f);
+		TheTerrainRenderObject->doTheLight(&vb, lightRay.rays, &normal, NULL, 1.0f);
 		curVb->nx = 0;	//will these to keep AGP write buffer happy.
 		curVb->ny = 0;
 		curVb->nz = 1;

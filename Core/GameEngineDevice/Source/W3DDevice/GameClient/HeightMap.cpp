@@ -300,12 +300,10 @@ mapped into this VB.
 //=============================================================================
 Int HeightMapRenderObjClass::updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *data, Int x0, Int y0, Int x1, Int y1, Int originX, Int originY, WorldHeightMap *pMap, RefRenderObjListIterator *pLightsIterator)
 {
-	Int i,j;
-	Vector3 lightRay[MAX_GLOBAL_LIGHTS];
-	const Coord3D *lightPos;
+	TerrainLightRay lightRay = getTerrainLightRay();
+	Int i, j;
 	Int xCoord, yCoord;
-	constexpr const Int	vertsPerRow=(VERTEX_BUFFER_TILE_LENGTH)*4;	//vertices per row of VB
-
+	constexpr const Int vertsPerRow=(VERTEX_BUFFER_TILE_LENGTH)*4;	//vertices per row of VB
 	constexpr const Int cellOffset = 1;
 
 	REF_PTR_SET(m_map, pMap);	//update our heightmap pointer in case it changed since last call.
@@ -345,12 +343,6 @@ Int HeightMapRenderObjClass::updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *
 				pMap->getPrecomputedUVData(xCoord, yCoord, U, V);
 				pMap->getPrecomputedAlphaUVData(xCoord, yCoord, UA, VA, alpha, &flipForBlend);
 
-				for (Int lightIndex=0; lightIndex < TheGlobalData->m_numGlobalLights; lightIndex++)
-				{
-					lightPos=&TheGlobalData->m_terrainLightPos[lightIndex];
-					lightRay[lightIndex].Set(-lightPos->x,-lightPos->y,	-lightPos->z);
-				}
-
 				const WorldHeightMap::TexelNormal* texelNormal = pMap->getPrecomputedTexelNormal(xCoord, yCoord);
 
 				//top-left sample
@@ -363,7 +355,7 @@ Int HeightMapRenderObjClass::updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *
 				vb->v1=V[0];
 				vb->u2=UA[0];
 				vb->v2=VA[0];
-				doTheLight(vb, lightRay, &texelNormal->normal[0], pLightsIterator, alpha[0]);
+				doTheLight(vb, lightRay.rays, &texelNormal->normal[0], pLightsIterator, alpha[0]);
 				vb++;
 
 				//top-right sample
@@ -376,7 +368,7 @@ Int HeightMapRenderObjClass::updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *
 				vb->v1=V[1];
 				vb->u2=UA[1];
 				vb->v2=VA[1];
-				doTheLight(vb, lightRay, &texelNormal->normal[1], pLightsIterator, alpha[1]);
+				doTheLight(vb, lightRay.rays, &texelNormal->normal[1], pLightsIterator, alpha[1]);
 				vb++;
 
 				//bottom-right sample
@@ -393,7 +385,7 @@ Int HeightMapRenderObjClass::updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *
 				vb->v1=V[2];
 				vb->u2=UA[2];
 				vb->v2=VA[2];
-				doTheLight(vb, lightRay, &texelNormal->normal[2], pLightsIterator, alpha[2]);
+				doTheLight(vb, lightRay.rays, &texelNormal->normal[2], pLightsIterator, alpha[2]);
 				vb++;
 
 				//bottom-left sample
@@ -415,7 +407,7 @@ Int HeightMapRenderObjClass::updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *
 				vb->v1=V[3];
 				vb->u2=UA[3];
 				vb->v2=VA[3];
-				doTheLight(vb, lightRay, &texelNormal->normal[3], pLightsIterator, alpha[3]);
+				doTheLight(vb, lightRay.rays, &texelNormal->normal[3], pLightsIterator, alpha[3]);
 				vb++;
 
 				VERTEX_FORMAT *pCurVertices = vb-4;

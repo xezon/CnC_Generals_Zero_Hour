@@ -55,7 +55,6 @@
 #include <rinfo.h>
 #include <camera.h>
 #include <d3dx8core.h>
-#include "Common/GlobalData.h"
 #include "Common/PerfTimer.h"
 #include "Common/Xfer.h"
 
@@ -2080,14 +2079,7 @@ Int BaseHeightMapRenderObjClass::getStaticDiffuse(Int x, Int y)
 		return(0);
 	}
 
-	Vector3 lightRay[MAX_GLOBAL_LIGHTS];
-	const Coord3D *lightPos;
-
-	for (Int lightIndex=0; lightIndex < TheGlobalData->m_numGlobalLights; lightIndex++)
-	{
-		lightPos=&TheGlobalData->m_terrainLightPos[lightIndex];
-		lightRay[lightIndex].Set(-lightPos->x,-lightPos->y,	-lightPos->z);
-	}
+	TerrainLightRay lightRay = getTerrainLightRay();
 
 	//top-left sample
 	const WorldHeightMap::TexelNormal* texelNormal = m_map->getPrecomputedTexelNormal(x, y);
@@ -2105,13 +2097,13 @@ Int BaseHeightMapRenderObjClass::getStaticDiffuse(Int x, Int y)
 	RTS3DScene *pMyScene = (RTS3DScene *)Scene;
 	if (pMyScene) {
 		RefRenderObjListIterator *it = pMyScene->createLightsIterator();
-		doTheLight(&vertex, lightRay, &texelNormal->normal[0], it, 1.0f);
+		doTheLight(&vertex, lightRay.rays, &texelNormal->normal[0], it, 1.0f);
 		if (it) {
 		 pMyScene->destroyLightsIterator(it);
 		 it = NULL;
 		}
 	} else {
-		doTheLight(&vertex, lightRay, &texelNormal->normal[0], NULL, 1.0f);
+		doTheLight(&vertex, lightRay.rays, &texelNormal->normal[0], NULL, 1.0f);
 	}
 	return vertex.diffuse;
 }
@@ -2981,8 +2973,21 @@ void BaseHeightMapRenderObjClass::loadPostProcess( void )
 	// empty. jba [8/11/2003]
 }
 
-//=============================================================================
+// ------------------------------------------------------------------------------------------------
 Bool BaseHeightMapRenderObjClass::useCloud()
 {
 	return TheGlobalData->m_useCloudMap && TheGlobalData->m_timeOfDay != TIME_OF_DAY_NIGHT;
+}
+
+// ------------------------------------------------------------------------------------------------
+BaseHeightMapRenderObjClass::TerrainLightRay BaseHeightMapRenderObjClass::getTerrainLightRay()
+{
+	TerrainLightRay rayLight;
+	for (Int lightIndex = 0; lightIndex < ARRAY_SIZE(rayLight.rays); ++lightIndex)
+	{
+		const Coord3D &lightPos = TheGlobalData->m_terrainLightPos[lightIndex];
+		rayLight.rays[lightIndex].Set(-lightPos.x, -lightPos.y, -lightPos.z);
+		// expected normalized
+	}
+	return rayLight;
 }
