@@ -1604,12 +1604,15 @@ void BaseHeightMapRenderObjClass::updateShorelineTile(Int i, Int j, Int border, 
 	{	//add tile to set that needs shoreline blending.
 		if (m_numShoreLineTiles >= m_shoreLineTilePositionsSize)
 		{	//no more room to store extra blend tiles so enlarge the buffer.
-			shoreLineTileInfo *tempPositions=NEW shoreLineTileInfo[m_shoreLineTilePositionsSize+512];
+			// TheSuperHacker @performance Increases max growth from originally 512 bytes to 32 kb,
+			// because maps with a lot of shore lines grow this buffer to 162 kb and beyond.
+			const Int newSize = min(m_shoreLineTilePositionsSize*2, m_shoreLineTilePositionsSize + DEFAULT_MAX_MAP_SHORELINE_TILES*8);
+			shoreLineTileInfo *tempPositions=NEW shoreLineTileInfo[newSize];
 			memcpy(tempPositions, m_shoreLineTilePositions, m_shoreLineTilePositionsSize*sizeof(shoreLineTileInfo));
 			delete [] m_shoreLineTilePositions;
 			//enlarge by more tiles to reduce memory trashing
 			m_shoreLineTilePositions = tempPositions;
-			m_shoreLineTilePositionsSize += 512;
+			m_shoreLineTilePositionsSize = newSize;
 		}
 		//Pack x and y position into single integer since maps are limited in size
 		shoreLineTileInfo *shoreInfo=&m_shoreLineTilePositions[m_numShoreLineTiles];
