@@ -263,10 +263,6 @@ BaseHeightMapRenderObjClass::BaseHeightMapRenderObjClass(void)
 	m_stageThreeTexture=NULL;
 	m_destAlphaTexture=NULL;
 	m_map=NULL;
-	m_depthFade.X = 0.0f;
-	m_depthFade.Y = 0.0f;
-	m_depthFade.Z = 0.0f;
-	m_useDepthFade = false;
 	m_disableTextures = false;
 	TheTerrainRenderObject = this;
 
@@ -583,15 +579,6 @@ void BaseHeightMapRenderObjClass::doTheLight(VERTEX_FORMAT *vb, const Vector3*li
 	shadeR = WWMath::Clamp(shadeR,0.0f,1.0f);
 	shadeG = WWMath::Clamp(shadeG,0.0f,1.0f);
 	shadeB = WWMath::Clamp(shadeB,0.0f,1.0f);
-
-	if (m_useDepthFade && vb->z <= TheGlobalData->m_waterPositionZ)
-	{	//height is below water level
-		//reduce lighting values based on light fall off as it travels through water.
-		float depthScale = (1.4f - vb->z)/TheGlobalData->m_waterPositionZ;
-		shadeR *= 1.0f - depthScale * (1.0f-m_depthFade.X);
-		shadeG *= 1.0f - depthScale * (1.0f-m_depthFade.Y);
-		shadeB *= 1.0f - depthScale * (1.0f-m_depthFade.Z);
-	}
 
 	shadeR*=255.0f;
 	shadeG*=255.0f;

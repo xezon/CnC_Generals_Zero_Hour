@@ -270,9 +270,7 @@ protected:
 	void drawScorches(void);		///< Draws the scorch mark polygons in m_vertexScorch.
 #endif
 	WorldHeightMap *m_map;
-	Bool m_useDepthFade;	///<fade terrain lighting under water
 	Bool m_updating;
-	Vector3 m_depthFade;	///<depth based fall off values for r,g,b
 	Bool m_disableTextures;
 	Bool m_needFullUpdate; ///< True if lighting changed, and we need to update all instead of what moved.
 	Bool m_doXNextTime; ///< True if we updated y scroll, and need to do x scroll next frame.
