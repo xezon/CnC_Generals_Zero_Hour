@@ -35,7 +35,6 @@
 #include "Common/DataChunk.h"
 //#include "Common/GameFileSystem.h"
 #include "Common/FileSystem.h" // for LOAD_TEST_ASSETS
-#include "Common/GlobalData.h"
 #include "Common/MapReaderWriterInfo.h"
 #include "Common/TerrainTypes.h"
 #include "Common/ThingFactory.h"
@@ -49,9 +48,12 @@
 #include "W3DDevice/GameClient/TileData.h"
 #include "W3DDevice/GameClient/HeightMap.h"
 #include "W3DDevice/GameClient/TerrainTex.h"
+#include "W3DDevice/GameClient/W3DDisplay.h"
+#include "W3DDevice/GameClient/W3DScene.h"
 #include "W3DDevice/GameClient/W3DShadow.h"
 
 #include "Common/file.h"
+#include "light.h"
 
 
 #define K_OBSOLETE_HEIGHT_MAP_VERSION 8
@@ -416,6 +418,27 @@ WorldHeightMap::~WorldHeightMap(void)
 	delete[] m_alphaUVDataCache;
 	delete[] m_extraAlphaUVDataCache;
 	delete[] m_texelNormals;
+	delete[] m_ambientLights;
+
+	if (m_lightsIterator != NULL)
+	{
+		DEBUG_ASSERTCRASH(W3DDisplay::m_3DScene != NULL, ("Cannot destroy lights iterator if Scene is gone"));
+		W3DDisplay::m_3DScene->destroyLightsIterator(m_lightsIterator);
+	}
+}
+
+// TheSuperHackers @todo The light setup currently does a weird round trip from
+// WorldHeightMap to GlobalData and back to WorldHeightMap. Simplify this.
+WorldHeightMap::LightRays WorldHeightMap::makeLightRays()
+{
+	LightRays lightRays;
+	for (Int lightIndex = 0; lightIndex < ARRAY_SIZE(LightRays::rays); ++lightIndex)
+	{
+		const Coord3D &lightPos = TheGlobalData->m_terrainLightPos[lightIndex];
+		lightRays.rays[lightIndex].Set(-lightPos.x, -lightPos.y, -lightPos.z);
+		// Is expected normalized
+	}
+	return lightRays;
 }
 
 void WorldHeightMap::freeListOfMapObjects(void)
@@ -466,6 +489,8 @@ WorldHeightMap::WorldHeightMap()
 	, m_alphaUVDataCache(NULL)
 	, m_extraAlphaUVDataCache(NULL)
 	, m_texelNormals(NULL)
+	, m_ambientLights(NULL)
+	, m_lightsIterator(NULL)
 {
 	Int i;
 	for (i=0; i<NUM_SOURCE_TILES; i++) {
@@ -525,6 +550,8 @@ WorldHeightMap::WorldHeightMap(ChunkInputStream *pStrm, Bool logicalDataOnly)
 	, m_alphaUVDataCache(NULL)
 	, m_extraAlphaUVDataCache(NULL)
 	, m_texelNormals(NULL)
+	, m_ambientLights(NULL)
+	, m_lightsIterator(NULL)
 {
 
 	int i;
@@ -591,11 +618,21 @@ WorldHeightMap::WorldHeightMap(ChunkInputStream *pStrm, Bool logicalDataOnly)
 
 void WorldHeightMap::initHeightData()
 {
+	if (W3DDisplay::m_3DScene != NULL)
+	{
+		m_lightsIterator = W3DDisplay::m_3DScene->createLightsIterator();
+	}
+
+	m_lightRays = makeLightRays();
+
 	if (!m_UVDataCache)
 		precomputeUVData();
 
 	if (!m_texelNormals)
 		precomputeTexelNormals();
+
+	if (!m_ambientLights)
+		precomputeAmbientLights();
 }
 
 /** Optimized version of method to get triangle flip state of a terrain cell.  Use this
@@ -802,7 +839,7 @@ Bool WorldHeightMap::ParseWorldDictDataChunk(DataChunkInput &file, DataChunkInfo
 */
 Bool WorldHeightMap::ParseLightingDataChunk(DataChunkInput &file, DataChunkInfo *info, void *userData)
 {
-		TheWritableGlobalData->m_timeOfDay = (TimeOfDay)file.readInt();
+		const TimeOfDay tod = (TimeOfDay)file.readInt();
 		Int i;
 		GlobalData::TerrainLighting	initLightValues	= { { 0,0,0},{0,0,0},{0,0,-1.0f}};
 
@@ -870,6 +907,9 @@ Bool WorldHeightMap::ParseLightingDataChunk(DataChunkInput &file, DataChunkInfo 
 				TheW3DShadowManager->setShadowColor(shadowColor);
 			}
 		}
+
+		TheWritableGlobalData->setTimeOfDay(tod);
+
 	DEBUG_ASSERTCRASH(file.atEndOfChunk(), ("Unexpected data left over."));
 	return true;
 }
@@ -1726,6 +1766,68 @@ void WorldHeightMap::precomputeTexelNormalsAt(Int x, Int y)
 	l2r.Set(2*MAP_XY_FACTOR, 0, MAP_HEIGHT_SCALE * (getQuickHeight(x+cellOffset, y+cellOffset) - getQuickHeight(un0, y+cellOffset)));
 	n2f.Set(0, 2*MAP_XY_FACTOR, MAP_HEIGHT_SCALE * (getQuickHeight(x, vp1) - getQuickHeight(x , y)));
 	Vector3::Normalized_Cross_Product(l2r, n2f, &texelNormal.normal[3]);
+}
+
+void WorldHeightMap::precomputeAmbientLights()
+{
+	DEBUG_ASSERTCRASH(m_texelNormals != NULL, ("WorldHeightMap::precomputeAmbientLights - m_texelNormals must be created before hand"));
+
+	delete[] m_ambientLights;
+	m_ambientLights = MSGNEW("WorldHeightMap_AmbientLights") AmbientLight[m_dataSize];
+
+	Int x=0;
+	Int y=0;
+	for (y=0; y<m_height; ++y)
+	{
+		for (x=0; x<m_width; ++x)
+		{
+			precomputeAmbientLightAt(x, y);
+		}
+	}
+}
+
+void WorldHeightMap::precomputeAmbientLightAt(Int x, Int y)
+{
+	const TexelNormal *texelNormal = getPrecomputedTexelNormal(x, y);
+	const Int tileIndex = y*m_width + x;
+
+	Vector3 lightPositions[4];
+	if (m_lightsIterator && (m_lightsIterator->First(), !m_lightsIterator->Is_Done()))
+	{
+		constexpr const Int cellOffset = 1;
+		//top-left
+		lightPositions[0].X = (x - getBorderSizeInline()) * MAP_XY_FACTOR;
+		lightPositions[0].Y = (y - getBorderSizeInline()) * MAP_XY_FACTOR;
+		lightPositions[0].Z = getQuickHeight(x, y) * MAP_HEIGHT_SCALE;
+		//top-right
+		lightPositions[1].X = (x+cellOffset - getBorderSizeInline()) * MAP_XY_FACTOR;
+		lightPositions[1].Y = (y - getBorderSizeInline()) * MAP_XY_FACTOR;
+		lightPositions[1].Z = getQuickHeight(min(x+cellOffset,m_width), y) * MAP_HEIGHT_SCALE;
+		//bottom-right
+		lightPositions[2].X = (x+cellOffset - getBorderSizeInline()) * MAP_XY_FACTOR;
+		lightPositions[2].Y = (y+cellOffset - getBorderSizeInline()) * MAP_XY_FACTOR;
+		lightPositions[2].Z = getQuickHeight(min(x+cellOffset,m_width), min(y+cellOffset,m_height)) * MAP_HEIGHT_SCALE;
+		//bottom-left
+		lightPositions[3].X = (x - getBorderSizeInline()) * MAP_XY_FACTOR;
+		lightPositions[3].Y = (y+cellOffset - getBorderSizeInline()) * MAP_XY_FACTOR;
+		lightPositions[3].Z = getQuickHeight(x, min(y+cellOffset,m_height)) * MAP_HEIGHT_SCALE;
+	}
+
+	AmbientLight& ambientLight = m_ambientLights[tileIndex];
+
+	for (Int tileCorner = 0; tileCorner < ARRAY_SIZE(AmbientLight::color); ++tileCorner)
+	{
+		const Vector3 *pos = lightPositions + tileCorner;
+		const Vector3 *normal = texelNormal->normal + tileCorner;
+		const UnsignedByte alpha = m_alphaUVDataCache[tileIndex].alpha[tileCorner];
+		const RGBAColorReal computedColor = BaseHeightMapRenderObjClass::computeAmbientLight(m_lightRays, normal, alpha, m_lightsIterator, pos);
+
+		Color& color = ambientLight.color[tileCorner];
+		color.r = computedColor.red * 255.0f;
+		color.g = computedColor.green * 255.0f;
+		color.b = computedColor.blue * 255.0f;
+		color.a = computedColor.alpha * 255.0f;
+	}
 }
 
 /** getUVForNdx - Gets the texture coordinates to use.  See getTerrainTexture.

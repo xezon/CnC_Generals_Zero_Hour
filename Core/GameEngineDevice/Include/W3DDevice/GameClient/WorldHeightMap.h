@@ -34,8 +34,10 @@
 #include "WWMath/vector3.h"
 #include "W3DDevice/GameClient/TileData.h"
 #include "Common/MapObject.h"
-
+#include "Common/GlobalData.h"
 #include "Common/STLTypedefs.h"
+#include "robjlist.h"
+
 typedef std::vector<ICoord2D> VecICoord2D;
 
 
@@ -112,6 +114,16 @@ public:
 		STRETCH_DRAW_WIDTH = 1 + 2*VERTEX_BUFFER_TILE_LENGTH,
 		STRETCH_DRAW_HEIGHT = 1 + 2*VERTEX_BUFFER_TILE_LENGTH,
 	};
+
+	struct LightRays
+	{
+		LightRays() { memset(rays, 0, sizeof(rays)); }
+		Vector3 rays[MAX_GLOBAL_LIGHTS];
+		static_assert(sizeof(rays) == sizeof(GlobalData::m_terrainLightPos), "Incorrect array size");
+	};
+
+private:
+	static LightRays makeLightRays();
 
 protected:
 	Int m_width;				///< Height map width.
@@ -217,11 +229,30 @@ public:
 		Vector3 normal[4];
 	};
 
+	struct Color
+	{
+		UnsignedByte a;
+		UnsignedByte r;
+		UnsignedByte g;
+		UnsignedByte b;
+
+		UnsignedInt getARGB() const { return (UnsignedInt)b | ((UnsignedInt)g << 8) | ((UnsignedInt)r << 16) | ((UnsignedInt)a << 24); }
+	};
+
+	struct AmbientLight
+	{
+		Color color[4];
+	};
+
 protected:
 	UVData *m_UVDataCache;
 	AlphaUVData *m_alphaUVDataCache;
 	ExtraAlphaUVData *m_extraAlphaUVDataCache;
 	TexelNormal* m_texelNormals;
+	AmbientLight *m_ambientLights;
+
+	RefRenderObjListIterator *m_lightsIterator;
+	LightRays m_lightRays;
 
 	/// Tiles that hold the alpha channel info.
 	static TileData *m_alphaTiles[NUM_ALPHA_TILES];
@@ -265,6 +296,8 @@ private:
 	void precomputeUVData(); ///< precomputes UV data for efficient lookups
 	void precomputeTexelNormals(); ///< precomputes texel normals for efficient lookups
 	void precomputeTexelNormalsAt(Int x, Int y); ///< precomputes texel normals for efficient lookups
+	void precomputeAmbientLights(); ///< precomputes ambient lights for efficient lookups
+	void precomputeAmbientLightAt(Int x, Int y); ///< precomputes ambient lights for efficient lookups
 
 public:  // Boundary info
 	const VecICoord2D& getAllBoundaries(void) const { return m_boundaries; }
@@ -340,6 +373,8 @@ public:  // tile and texture info.
 	AsciiString getTerrainNameAt(Real x, Real y);
 	Bool isCliffMappedTexture(Int xIndex, Int yIndex);
 	const TexelNormal* getPrecomputedTexelNormal(Int x, Int y) const { return m_texelNormals + y*m_width + x; }
+	const AmbientLight* getPrecomputedAmbientLight(Int x, Int y) const { return m_ambientLights + y*m_width + x; }
+	const LightRays& getLightRays() const { return m_lightRays; }
 
 	Bool getSeismicUpdateFlag(Int xIndex, Int yIndex) const;
 	void setSeismicUpdateFlag(Int xIndex, Int yIndex, Bool value);
@@ -367,6 +402,7 @@ public:  // modify height value
 			// TheSuperHackers @info No need to recompute UV data here.
 			// But recompute the texel normals.
 			precomputeTexelNormalsAt(xIndex, yIndex);
+			precomputeAmbientLightAt(xIndex, yIndex);
 		}
 	};
 public: // Read tile utilities. jba [7/9/2003]

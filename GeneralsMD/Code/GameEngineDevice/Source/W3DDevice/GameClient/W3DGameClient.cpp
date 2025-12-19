@@ -172,6 +172,9 @@ void W3DGameClient::createRayEffectByTemplate( const Coord3D *start,
 void W3DGameClient::setTimeOfDay( TimeOfDay tod )
 {
 
+	if(tod >= TIME_OF_DAY_COUNT || tod < TIME_OF_DAY_FIRST)
+		return;
+
 	GameClient::setTimeOfDay(tod);
 
 	//tell cloud/water plane to update its lighting/texture

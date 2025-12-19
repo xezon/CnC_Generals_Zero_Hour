@@ -419,7 +419,7 @@ Int W3DBridge::getModelVertices(VertexFormatXYZNDUV1 *destination_vb, Int curVer
 		return(0);
 	}
 
-	BaseHeightMapRenderObjClass::TerrainLightRay lightRay = BaseHeightMapRenderObjClass::getTerrainLightRay();
+	const WorldHeightMap::LightRays &lightRays = TheTerrainRenderObject->getMap()->getLightRays();
 
 	const Vector2*uvs=pMesh->Peek_Model()->Get_UV_Array_By_Index(0);
 	VertexFormatXYZNDUV1 *curVb = destination_vb+curVertex;
@@ -453,7 +453,7 @@ Int W3DBridge::getModelVertices(VertexFormatXYZNDUV1 *destination_vb, Int curVer
 #else
 		normal = (normal.X) * vec + normal.Y*vecNormal + normal.Z*vecZ;
 		normal.Normalize();
-		TheTerrainRenderObject->doTheLight(&vb, lightRay.rays, &normal, NULL, 1.0f);
+		TheTerrainRenderObject->doTheLight(&vb, lightRays, &normal, NULL, 1.0f);
 		curVb->nx = 0;	//will these to keep AGP write buffer happy.
 		curVb->ny = 0;
 		curVb->nz = 1;

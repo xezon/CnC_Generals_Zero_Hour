@@ -157,7 +157,9 @@ public:
 	void updateMacroTexture(AsciiString textureName);
 	void doTextures(Bool flag) {m_disableTextures = !flag;};
 	/// Update the diffuse value from static light info for one vertex.
-	void doTheLight(VERTEX_FORMAT *vb, const Vector3*light, const Vector3*normal, RefRenderObjListIterator *pLightsIterator, UnsignedByte alpha);
+	static void doTheLight(VERTEX_FORMAT *vb, const WorldHeightMap::LightRays &lightRays, const Vector3 *normal, RefRenderObjListIterator *staticLightsIterator, UnsignedByte alpha);
+	static RGBAColorReal computeAmbientLight(const WorldHeightMap::LightRays &lightRays, const Vector3 *normal, UnsignedByte alpha, RefRenderObjListIterator *staticLightsIterator = NULL, const Vector3 *posForStaticLights = NULL);
+	void doThePrecomputedLight(VERTEX_FORMAT *vbArray, UnsignedInt vbCount, Int x, Int y);
 	void addScorch(Vector3 location, Real radius, Scorches type);
 	void addTree(DrawableID id, Coord3D location, Real scale, Real angle,
 								Real randomScaleAmount,  const W3DTreeDrawModuleData *data);
@@ -227,13 +229,6 @@ public:
 
 
 	virtual int updateBlock(Int x0, Int y0, Int x1, Int y1, WorldHeightMap *pMap, RefRenderObjListIterator *pLightsIterator) = 0;
-
-	struct TerrainLightRay
-	{
-		Vector3 rays[MAX_GLOBAL_LIGHTS];
-		static_assert(sizeof(rays) == sizeof(GlobalData::m_terrainLightPos), "Incorrect array size");
-	};
-	static TerrainLightRay getTerrainLightRay();
 
 protected:
 	// snapshot methods

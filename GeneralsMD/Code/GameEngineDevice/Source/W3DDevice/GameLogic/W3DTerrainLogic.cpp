@@ -165,8 +165,7 @@ Bool W3DTerrainLogic::loadMap( AsciiString filename , Bool query )
 		return FALSE;
 
 	// Map file now contains lighting & time of day info.
-	if( TheWritableGlobalData->setTimeOfDay( TheGlobalData->m_timeOfDay ) )
-		TheGameClient->setTimeOfDay( TheGlobalData->m_timeOfDay );
+	TheGameClient->setTimeOfDay( TheGlobalData->m_timeOfDay );
 
 	return TRUE;  // success
 

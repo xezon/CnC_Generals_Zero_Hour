@@ -494,24 +494,50 @@ static lights into account as well.  It is possible to just use the normal in th
 vertex and let D3D do the lighting, but it is slower to render, and can only
 handle 4 lights at this point. */
 //=============================================================================
-void BaseHeightMapRenderObjClass::doTheLight(VERTEX_FORMAT *vb, const Vector3*light, const Vector3*normal, RefRenderObjListIterator *pLightsIterator, UnsignedByte alpha)
+void BaseHeightMapRenderObjClass::doTheLight(
+	VERTEX_FORMAT *vb,
+	const WorldHeightMap::LightRays &lightRays,
+	const Vector3 *normal,
+	RefRenderObjListIterator *staticLightsIterator,
+	UnsignedByte alpha)
 {
 #ifdef USE_NORMALS
 	vb->nx = normal->X;
 	vb->ny = normal->Y;
 	vb->nz = normal->Z;
 #else
-	Real shadeR, shadeG, shadeB;
+	Vector3 pos(vb->x, vb->y, vb->z);
+	RGBAColorReal color = computeAmbientLight(lightRays, normal, alpha,  staticLightsIterator, &pos);
+	color.red *= 255.0f;
+	color.green *= 255.0f;
+	color.blue *= 255.0f;
+	color.alpha *= 255.0f;
+	vb->diffuse = (Int)color.blue | ((Int)color.green << 8) | ((Int)color.red << 16) | ((Int)color.alpha << 24);
+#endif
+}
+
+RGBAColorReal BaseHeightMapRenderObjClass::computeAmbientLight(
+	const WorldHeightMap::LightRays &lightRays,
+	const Vector3 *normal,
+	UnsignedByte alpha,
+	RefRenderObjListIterator *staticLightsIterator,
+	const Vector3 *posForStaticLights)
+{
+	RGBAColorReal color;
+	Real &shadeR = color.red;
+	Real &shadeG = color.green;
+	Real &shadeB = color.blue;
+	color.alpha = alpha / 255.0f;
 	Real shade;
 	shadeR = TheGlobalData->m_terrainAmbient[0].red;	//only the first terrain light contributes to ambient
 	shadeG = TheGlobalData->m_terrainAmbient[0].green;
 	shadeB = TheGlobalData->m_terrainAmbient[0].blue;
 
-	if (pLightsIterator) {
-		for (pLightsIterator->First(); !pLightsIterator->Is_Done(); pLightsIterator->Next())
+	if (staticLightsIterator) {
+		for (staticLightsIterator->First(); !staticLightsIterator->Is_Done(); staticLightsIterator->Next())
 		{
-			LightClass *pLight = (LightClass*)pLightsIterator->Peek_Obj();
-			Vector3 lightDirection(vb->x, vb->y, vb->z);
+			LightClass *pLight = (LightClass*)staticLightsIterator->Peek_Obj();
+			Vector3 lightDirection(posForStaticLights->X, posForStaticLights->Y, posForStaticLights->Z);
 			Real factor = 1.0f;
 			switch(pLight->Get_Type()) {
 			case LightClass::POINT:
@@ -520,10 +546,10 @@ void BaseHeightMapRenderObjClass::doTheLight(VERTEX_FORMAT *vb, const Vector3*li
 					lightDirection -= lightLoc;
 					double range, midRange;
 					pLight->Get_Far_Attenuation_Range(midRange, range);
-					if (vb->x < lightLoc.X-range) continue;
-					if (vb->x > lightLoc.X+range) continue;
-					if (vb->y < lightLoc.Y-range) continue;
-					if (vb->y > lightLoc.Y+range) continue;
+					if (posForStaticLights->X < lightLoc.X-range) continue;
+					if (posForStaticLights->X > lightLoc.X+range) continue;
+					if (posForStaticLights->Y < lightLoc.Y-range) continue;
+					if (posForStaticLights->Y > lightLoc.Y+range) continue;
 					Real dist = lightDirection.Length();
 					if (dist >= range) continue;
 					if (midRange < 0.1) continue;
@@ -568,7 +594,7 @@ void BaseHeightMapRenderObjClass::doTheLight(VERTEX_FORMAT *vb, const Vector3*li
 	const RGBColor *terrainDiffuse;
 	for (Int lightIndex=0; lightIndex < TheGlobalData->m_numGlobalLights; lightIndex++)
 	{
-		shade = Vector3::Dot_Product(light[lightIndex], *normal);
+		shade = Vector3::Dot_Product(lightRays.rays[lightIndex], *normal);
 		shade = WWMath::Clamp(shade,0.0f,1.0f);
 		terrainDiffuse=&TheGlobalData->m_terrainDiffuse[lightIndex];
 		shadeR += shade*terrainDiffuse->red;
@@ -576,15 +602,32 @@ void BaseHeightMapRenderObjClass::doTheLight(VERTEX_FORMAT *vb, const Vector3*li
 		shadeB += shade*terrainDiffuse->blue;
 	}
 
-	shadeR = WWMath::Clamp(shadeR,0.0f,1.0f);
-	shadeG = WWMath::Clamp(shadeG,0.0f,1.0f);
-	shadeB = WWMath::Clamp(shadeB,0.0f,1.0f);
+	shadeR = min(shadeR, 1.0f);
+	shadeG = min(shadeG, 1.0f);
+	shadeB = min(shadeB, 1.0f);
 
-	shadeR*=255.0f;
-	shadeG*=255.0f;
-	shadeB*=255.0f;
-	vb->diffuse = REAL_TO_INT(shadeB) | (REAL_TO_INT(shadeG) << 8) | (REAL_TO_INT(shadeR) << 16) | ((Int)alpha << 24);
+	return color;
+}
+
+void BaseHeightMapRenderObjClass::doThePrecomputedLight(VERTEX_FORMAT *vbArray, UnsignedInt vbCount, Int x, Int y)
+{
+#ifdef USE_NORMALS
+	const WorldHeightMap::TexelNormal* texelNormal = m_map->getPrecomputedTexelNormal(x, y);
+#else
+	const WorldHeightMap::AmbientLight* ambientLight = m_map->getPrecomputedAmbientLight(x, y);
 #endif
+
+	for (UnsignedInt tileCorner = 0; tileCorner < vbCount; ++tileCorner)
+	{
+		VERTEX_FORMAT* vb = vbArray + tileCorner;
+#ifdef USE_NORMALS
+		vb->nx = texelNormal.normal[tileCorner].X;
+		vb->ny = texelNormal.normal[tileCorner].Y;
+		vb->nz = texelNormal.normal[tileCorner].Z;
+#else
+		vb->diffuse = ambientLight->color[tileCorner].getARGB();
+#endif
+	}
 }
 
 //=============================================================================
@@ -2069,32 +2112,17 @@ Int BaseHeightMapRenderObjClass::getStaticDiffuse(Int x, Int y)
 		return(0);
 	}
 
-	TerrainLightRay lightRay = getTerrainLightRay();
-
 	//top-left sample
-	const WorldHeightMap::TexelNormal* texelNormal = m_map->getPrecomputedTexelNormal(x, y);
-
 	VERTEX_FORMAT vertex;
 	vertex.x=ADJUST_FROM_INDEX_TO_REAL(x);
 	vertex.y=ADJUST_FROM_INDEX_TO_REAL(y);
-
-	vertex.z=  ((float)m_map->getHeight(x,y))*MAP_HEIGHT_SCALE;
+	vertex.z=((float)m_map->getHeight(x,y))*MAP_HEIGHT_SCALE;
 	vertex.u1=0;
 	vertex.v1=0;
 	vertex.u2=1;
 	vertex.v2=1;
+	doThePrecomputedLight(&vertex, 1, x, y);
 
-	RTS3DScene *pMyScene = (RTS3DScene *)Scene;
-	if (pMyScene) {
-		RefRenderObjListIterator *it = pMyScene->createLightsIterator();
-		doTheLight(&vertex, lightRay.rays, &texelNormal->normal[0], it, 1.0f);
-		if (it) {
-		 pMyScene->destroyLightsIterator(it);
-		 it = NULL;
-		}
-	} else {
-		doTheLight(&vertex, lightRay.rays, &texelNormal->normal[0], NULL, 1.0f);
-	}
 	return vertex.diffuse;
 }
 
@@ -2967,17 +2995,4 @@ void BaseHeightMapRenderObjClass::loadPostProcess( void )
 Bool BaseHeightMapRenderObjClass::useCloud()
 {
 	return TheGlobalData->m_useCloudMap && TheGlobalData->m_timeOfDay != TIME_OF_DAY_NIGHT;
-}
-
-// ------------------------------------------------------------------------------------------------
-BaseHeightMapRenderObjClass::TerrainLightRay BaseHeightMapRenderObjClass::getTerrainLightRay()
-{
-	TerrainLightRay rayLight;
-	for (Int lightIndex = 0; lightIndex < ARRAY_SIZE(rayLight.rays); ++lightIndex)
-	{
-		const Coord3D &lightPos = TheGlobalData->m_terrainLightPos[lightIndex];
-		rayLight.rays[lightIndex].Set(-lightPos.x, -lightPos.y, -lightPos.z);
-		// expected normalized
-	}
-	return rayLight;
 }
