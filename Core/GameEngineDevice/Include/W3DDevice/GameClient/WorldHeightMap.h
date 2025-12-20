@@ -390,17 +390,8 @@ public:  // Flat tile texture info.
 	Bool getRawTileData(Short tileNdx, Int width, UnsignedByte *buffer, Int bufLen);
 	UnsignedByte *getRGBAlphaDataForWidth(Int width, TBlendTileInfo *pBlend);
 
-public:  // modify height value
-	void setRawHeight(Int xIndex, Int yIndex, UnsignedByte height) {
-		Int ndx = (yIndex*m_width)+xIndex;
-		if ((ndx>=0) && (ndx<m_dataSize) && m_data) {
-			m_data[ndx]=height;
-			// TheSuperHackers @info No need to recompute UV data here.
-			// But recompute the texel normals.
-			precomputeTexelNormalsAt(xIndex, yIndex);
-			precomputeAmbientLightAt(xIndex, yIndex);
-		}
-	};
+	void setRawHeight(Int xIndex, Int yIndex, UnsignedByte height); ///< modify height value
+
 public: // Read tile utilities. jba [7/9/2003]
 	static Bool readTiles(InputStream *pStrm, TileData **tiles, Int numRows);
 	static Int countTiles(InputStream *pStrm, Bool *halfTile=NULL);

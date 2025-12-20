@@ -2809,3 +2809,31 @@ Bool  WorldHeightMap::getRawTileData(Short tileNdx, Int width,
 	return(false);
 }
 
+void WorldHeightMap::setRawHeight(Int xIndex, Int yIndex, UnsignedByte height)
+{
+	Int ndx = (yIndex*m_width)+xIndex;
+	if ((ndx>=0) && (ndx<m_dataSize) && m_data)
+	{
+		m_data[ndx]=height;
+
+		// TheSuperHackers @info After the tile height was modified,
+		// it must recompute the tile and its surrounding 24 tiles. Is not cheap.
+		// This could be cheaper by post processing the affected region in the next update,
+		// but it would require an additional state to maintain and add complexity.
+		IRegion2D region;
+		region.lo.x = max(xIndex-2, 0);
+		region.hi.x = min(xIndex+2, m_width-1);
+		region.lo.y = max(yIndex-2, 0);
+		region.hi.y = min(yIndex+2, m_height-1);
+
+		for (Int y = region.lo.y; y <= region.hi.y; ++y)
+		{
+			for (Int x = region.lo.x; x <= region.hi.x; ++x)
+			{
+				// TheSuperHackers @info No need to recompute UV data here.
+				precomputeTexelNormalAt(x, y);
+				precomputeAmbientLightAt(x, y);
+			}
+		}
+	}
+}
