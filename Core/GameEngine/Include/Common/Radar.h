@@ -218,8 +218,11 @@ public:
 	/// empty the entire shroud
 	virtual void clearShroud() = 0;
 
-	/// set the shroud level at shroud cell x,y
-	virtual void setShroudLevel( Int x, Int y, CellShroudStatus setting ) = 0;
+	/// TheSuperHackers @performance xezon 20/12/2025 Now provides beginSetShroudLevel and endSetShroudLevel for improved performance.
+	/// Calling setShroudLevel many times is very expensive because it will lock a render resource on every call.
+	virtual void setShroudLevel( Int x, Int y, CellShroudStatus setting ) = 0; ///< set the shroud level at shroud cell x,y
+	virtual void beginSetShroudLevel( const IRegion2D* surfaceRegion=NULL ) {} ///< call this once before multiple calls to setShroudLevel for better performance
+	virtual void endSetShroundLevel() {} ///< call this once after beginSetShroudLevel and setShroudLevel
 
 	virtual void notifyViewChanged() {} ///< signals that the camera view has changed
 
