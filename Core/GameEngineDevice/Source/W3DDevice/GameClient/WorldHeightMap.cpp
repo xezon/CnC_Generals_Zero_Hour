@@ -1730,42 +1730,25 @@ void WorldHeightMap::precomputeTexelNormals()
 	{
 		for (x=0; x<m_width; ++x)
 		{
-			precomputeTexelNormalsAt(x, y);
+			precomputeTexelNormalAt(x, y);
 		}
 	}
 }
 
-void WorldHeightMap::precomputeTexelNormalsAt(Int x, Int y)
+void WorldHeightMap::precomputeTexelNormalAt(Int x, Int y)
 {
 	constexpr const Int cellOffset = 1;
-	const Int vn0 = max(0, y-cellOffset);
-	const Int vp1 = min(m_height-1, y+2*cellOffset);
-	const Int un0 = max(0, x-cellOffset);
-	const Int up1 = min(m_width-1, x+2*cellOffset);
+	const Int leftX = max(x-cellOffset, 0);
+	const Int upY = max(y-cellOffset, 0);
+	const Int rightX = min(x+cellOffset, m_width-cellOffset);
+	const Int downY = min(y+cellOffset, m_height-cellOffset);
 	const Int ndx = y*m_width + x;
 	TexelNormal& texelNormal = m_texelNormals[ndx];
-	Vector3 l2r;
-	Vector3 n2f;
 
 	//top-left sample
-	l2r.Set(2*MAP_XY_FACTOR, 0, MAP_HEIGHT_SCALE * (getQuickHeight(x+cellOffset, y) - getQuickHeight(un0, y)));
-	n2f.Set(0, 2*MAP_XY_FACTOR, MAP_HEIGHT_SCALE * (getQuickHeight(x, y+cellOffset) - getQuickHeight(x, vn0)));
-	Vector3::Normalized_Cross_Product(l2r, n2f, &texelNormal.normal[0]);
-
-	//top-right sample
-	l2r.Set(2*MAP_XY_FACTOR, 0, MAP_HEIGHT_SCALE * (getQuickHeight(up1, y) - getQuickHeight(x, y)));
-	n2f.Set(0, 2*MAP_XY_FACTOR, MAP_HEIGHT_SCALE * (getQuickHeight(x+cellOffset, y+cellOffset) - getQuickHeight(x+cellOffset, vn0)));
-	Vector3::Normalized_Cross_Product(l2r, n2f, &texelNormal.normal[1]);
-
-	//bottom-right sample
-	l2r.Set(2*MAP_XY_FACTOR, 0, MAP_HEIGHT_SCALE * (getQuickHeight(up1, y+cellOffset) - getQuickHeight(x, y+cellOffset)));
-	n2f.Set(0, 2*MAP_XY_FACTOR, MAP_HEIGHT_SCALE * (getQuickHeight(x+cellOffset, vp1) - getQuickHeight(x+cellOffset, y)));
-	Vector3::Normalized_Cross_Product(l2r, n2f, &texelNormal.normal[2]);
-
-	//bottom-left sample
-	l2r.Set(2*MAP_XY_FACTOR, 0, MAP_HEIGHT_SCALE * (getQuickHeight(x+cellOffset, y+cellOffset) - getQuickHeight(un0, y+cellOffset)));
-	n2f.Set(0, 2*MAP_XY_FACTOR, MAP_HEIGHT_SCALE * (getQuickHeight(x, vp1) - getQuickHeight(x , y)));
-	Vector3::Normalized_Cross_Product(l2r, n2f, &texelNormal.normal[3]);
+	Vector3 l2r(2*MAP_XY_FACTOR, 0, MAP_HEIGHT_SCALE * (getQuickHeight(rightX, y) - getQuickHeight(leftX, y)));
+	Vector3 n2f(0, 2*MAP_XY_FACTOR, MAP_HEIGHT_SCALE * (getQuickHeight(x, downY) - getQuickHeight(x, upY)));
+	Vector3::Normalized_Cross_Product(l2r, n2f, &texelNormal.topLeft);
 }
 
 void WorldHeightMap::precomputeAmbientLights()
@@ -1788,13 +1771,19 @@ void WorldHeightMap::precomputeAmbientLights()
 
 void WorldHeightMap::precomputeAmbientLightAt(Int x, Int y)
 {
-	const TexelNormal *texelNormal = getPrecomputedTexelNormal(x, y);
+	constexpr const Int cellOffset = 1;
+	const Int rightX = min(x+cellOffset, m_width-cellOffset);
+	const Int downY = min(y+cellOffset, m_height-cellOffset);
+	const TexelNormal* texelNormal[4];
+	texelNormal[0] = getPrecomputedTexelNormal(x, y);
+	texelNormal[1] = getPrecomputedTexelNormal(rightX, y);
+	texelNormal[2] = getPrecomputedTexelNormal(rightX, downY);
+	texelNormal[3] = getPrecomputedTexelNormal(x, downY);
 	const Int tileIndex = y*m_width + x;
 
 	Vector3 lightPositions[4];
 	if (m_lightsIterator && (m_lightsIterator->First(), !m_lightsIterator->Is_Done()))
 	{
-		constexpr const Int cellOffset = 1;
 		//top-left
 		lightPositions[0].X = (x - getBorderSizeInline()) * MAP_XY_FACTOR;
 		lightPositions[0].Y = (y - getBorderSizeInline()) * MAP_XY_FACTOR;
@@ -1802,15 +1791,15 @@ void WorldHeightMap::precomputeAmbientLightAt(Int x, Int y)
 		//top-right
 		lightPositions[1].X = (x+cellOffset - getBorderSizeInline()) * MAP_XY_FACTOR;
 		lightPositions[1].Y = (y - getBorderSizeInline()) * MAP_XY_FACTOR;
-		lightPositions[1].Z = getQuickHeight(min(x+cellOffset,m_width), y) * MAP_HEIGHT_SCALE;
+		lightPositions[1].Z = getQuickHeight(rightX, y) * MAP_HEIGHT_SCALE;
 		//bottom-right
 		lightPositions[2].X = (x+cellOffset - getBorderSizeInline()) * MAP_XY_FACTOR;
 		lightPositions[2].Y = (y+cellOffset - getBorderSizeInline()) * MAP_XY_FACTOR;
-		lightPositions[2].Z = getQuickHeight(min(x+cellOffset,m_width), min(y+cellOffset,m_height)) * MAP_HEIGHT_SCALE;
+		lightPositions[2].Z = getQuickHeight(rightX, downY) * MAP_HEIGHT_SCALE;
 		//bottom-left
 		lightPositions[3].X = (x - getBorderSizeInline()) * MAP_XY_FACTOR;
 		lightPositions[3].Y = (y+cellOffset - getBorderSizeInline()) * MAP_XY_FACTOR;
-		lightPositions[3].Z = getQuickHeight(x, min(y+cellOffset,m_height)) * MAP_HEIGHT_SCALE;
+		lightPositions[3].Z = getQuickHeight(x, downY) * MAP_HEIGHT_SCALE;
 	}
 
 	AmbientLight& ambientLight = m_ambientLights[tileIndex];
@@ -1818,7 +1807,7 @@ void WorldHeightMap::precomputeAmbientLightAt(Int x, Int y)
 	for (Int tileCorner = 0; tileCorner < ARRAY_SIZE(AmbientLight::color); ++tileCorner)
 	{
 		const Vector3 *pos = lightPositions + tileCorner;
-		const Vector3 *normal = texelNormal->normal + tileCorner;
+		const Vector3 *normal = &texelNormal[tileCorner]->topLeft;
 		const UnsignedByte alpha = m_alphaUVDataCache[tileIndex].alpha[tileCorner];
 		const RGBAColorReal computedColor = BaseHeightMapRenderObjClass::computeAmbientLight(m_lightRays, normal, alpha, m_lightsIterator, pos);
 

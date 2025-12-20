@@ -492,7 +492,8 @@ Int HeightMapRenderObjClass::updateVBForLight(DX8VertexBufferClass	*pVB, VERTEX_
 #endif
 
 	Int i,j,k;
-	constexpr const Int	vertsPerRow=(VERTEX_BUFFER_TILE_LENGTH)*4;	//vertices per row of VB
+	constexpr const Int vertsPerRow=(VERTEX_BUFFER_TILE_LENGTH)*4;	//vertices per row of VB
+	constexpr const Int cellOffset = 1;
 
 	if (m_vertexBufferTiles && m_map)
 	{
@@ -558,22 +559,27 @@ Int HeightMapRenderObjClass::updateVBForLight(DX8VertexBufferClass	*pVB, VERTEX_
 
 				Vector3 lightRay(0,0,0);
 
-				const WorldHeightMap::TexelNormal* texelNormal = m_map->getPrecomputedTexelNormal(xCoord, yCoord);
+				const Int rightX = min(xCoord+cellOffset, m_map->getXExtent()-cellOffset);
+				const Int downY = min(yCoord+cellOffset, m_map->getYExtent()-cellOffset);
+				const WorldHeightMap::TexelNormal* texelNormalTopLeft = m_map->getPrecomputedTexelNormal(xCoord, yCoord);
+				const WorldHeightMap::TexelNormal* texelNormalTopRight = m_map->getPrecomputedTexelNormal(rightX, yCoord);
+				const WorldHeightMap::TexelNormal* texelNormalBottomRight = m_map->getPrecomputedTexelNormal(rightX, downY);
+				const WorldHeightMap::TexelNormal* texelNormalBottomLeft = m_map->getPrecomputedTexelNormal(xCoord, downY);
 
 				//top-left sample
-				doTheDynamicLight(vb, vbMirror, &lightRay, &texelNormal->normal[0], pLights, numLights);
+				doTheDynamicLight(vb, vbMirror, &lightRay, &texelNormalTopLeft->topLeft, pLights, numLights);
 				vb++;	vbMirror++;
 
 				//top-right sample
-				doTheDynamicLight(vb, vbMirror, &lightRay, &texelNormal->normal[1], pLights, numLights);
+				doTheDynamicLight(vb, vbMirror, &lightRay, &texelNormalTopRight->topLeft, pLights, numLights);
 				vb++;	vbMirror++;
 
 				//bottom-right sample
-				doTheDynamicLight(vb, vbMirror, &lightRay, &texelNormal->normal[2], pLights, numLights);
+				doTheDynamicLight(vb, vbMirror, &lightRay, &texelNormalBottomRight->topLeft, pLights, numLights);
 				vb++;	vbMirror++;
 
 				//bottom-left sample
-				doTheDynamicLight(vb, vbMirror, &lightRay, &texelNormal->normal[3], pLights, numLights);
+				doTheDynamicLight(vb, vbMirror, &lightRay, &texelNormalBottomLeft->topLeft, pLights, numLights);
 				vb++;	vbMirror++;
 			}
 		}
@@ -587,6 +593,7 @@ Int HeightMapRenderObjClass::updateVBForLightOptimized(DX8VertexBufferClass	*pVB
 {
 	Int i,j,k;
 	constexpr const Int vertsPerRow=(VERTEX_BUFFER_TILE_LENGTH)*4;	//vertices per row of VB
+	constexpr const Int cellOffset = 1;
 
 	if (m_vertexBufferTiles && m_map)
 	{
@@ -668,7 +675,12 @@ Int HeightMapRenderObjClass::updateVBForLightOptimized(DX8VertexBufferClass	*pVB
 
 				Vector3 lightRay(0,0,0);
 
-				const WorldHeightMap::TexelNormal* texelNormal = m_map->getPrecomputedTexelNormal(xCoord, yCoord);
+				const Int rightX = min(xCoord+cellOffset, m_map->getXExtent()-cellOffset);
+				const Int downY = min(yCoord+cellOffset, m_map->getYExtent()-cellOffset);
+				const WorldHeightMap::TexelNormal* texelNormalTopLeft = m_map->getPrecomputedTexelNormal(xCoord, yCoord);
+				const WorldHeightMap::TexelNormal* texelNormalTopRight = m_map->getPrecomputedTexelNormal(rightX, yCoord);
+				const WorldHeightMap::TexelNormal* texelNormalBottomRight = m_map->getPrecomputedTexelNormal(rightX, downY);
+				const WorldHeightMap::TexelNormal* texelNormalBottomLeft = m_map->getPrecomputedTexelNormal(xCoord, downY);
 
 				//
 				// (gth) Following the set of rules below lets us take advantage of lighting values that have
@@ -681,13 +693,13 @@ Int HeightMapRenderObjClass::updateVBForLightOptimized(DX8VertexBufferClass	*pVB
 
 				// top-left sample -> only compute when i==0 and j==0
 				if ((i==x0) && (j==y0)) {
-					doTheDynamicLight(vb, vbMirror, &lightRay, &texelNormal->normal[0], pLights, numLights);
+					doTheDynamicLight(vb, vbMirror, &lightRay, &texelNormalTopLeft->topLeft, pLights, numLights);
 				}
 				vb++;	vbMirror++;
 
 				//top-right sample -> compute when j==0, then copy to (right,0)
 				if (j==y0) {
-					light_copy = doTheDynamicLight(vb, vbMirror, &lightRay, &texelNormal->normal[1], pLights, numLights);
+					light_copy = doTheDynamicLight(vb, vbMirror, &lightRay, &texelNormalTopRight->topLeft, pLights, numLights);
 
 					if (i < x1-1) {
 						// copy light to (right,0)
@@ -697,7 +709,7 @@ Int HeightMapRenderObjClass::updateVBForLightOptimized(DX8VertexBufferClass	*pVB
 				vb++;	vbMirror++;
 
 				//bottom-right sample -> always compute, then copy to (right,3), (down,1), (down+right,0)
-				light_copy = doTheDynamicLight(vb, vbMirror, &lightRay, &texelNormal->normal[2], pLights, numLights);
+				light_copy = doTheDynamicLight(vb, vbMirror, &lightRay, &texelNormalBottomRight->topLeft, pLights, numLights);
 
 				if (i < x1-1) {
 					// copy light to (right,3)
@@ -718,7 +730,7 @@ Int HeightMapRenderObjClass::updateVBForLightOptimized(DX8VertexBufferClass	*pVB
 
 				//bottom-left sample -> compute when i==0, otherwise copy from (left,2)
 				if (i==x0) {
-					light_copy = doTheDynamicLight(vb, vbMirror, &lightRay, &texelNormal->normal[3], pLights, numLights);
+					light_copy = doTheDynamicLight(vb, vbMirror, &lightRay, &texelNormalBottomLeft->topLeft, pLights, numLights);
 
 					if (j < y1-1) {
 						// copy light to (down,0)

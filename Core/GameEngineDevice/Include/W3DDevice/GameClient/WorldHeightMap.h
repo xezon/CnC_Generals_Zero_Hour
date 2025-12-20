@@ -222,11 +222,7 @@ protected:
 public:
 	struct TexelNormal
 	{
-		// 0 = top left
-		// 1 = top right
-		// 2 = bottom right
-		// 3 = bottom left
-		Vector3 normal[4];
+		Vector3 topLeft;
 	};
 
 	struct Color
@@ -295,7 +291,7 @@ public: // constructors/destructors
 private:
 	void precomputeUVData(); ///< precomputes UV data for efficient lookups
 	void precomputeTexelNormals(); ///< precomputes texel normals for efficient lookups
-	void precomputeTexelNormalsAt(Int x, Int y); ///< precomputes texel normals for efficient lookups
+	void precomputeTexelNormalAt(Int x, Int y); ///< precomputes texel normals for efficient lookups
 	void precomputeAmbientLights(); ///< precomputes ambient lights for efficient lookups
 	void precomputeAmbientLightAt(Int x, Int y); ///< precomputes ambient lights for efficient lookups
 

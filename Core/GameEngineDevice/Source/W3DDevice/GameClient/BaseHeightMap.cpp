@@ -612,22 +612,30 @@ RGBAColorReal BaseHeightMapRenderObjClass::computeAmbientLight(
 void BaseHeightMapRenderObjClass::doThePrecomputedLight(VERTEX_FORMAT *vbArray, UnsignedInt vbCount, Int x, Int y)
 {
 #ifdef USE_NORMALS
-	const WorldHeightMap::TexelNormal* texelNormal = m_map->getPrecomputedTexelNormal(x, y);
+	constexpr const Int cellOffset = 1;
+	const Int rightX = min(x+cellOffset, m_map->getXExtent()-cellOffset);
+	const Int downY = min(y+cellOffset, m_map->getYExtent()-cellOffset);
+	const WorldHeightMap::TexelNormal* texelNormal[4];
+	texelNormal[0] = m_map->getPrecomputedTexelNormal(x, y);
+	texelNormal[1] = m_map->getPrecomputedTexelNormal(rightX, y);
+	texelNormal[2] = m_map->getPrecomputedTexelNormal(rightX, downY);
+	texelNormal[3] = m_map->getPrecomputedTexelNormal(x, downY);
+	for (UnsignedInt tileCorner = 0; tileCorner < vbCount; ++tileCorner)
+	{
+		VERTEX_FORMAT* vb = vbArray + tileCorner;
+		vb->nx = texelNormal[tileCorner]->topLeft.X;
+		vb->ny = texelNormal[tileCorner]->topLeft.Y;
+		vb->nz = texelNormal[tileCorner]->topLeft.Z;
+	}
 #else
 	const WorldHeightMap::AmbientLight* ambientLight = m_map->getPrecomputedAmbientLight(x, y);
-#endif
 
 	for (UnsignedInt tileCorner = 0; tileCorner < vbCount; ++tileCorner)
 	{
 		VERTEX_FORMAT* vb = vbArray + tileCorner;
-#ifdef USE_NORMALS
-		vb->nx = texelNormal.normal[tileCorner].X;
-		vb->ny = texelNormal.normal[tileCorner].Y;
-		vb->nz = texelNormal.normal[tileCorner].Z;
-#else
 		vb->diffuse = ambientLight->color[tileCorner].getARGB();
-#endif
 	}
+#endif
 }
 
 //=============================================================================
