@@ -298,7 +298,7 @@ data is expected to be an array same dimensions as current heightmap
 mapped into this VB.
 */
 //=============================================================================
-Int HeightMapRenderObjClass::updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *data, Int x0, Int y0, Int x1, Int y1, Int originX, Int originY, WorldHeightMap *pMap, RefRenderObjListIterator *pLightsIterator)
+Int HeightMapRenderObjClass::updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *data, Int x0, Int y0, Int x1, Int y1, Int originX, Int originY, WorldHeightMap *pMap)
 {
 	Int i, j;
 	Int xCoord, yCoord;
@@ -755,7 +755,7 @@ Int HeightMapRenderObjClass::updateVBForLightOptimized(DX8VertexBufferClass	*pVB
 The coordinates in partialRange are map cell coordinates, relative to the entire map.
 The vertex coordinates and texture coordinates, as well as static lighting are updated.
 */
-void HeightMapRenderObjClass::doPartialUpdate(const IRegion2D &partialRange, WorldHeightMap *htMap, RefRenderObjListIterator *pLightsIterator)
+void HeightMapRenderObjClass::doPartialUpdate(const IRegion2D &partialRange, WorldHeightMap *htMap)
 {
 	// Adjust range into the current drawn map range.
 	Int minX = partialRange.lo.x - htMap->getDrawOrgX();
@@ -770,8 +770,7 @@ void HeightMapRenderObjClass::doPartialUpdate(const IRegion2D &partialRange, Wor
 	if (maxY < minY) return;
 	if (m_originX == 0 && m_originY == 0) {
 		// simple case.
-		updateBlock(minX, minY, maxX, maxY,
-								htMap, pLightsIterator);
+		updateBlock(minX, minY, maxX, maxY, htMap);
 	}
 	else
 	{
@@ -784,10 +783,10 @@ void HeightMapRenderObjClass::doPartialUpdate(const IRegion2D &partialRange, Wor
 		}
 		if (maxY > m_y-1) {
 			maxY -= m_y-1;
-			updateBlock(0, minY, m_x-1, m_y-1, htMap, pLightsIterator);
-			updateBlock(0, 0, m_x-1, maxY, htMap, pLightsIterator);
+			updateBlock(0, minY, m_x-1, m_y-1, htMap);
+			updateBlock(0, 0, m_x-1, maxY, htMap);
 		} else {
-			updateBlock(0, minY, m_x-1, maxY, htMap, pLightsIterator);
+			updateBlock(0, minY, m_x-1, maxY, htMap);
 		}
 	}
 
@@ -832,7 +831,7 @@ void HeightMapRenderObjClass::doPartialUpdate(const IRegion2D &partialRange, Wor
 /** Updates a block of vertices from [x0,y0 to x1,y1]
 The vertex coordinates and texture coordinates, as well as static lighting are updated.
 */
-Int HeightMapRenderObjClass::updateBlock(Int x0, Int y0, Int x1, Int y1,  WorldHeightMap *pMap, RefRenderObjListIterator *pLightsIterator)
+Int HeightMapRenderObjClass::updateBlock(Int x0, Int y0, Int x1, Int y1,  WorldHeightMap *pMap)
 {
 #ifdef RTS_DEBUG
 	DEBUG_ASSERTCRASH(x0>=0,  ("HeightMapRenderObjClass::UpdateBlock parameters extend beyond left edge."));
@@ -876,7 +875,7 @@ Int HeightMapRenderObjClass::updateBlock(Int x0, Int y0, Int x1, Int y1,  WorldH
 			constexpr const Int numVertex = VERTEX_BUFFER_TILE_LENGTH*2*VERTEX_BUFFER_TILE_LENGTH*2;
 			DX8VertexBufferClass *pVB = m_vertexBufferTiles + j*m_numVBTilesX+i;	//point to correct row/column of vertex buffers
 			VERTEX_FORMAT *pData = m_vertexBufferBackup + j*m_numVBTilesX*numVertex + i*numVertex;
-			updateVB(pVB, pData, xMin, yMin, xMax, yMax, originX, originY, pMap, pLightsIterator);
+			updateVB(pVB, pData, xMin, yMin, xMax, yMax, originX, originY, pMap);
 		}
 	}
 
@@ -1065,8 +1064,8 @@ void HeightMapRenderObjClass::oversizeTerrain(Int tilesToOversize)
 		m_shroud->reset();
 	//delete m_shroud;
 	//m_shroud = NULL;
-	initHeightData(m_map->getDrawWidth(), m_map->getDrawHeight(), m_map, NULL, FALSE);
 	m_needFullUpdate = true;
+	initHeightData(m_map->getDrawWidth(), m_map->getDrawHeight(), m_map, FALSE);
 }
 
 
@@ -1079,12 +1078,12 @@ void HeightMapRenderObjClass::oversizeTerrain(Int tilesToOversize)
 Also allocates all rendering resources such as vertex buffers, index buffers,
 shaders, and materials.*/
 //=============================================================================
-Int HeightMapRenderObjClass::initHeightData(Int x, Int y, WorldHeightMap *pMap, RefRenderObjListIterator *pLightsIterator, Bool updateExtraPassTiles)
+Int HeightMapRenderObjClass::initHeightData(Int x, Int y, WorldHeightMap *pMap, Bool updateExtraPassTiles)
 {
 	// TheSuperHackers @performance xezon 10/12/2025 Precomputes all UV data for fast lookups in heightmap creation and updates.
 	pMap->initHeightData();
 
-	BaseHeightMapRenderObjClass::initHeightData(x, y, pMap, pLightsIterator, updateExtraPassTiles);
+	BaseHeightMapRenderObjClass::initHeightData(x, y, pMap, updateExtraPassTiles);
 	Int i,j;
 //	Int	vertsPerRow=x*2-2;
 //	Int	vertsPerColumn=y*2-2;
@@ -1190,7 +1189,7 @@ Int HeightMapRenderObjClass::initHeightData(Int x, Int y, WorldHeightMap *pMap, 
 		//go with a preset material for now.
 	}
 
-	updateBlock(0,0,x-1,y-1,pMap,pLightsIterator);
+	updateBlock(0,0,x-1,y-1,pMap);
 
 	return 0;
 }
@@ -1494,7 +1493,7 @@ heightmap. As the view slides around, this determines what is the actually
 rendered portion of the terrain. Only a small section is rendered at any time.
 */
 //=============================================================================
-void HeightMapRenderObjClass::updateCenter(CameraClass *camera, Vector3* cameraPivot, RefRenderObjListIterator *pLightsIterator)
+void HeightMapRenderObjClass::updateCenter(CameraClass *camera, Vector3* cameraPivot)
 {
 	if (m_map==NULL) {
 		return;
@@ -1505,13 +1504,13 @@ void HeightMapRenderObjClass::updateCenter(CameraClass *camera, Vector3* cameraP
 	if (m_vertexBufferTiles ==NULL)
 		return;		//did not initialize resources yet.
 
-	BaseHeightMapRenderObjClass::updateCenter(camera, cameraPivot, pLightsIterator);
+	BaseHeightMapRenderObjClass::updateCenter(camera, cameraPivot);
 
 	m_updating = true;
 	if (m_needFullUpdate)
 	{
 		m_needFullUpdate = false;
-		updateBlock(0, 0, m_x-1, m_y-1, m_map, pLightsIterator);
+		updateBlock(0, 0, m_x-1, m_y-1, m_map);
 		m_updating = false;
 		return;
 	}
@@ -1715,7 +1714,7 @@ void HeightMapRenderObjClass::updateCenter(CameraClass *camera, Vector3* cameraP
 			m_map->setDrawOrg(newOrgX, newOrgY);
 			m_originY = 0;
 			m_originX = 0;
-			updateBlock(0, 0, m_x-1, m_y-1, m_map, pLightsIterator);
+			updateBlock(0, 0, m_x-1, m_y-1, m_map);
 			m_updating = false;
 			return;
 		}
@@ -1740,10 +1739,10 @@ void HeightMapRenderObjClass::updateCenter(CameraClass *camera, Vector3* cameraP
 					if (minY<0) {
 						minY += m_y-1;
 						if (minY<0) minY = 0;
-						updateBlock(0, minY, m_x-1, m_y-1, m_map, pLightsIterator);
-						updateBlock(0, 0, m_x-1, maxY, m_map, pLightsIterator);
+						updateBlock(0, minY, m_x-1, m_y-1, m_map);
+						updateBlock(0, 0, m_x-1, maxY, m_map);
 					} else {
-						updateBlock(0, minY, m_x-1, maxY, m_map, pLightsIterator);
+						updateBlock(0, minY, m_x-1, maxY, m_map);
 					}
 				}
 				// It is much more efficient to update a couple of columns one frame, and then
@@ -1777,10 +1776,10 @@ void HeightMapRenderObjClass::updateCenter(CameraClass *camera, Vector3* cameraP
 					if (minX<0) {
 						minX += m_x-1;
 						if (minX<0) minX = 0;
-						updateBlock(minX,0,m_x-1, m_y-1, m_map, pLightsIterator);
-						updateBlock(0,0,maxX, m_y-1, m_map, pLightsIterator);
+						updateBlock(minX,0,m_x-1, m_y-1, m_map);
+						updateBlock(0,0,maxX, m_y-1, m_map);
 					} else {
-						updateBlock(minX,0,maxX, m_y-1, m_map, pLightsIterator);
+						updateBlock(minX,0,maxX, m_y-1, m_map);
 					}
 				}
 			}

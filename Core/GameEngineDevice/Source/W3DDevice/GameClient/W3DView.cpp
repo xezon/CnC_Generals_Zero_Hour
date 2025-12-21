@@ -3538,11 +3538,5 @@ void W3DView::updateTerrain()
 	cameraPivot.Y = m_pos.y;
 	cameraPivot.Z = m_groundLevel;
 
-	RefRenderObjListIterator *it = W3DDisplay::m_3DScene->createLightsIterator();
-	TheTerrainRenderObject->updateCenter(m_3DCamera, &cameraPivot, it);
-
-	if (it)
-	{
-		W3DDisplay::m_3DScene->destroyLightsIterator(it);
-	}
+	TheTerrainRenderObject->updateCenter(m_3DCamera, &cameraPivot);
 }

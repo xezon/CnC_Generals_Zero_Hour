@@ -286,6 +286,7 @@ public: // constructors/destructors
 	WorldHeightMap(ChunkInputStream *pFile, Bool bHMapOnly=false);	// read from file.
 	~WorldHeightMap(void);			// destroy.
 
+	void setStaticLightsIterator(RefRenderObjListIterator *pLightsIterator);
 	void initHeightData();
 
 private:

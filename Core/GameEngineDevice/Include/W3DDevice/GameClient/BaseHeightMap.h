@@ -118,11 +118,11 @@ public:
   // Other VIRTUAL methods. [3/20/2003]
 
 	///allocate resources needed to render heightmap
-	virtual int initHeightData(Int width, Int height, WorldHeightMap *pMap, RefRenderObjListIterator *pLightsIterator, Bool updateExtraPassTiles=TRUE);
+	virtual int initHeightData(Int width, Int height, WorldHeightMap *pMap, Bool updateExtraPassTiles=TRUE);
 	virtual Int freeMapResources(void);	///< free resources used to render heightmap
-	virtual void updateCenter(CameraClass *camera, Vector3* cameraPivot, RefRenderObjListIterator *pLightsIterator);
+	virtual void updateCenter(CameraClass *camera, Vector3* cameraPivot);
  	virtual void adjustTerrainLOD(Int adj);
-	virtual void doPartialUpdate(const IRegion2D &partialRange, WorldHeightMap *htMap, RefRenderObjListIterator *pLightsIterator) = 0;
+	virtual void doPartialUpdate(const IRegion2D &partialRange, WorldHeightMap *htMap) = 0;
 	virtual void staticLightingChanged(void);
 	virtual void oversizeTerrain(Int tilesToOversize);
 	virtual void reset(void);
@@ -228,7 +228,7 @@ public:
 	Bool doesNeedFullUpdate(void) {return m_needFullUpdate;}
 
 
-	virtual int updateBlock(Int x0, Int y0, Int x1, Int y1, WorldHeightMap *pMap, RefRenderObjListIterator *pLightsIterator) = 0;
+	virtual int updateBlock(Int x0, Int y0, Int x1, Int y1, WorldHeightMap *pMap) = 0;
 
 protected:
 	// snapshot methods

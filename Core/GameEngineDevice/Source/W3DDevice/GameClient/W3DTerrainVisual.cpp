@@ -473,8 +473,7 @@ void W3DTerrainVisual::updateSeismicSimulations( void )
           hur->m_region.lo.y + border,
           hur->m_region.hi.x + border,
           hur->m_region.hi.y + border,
-          m_clientHeightMap,
-          0);
+          m_clientHeightMap);
       }
 
       ++it;
@@ -606,22 +605,17 @@ Bool W3DTerrainVisual::load( AsciiString filename )
 	// apply the heightmap to the terrain render object
 
 #ifdef DO_SEISMIC_SIMULATIONS
+	m_clientHeightMap->setStaticLightsIterator(it);
 	m_terrainRenderObject->initHeightData( m_clientHeightMap->getDrawWidth(),
 																				 m_clientHeightMap->getDrawHeight(),
-																				 m_clientHeightMap,
-																				 it);
+																				 m_clientHeightMap);
 #else
+	m_logicHeightMap->setStaticLightsIterator(it);
 	m_terrainRenderObject->initHeightData( m_logicHeightMap->getDrawWidth(),
 																				 m_logicHeightMap->getDrawHeight(),
-																				 m_logicHeightMap,
-																				 it);
+																				 m_logicHeightMap);
 #endif
 
-
-	if (it) {
-	 W3DDisplay::m_3DScene->destroyLightsIterator(it);
-	 it = NULL;
-	}
 	// add our terrain render object to the scene
 	if (W3DDisplay::m_3DScene != NULL)
 		W3DDisplay::m_3DScene->Add_Render_Object( m_terrainRenderObject );

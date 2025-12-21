@@ -1803,7 +1803,7 @@ void BaseHeightMapRenderObjClass::initDestAlphaLUT(void)
 Also allocates all rendering resources such as vertex buffers, index buffers,
 shaders, and materials.*/
 //=============================================================================
-Int BaseHeightMapRenderObjClass::initHeightData(Int x, Int y, WorldHeightMap *pMap, RefRenderObjListIterator *pLightsIteratork, Bool updateExtraPassTiles)
+Int BaseHeightMapRenderObjClass::initHeightData(Int x, Int y, WorldHeightMap *pMap, Bool updateExtraPassTiles)
 {
 
 	REF_PTR_SET(m_map, pMap);	//update our heightmap pointer in case it changed since last call.
@@ -2389,7 +2389,7 @@ rendered portion of the terrain.  Only a 96x96 section is rendered at any time,
 even though maps can be up to 1024x1024.  This function determines which subset
 is rendered. */
 //=============================================================================
-void BaseHeightMapRenderObjClass::updateCenter(CameraClass *camera, Vector3* cameraPivot, RefRenderObjListIterator *pLightsIterator)
+void BaseHeightMapRenderObjClass::updateCenter(CameraClass *camera, Vector3* cameraPivot)
 {
 	if (m_map==NULL) {
 		return;
@@ -2412,11 +2412,11 @@ void BaseHeightMapRenderObjClass::updateCenter(CameraClass *camera, Vector3* cam
 #endif
 	if (m_needFullUpdate) {
 		m_bridgeBuffer->doFullUpdate();
-		m_bridgeBuffer->updateCenter(camera, pLightsIterator);
+		m_bridgeBuffer->updateCenter(camera);
 		m_updating = false;
 		return;
 	}
-	m_bridgeBuffer->updateCenter(camera, pLightsIterator);
+	m_bridgeBuffer->updateCenter(camera);
 	m_updating = false;
 }
 

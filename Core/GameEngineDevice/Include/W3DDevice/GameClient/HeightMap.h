@@ -71,18 +71,18 @@ public:
 	virtual void					On_Frame_Update(void);
 
 	///allocate resources needed to render heightmap
-	virtual int initHeightData(Int width, Int height, WorldHeightMap *pMap, RefRenderObjListIterator *pLightsIterator, Bool updateExtraPassTiles=TRUE);
+	virtual int initHeightData(Int width, Int height, WorldHeightMap *pMap, Bool updateExtraPassTiles=TRUE);
 	virtual Int freeMapResources(void);	///< free resources used to render heightmap
-	virtual void updateCenter(CameraClass *camera, Vector3* cameraPivot, RefRenderObjListIterator *pLightsIterator);
+	virtual void updateCenter(CameraClass *camera, Vector3* cameraPivot);
 
 	virtual void staticLightingChanged(void);
 	virtual	void adjustTerrainLOD(Int adj);
 	virtual void reset(void);
-	virtual void doPartialUpdate(const IRegion2D &partialRange, WorldHeightMap *htMap, RefRenderObjListIterator *pLightsIterator);
+	virtual void doPartialUpdate(const IRegion2D &partialRange, WorldHeightMap *htMap);
 
 	virtual void oversizeTerrain(Int tilesToOversize);
 
-	virtual int updateBlock(Int x0, Int y0, Int x1, Int y1, WorldHeightMap *pMap, RefRenderObjListIterator *pLightsIterator);
+	virtual int updateBlock(Int x0, Int y0, Int x1, Int y1, WorldHeightMap *pMap);
 
 protected:
 	Int *m_extraBlendTilePositions;	///<array holding x,y tile positions of all extra blend tiles. (used for 3 textures per tile).
@@ -108,7 +108,7 @@ protected:
 	Int updateVBForLight(DX8VertexBufferClass *pVB, VERTEX_FORMAT *data, Int x0, Int y0, Int x1, Int y1, Int originX, Int originY, W3DDynamicLight *pLights[], Int numLights);
 	Int updateVBForLightOptimized(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *data, Int x0, Int y0, Int x1, Int y1, Int originX, Int originY, W3DDynamicLight *pLights[], Int numLights);
 	///update vertex buffer vertices inside given rectangle
-	Int updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *data, Int x0, Int y0, Int x1, Int y1, Int originX, Int originY, WorldHeightMap *pMap, RefRenderObjListIterator *pLightsIterator);
+	Int updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *data, Int x0, Int y0, Int x1, Int y1, Int originX, Int originY, WorldHeightMap *pMap);
 	///update vertex buffers associated with the given rectangle
 	void initDestAlphaLUT(void);	///<initialize water depth LUT stored in m_destAlphaTexture
 	void renderTerrainPass(CameraClass *pCamera);	///< renders additional terrain pass.

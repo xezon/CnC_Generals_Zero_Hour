@@ -420,11 +420,7 @@ WorldHeightMap::~WorldHeightMap(void)
 	delete[] m_texelNormals;
 	delete[] m_ambientLights;
 
-	if (m_lightsIterator != NULL)
-	{
-		DEBUG_ASSERTCRASH(W3DDisplay::m_3DScene != NULL, ("Cannot destroy lights iterator if Scene is gone"));
-		W3DDisplay::m_3DScene->destroyLightsIterator(m_lightsIterator);
-	}
+	delete m_lightsIterator;
 }
 
 // TheSuperHackers @todo The light setup currently does a weird round trip from
@@ -616,13 +612,17 @@ WorldHeightMap::WorldHeightMap(ChunkInputStream *pStrm, Bool logicalDataOnly)
 	setupAlphaTiles();
 }
 
+void WorldHeightMap::setStaticLightsIterator(RefRenderObjListIterator *pLightsIterator)
+{
+	if (m_lightsIterator != pLightsIterator)
+	{
+		delete m_lightsIterator;
+		m_lightsIterator = pLightsIterator;
+	}
+}
+
 void WorldHeightMap::initHeightData()
 {
-	if (W3DDisplay::m_3DScene != NULL)
-	{
-		m_lightsIterator = W3DDisplay::m_3DScene->createLightsIterator();
-	}
-
 	m_lightRays = makeLightRays();
 
 	if (!m_UVDataCache)

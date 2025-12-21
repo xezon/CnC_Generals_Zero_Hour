@@ -64,15 +64,15 @@ public:
 	virtual void					On_Frame_Update(void);
 
 	///allocate resources needed to render heightmap
-	virtual int initHeightData(Int width, Int height, WorldHeightMap *pMap, RefRenderObjListIterator *pLightsIterator,Bool updateExtraPassTiles=TRUE);
+	virtual int initHeightData(Int width, Int height, WorldHeightMap *pMap,Bool updateExtraPassTiles=TRUE);
 	virtual Int freeMapResources(void);	///< free resources used to render heightmap
-	virtual void updateCenter(CameraClass *camera, Vector3* cameraPivot, RefRenderObjListIterator *pLightsIterator);
+	virtual void updateCenter(CameraClass *camera, Vector3* cameraPivot);
  	virtual void adjustTerrainLOD(Int adj);
 	virtual void reset(void);
 	virtual void oversizeTerrain(Int tilesToOversize);
 	virtual void staticLightingChanged(void);
-	virtual void doPartialUpdate(const IRegion2D &partialRange, WorldHeightMap *htMap, RefRenderObjListIterator *pLightsIterator);
-  virtual int updateBlock(Int x0, Int y0, Int x1, Int y1, WorldHeightMap *pMap, RefRenderObjListIterator *pLightsIterator){return 0;};
+	virtual void doPartialUpdate(const IRegion2D &partialRange, WorldHeightMap *htMap);
+  virtual int updateBlock(Int x0, Int y0, Int x1, Int y1, WorldHeightMap *pMap){return 0;};
 
 protected:
 	W3DTerrainBackground	*m_tiles;

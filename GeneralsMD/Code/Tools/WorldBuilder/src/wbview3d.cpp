@@ -1578,19 +1578,19 @@ void WbView3d::updateHeightMapInView(WorldHeightMap *htMap, Bool partial, const 
 
 		Int curTicks = ::GetTickCount();
 
-		RefRenderObjListIterator lightListIt(&m_lightList);
 		if (partial) {
-			m_heightMapRenderObj->doPartialUpdate(partialRange, htMap, &lightListIt);
+			m_heightMapRenderObj->doPartialUpdate(partialRange, htMap);
 		} else {
+			htMap->setStaticLightsIterator(NEW RefRenderObjListIterator(&m_lightList));
 			if (m_showEntireMap) {
 				htMap->setDrawOrg(0, 0);
 				htMap->setDrawWidth(htMap->getXExtent());
 				htMap->setDrawHeight(htMap->getYExtent());
-				m_heightMapRenderObj->initHeightData(htMap->getXExtent(), htMap->getYExtent(), htMap, &lightListIt);
+				m_heightMapRenderObj->initHeightData(htMap->getXExtent(), htMap->getYExtent(), htMap);
 			} else {
 				htMap->setDrawWidth(m_partialMapSize);
 				htMap->setDrawHeight(m_partialMapSize);
-				m_heightMapRenderObj->initHeightData(htMap->getDrawWidth(), htMap->getDrawHeight(), htMap, &lightListIt);
+				m_heightMapRenderObj->initHeightData(htMap->getDrawWidth(), htMap->getDrawHeight(), htMap);
 			}
 			m_heightMapRenderObj->updateViewImpassableAreas();
 		}
@@ -2044,12 +2044,11 @@ void WbView3d::redraw(void)
 		}
 		++m_updateCount;
 		Int curTicks = GetTickCount();
-		RefRenderObjListIterator lightListIt(&m_lightList);
 		Vector3 cameraPivot;
 		cameraPivot.X = m_centerPt.X * MAP_XY_FACTOR;
 		cameraPivot.Y = m_centerPt.Y * MAP_XY_FACTOR;
 		cameraPivot.Z = m_heightMapRenderObj ? getHeightAroundPos(m_heightMapRenderObj, cameraPivot.X, cameraPivot.Y) : 0;
-		m_heightMapRenderObj->updateCenter(m_camera, &cameraPivot, &lightListIt);
+		m_heightMapRenderObj->updateCenter(m_camera, &cameraPivot);
 		m_heightMapRenderObj->On_Frame_Update();
 		--m_updateCount;
 

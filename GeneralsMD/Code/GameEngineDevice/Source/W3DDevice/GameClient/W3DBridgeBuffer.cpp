@@ -403,7 +403,7 @@ void W3DBridge::getBridgeInfo(BridgeInfo *pInfo)
 Int W3DBridge::getModelVertices(VertexFormatXYZNDUV1 *destination_vb, Int curVertex, Real xOffset,
 																Vector3 &vec, Vector3 &vecNormal, Vector3 &vecZ, Vector3 &offset,
 																const Matrix3D &mtx,
-																MeshClass *pMesh, RefRenderObjListIterator *pLightsIterator)
+																MeshClass *pMesh)
 {
 	if (pMesh == NULL)
 		return(0);
@@ -472,7 +472,7 @@ Int W3DBridge::getModelVertices(VertexFormatXYZNDUV1 *destination_vb, Int curVer
 /** Gets the vertex values for a section of a fixed bridge.  */
 //=============================================================================
 Int W3DBridge::getModelVerticesFixed(VertexFormatXYZNDUV1 *destination_vb, Int curVertex,
-																const Matrix3D &mtx, MeshClass *pMesh, RefRenderObjListIterator *pLightsIterator)
+																const Matrix3D &mtx, MeshClass *pMesh)
 {
 	if (pMesh == NULL)
 		return(0);
@@ -491,7 +491,7 @@ Int W3DBridge::getModelVerticesFixed(VertexFormatXYZNDUV1 *destination_vb, Int c
 	vecNormal *= m_scale;
 	vecZ *= m_scale;
 	Real xOffset = -m_leftMinX;
-	return(getModelVertices(destination_vb, curVertex, xOffset, vec, vecNormal, vecZ, m_start, mtx, pMesh, pLightsIterator));
+	return(getModelVertices(destination_vb, curVertex, xOffset, vec, vecNormal, vecZ, m_start, mtx, pMesh));
 }
 
 //=============================================================================
@@ -500,7 +500,7 @@ Int W3DBridge::getModelVerticesFixed(VertexFormatXYZNDUV1 *destination_vb, Int c
 /** Gets the index values and vertex values for a bridge.  */
 //=============================================================================
 void W3DBridge::getIndicesNVertices(UnsignedShort *destination_ib, VertexFormatXYZNDUV1 *destination_vb,
-																		Int *curIndexP, Int *curVertexP, RefRenderObjListIterator *pLightsIterator)
+																		Int *curIndexP, Int *curVertexP)
 {
 	Int numI;
 	Int numV;
@@ -509,7 +509,7 @@ void W3DBridge::getIndicesNVertices(UnsignedShort *destination_ib, VertexFormatX
 	m_numVertex = 0;
 	m_numPolygons = 0;
 	if (m_sectionMesh == NULL) {
-		numV = getModelVerticesFixed(destination_vb, *curVertexP, m_leftMtx, m_leftMesh, pLightsIterator);
+		numV = getModelVerticesFixed(destination_vb, *curVertexP, m_leftMtx, m_leftMesh);
 		if (!numV)
 		{	//not enough room for vertices
 			DEBUG_ASSERTCRASH( numV, ("W3DBridge::GetIndicesNVertices(). Vertex overflow.") );
@@ -559,7 +559,7 @@ void W3DBridge::getIndicesNVertices(UnsignedShort *destination_ib, VertexFormatX
 	// Draw the left end.
 	vec /= bridgeLength;
 	numV = getModelVertices(destination_vb, *curVertexP, xOffset, vec, vecNormal, vecZ, m_start,
-		m_leftMtx, m_leftMesh, pLightsIterator);
+		m_leftMtx, m_leftMesh);
 	if (!numV)
 	{	//not enough room for vertices
 		DEBUG_ASSERTCRASH( numV, ("W3DBridge::GetIndicesNVertices(). Vertex overflow.") );
@@ -580,7 +580,7 @@ void W3DBridge::getIndicesNVertices(UnsignedShort *destination_ib, VertexFormatX
 	// draw the spans.
 	for (i=0; i<numSpans; i++) {
 		numV = getModelVertices(destination_vb, *curVertexP, xOffset+i*spanLength, vec, vecNormal, vecZ, m_start,
-			m_sectionMtx, m_sectionMesh, pLightsIterator);
+			m_sectionMtx, m_sectionMesh);
 		if (!numV)
 		{	//not enough room for vertices
 			DEBUG_ASSERTCRASH( numV, ("W3DBridge::GetIndicesNVertices(). Vertex overflow.") );
@@ -600,7 +600,7 @@ void W3DBridge::getIndicesNVertices(UnsignedShort *destination_ib, VertexFormatX
 
 	// Draw the right end.
 	numV = getModelVertices(destination_vb, *curVertexP, xOffset+(numSpans-1)*spanLength, vec, vecNormal, vecZ, m_start,
-		m_rightMtx, m_rightMesh, pLightsIterator);
+		m_rightMtx, m_rightMesh);
 	if (!numV)
 	{	//not enough room for vertices
 		DEBUG_ASSERTCRASH( numV, ("W3DBridge::GetIndicesNVertices(). Vertex overflow.") );
@@ -674,7 +674,7 @@ void W3DBridgeBuffer::cull(CameraClass * camera)
 //=============================================================================
 /** Loads the bridges into the vertex buffer for drawing. */
 //=============================================================================
-void W3DBridgeBuffer::loadBridgesInVertexAndIndexBuffers(RefRenderObjListIterator *pLightsIterator)
+void W3DBridgeBuffer::loadBridgesInVertexAndIndexBuffers()
 {
 	if (!m_indexBridge || !m_vertexBridge || !m_initialized) {
 		return;
@@ -697,7 +697,7 @@ void W3DBridgeBuffer::loadBridgesInVertexAndIndexBuffers(RefRenderObjListIterato
 
 	for (curBridge=0; curBridge<m_numBridges; curBridge++) {
 		m_bridges[curBridge].getIndicesNVertices(ib, vb, &m_curNumBridgeIndices,
-			&m_curNumBridgeVertices, pLightsIterator);
+			&m_curNumBridgeVertices);
 	}
 }
 
@@ -1085,11 +1085,11 @@ void W3DBridgeBuffer::addBridge(Vector3 fromLoc, Vector3 toLoc, AsciiString name
 //=============================================================================
 /** Updates the drawing buffer, based on the camera position. */
 //=============================================================================
-void W3DBridgeBuffer::updateCenter(CameraClass *camera, RefRenderObjListIterator *pLightsIterator)
+void W3DBridgeBuffer::updateCenter(CameraClass *camera)
 {
 	cull(camera);
 	if (m_anythingChanged || m_curNumBridgeIndices == 0) {
-		loadBridgesInVertexAndIndexBuffers(pLightsIterator);
+		loadBridgesInVertexAndIndexBuffers();
 	}
 	m_updateVis = false;
 }
@@ -1128,7 +1128,7 @@ void W3DBridgeBuffer::drawBridges(CameraClass * camera, Bool wireframe, TextureC
 			}
 		}
 		if (changed) {
-			loadBridgesInVertexAndIndexBuffers(NULL);
+			loadBridgesInVertexAndIndexBuffers();
 		}
 	}	else {
 		// In wb, all are enabled.

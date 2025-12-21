@@ -251,7 +251,7 @@ void FlatHeightMapRenderObjClass::oversizeTerrain(Int tilesToOversize)
 The coordinates in partialRange are map cell coordinates, relative to the entire map.
 The vertex coordinates and texture coordinates, as well as static lighting are updated.
 */
-void FlatHeightMapRenderObjClass::doPartialUpdate(const IRegion2D &partialRange, WorldHeightMap *htMap, RefRenderObjListIterator *pLightsIterator)
+void FlatHeightMapRenderObjClass::doPartialUpdate(const IRegion2D &partialRange, WorldHeightMap *htMap)
 {
 	if (htMap) {
 		REF_PTR_SET(m_map, htMap);
@@ -288,10 +288,10 @@ void FlatHeightMapRenderObjClass::releaseTiles(void)
 Also allocates all rendering resources such as vertex buffers, index buffers,
 shaders, and materials.*/
 //=============================================================================
-Int FlatHeightMapRenderObjClass::initHeightData(Int x, Int y, WorldHeightMap *pMap, RefRenderObjListIterator *pLightsIterator, Bool updateExtraPassTiles)
+Int FlatHeightMapRenderObjClass::initHeightData(Int x, Int y, WorldHeightMap *pMap, Bool updateExtraPassTiles)
 {
 
-	BaseHeightMapRenderObjClass::initHeightData(x, y, pMap, pLightsIterator);
+	BaseHeightMapRenderObjClass::initHeightData(x, y, pMap);
 
 	Int width = (pMap->getXExtent()+CELLS_PER_TILE-2)/CELLS_PER_TILE;
 	Int height = (pMap->getYExtent()+CELLS_PER_TILE-2)/CELLS_PER_TILE;
@@ -404,13 +404,13 @@ rendered portion of the terrain.  Only a 96x96 section is rendered at any time,
 even though maps can be up to 1024x1024.  This function determines which subset
 is rendered. */
 //=============================================================================
-void FlatHeightMapRenderObjClass::updateCenter(CameraClass *camera, Vector3* cameraPivot, RefRenderObjListIterator *pLightsIterator)
+void FlatHeightMapRenderObjClass::updateCenter(CameraClass *camera, Vector3* cameraPivot)
 {
 #ifdef DO_UNIT_TIMINGS
 #pragma MESSAGE("*** WARNING *** DOING DO_UNIT_TIMINGS!!!!")
 	return;
 #endif
-	BaseHeightMapRenderObjClass::updateCenter(camera, cameraPivot, pLightsIterator);
+	BaseHeightMapRenderObjClass::updateCenter(camera, cameraPivot);
 	m_needFullUpdate = false;
 	Int i, j;
 	Int culled = 0;
