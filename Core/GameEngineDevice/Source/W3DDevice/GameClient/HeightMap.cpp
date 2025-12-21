@@ -300,8 +300,6 @@ mapped into this VB.
 //=============================================================================
 Int HeightMapRenderObjClass::updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *data, Int x0, Int y0, Int x1, Int y1, Int originX, Int originY, WorldHeightMap *pMap)
 {
-	Int i, j;
-	Int xCoord, yCoord;
 	constexpr const Int vertsPerRow=(VERTEX_BUFFER_TILE_LENGTH)*4;	//vertices per row of VB
 	constexpr const Int cellOffset = 1;
 
@@ -319,6 +317,7 @@ Int HeightMapRenderObjClass::updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *
 		// At the bottom, we will copy the final vertex data for one cell into the
 		// hardware vertex buffer.
 
+		Int i, j;
 		for (j=y0; j<y1; j++)
 		{
 			VERTEX_FORMAT *vb = vBase;
@@ -326,12 +325,14 @@ Int HeightMapRenderObjClass::updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *
 			vb += (x0-originX)*4;		//skip to correct vertex in row.
 
 			const Int mapY = getYWithOrigin(j);
-			yCoord = mapY+pMap->getDrawOrgY();
+			const Int yCoord = mapY+pMap->getDrawOrgY();
+			const Int downYCoord = min(yCoord+cellOffset, pMap->getYExtent()-cellOffset);
 
 			for (i=x0; i<x1; i++)
 			{
 				const Int mapX = getXWithOrigin(i);
-				xCoord = mapX+pMap->getDrawOrgX();
+				const Int xCoord = mapX+pMap->getDrawOrgX();
+				const Int rightXCoord = min(xCoord+cellOffset, pMap->getXExtent()-cellOffset);
 
 				//update the 4 vertices in this block
 				float U[4], V[4];
@@ -343,11 +344,9 @@ Int HeightMapRenderObjClass::updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *
 				pMap->getPrecomputedAlphaUVData(xCoord, yCoord, UA, VA, alpha, &flipForBlend);
 
 				//top-left sample
-				vb->x=xCoord;
-				vb->y=yCoord;
-				vb->z=  ((float)pMap->getDisplayHeight(mapX, mapY))*MAP_HEIGHT_SCALE;
-				vb->x = ADJUST_FROM_INDEX_TO_REAL(vb->x);
-				vb->y = ADJUST_FROM_INDEX_TO_REAL(vb->y);
+				vb->z = (float)pMap->getQuickHeight(xCoord, yCoord) * MAP_HEIGHT_SCALE;
+				vb->x = ADJUST_FROM_INDEX_TO_REAL(xCoord);
+				vb->y = ADJUST_FROM_INDEX_TO_REAL(yCoord);
 				vb->u1=U[0];
 				vb->v1=V[0];
 				vb->u2=UA[0];
@@ -355,11 +354,9 @@ Int HeightMapRenderObjClass::updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *
 				vb++;
 
 				//top-right sample
-				vb->x=xCoord+cellOffset;
-				vb->y=yCoord;
-				vb->z=  ((float)pMap->getDisplayHeight(mapX+cellOffset, mapY))*MAP_HEIGHT_SCALE;
-				vb->x = ADJUST_FROM_INDEX_TO_REAL(vb->x);
-				vb->y = ADJUST_FROM_INDEX_TO_REAL(vb->y);
+				vb->z = (float)pMap->getQuickHeight(rightXCoord, yCoord) * MAP_HEIGHT_SCALE;
+				vb->x = ADJUST_FROM_INDEX_TO_REAL(xCoord+cellOffset);
+				vb->y = ADJUST_FROM_INDEX_TO_REAL(yCoord);
 				vb->u1=U[1];
 				vb->v1=V[1];
 				vb->u2=UA[1];
@@ -367,15 +364,9 @@ Int HeightMapRenderObjClass::updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *
 				vb++;
 
 				//bottom-right sample
-				vb->x=xCoord+cellOffset;
-				if (yCoord + 1 == pMap->getDrawOrgY() + m_y - 1) {
-					vb->y=yCoord+1;
-				} else {
-					vb->y=yCoord+cellOffset;
-				}
-				vb->z=  ((float)pMap->getDisplayHeight(mapX+cellOffset, mapY+cellOffset))*MAP_HEIGHT_SCALE;
-				vb->x = ADJUST_FROM_INDEX_TO_REAL(vb->x);
-				vb->y = ADJUST_FROM_INDEX_TO_REAL(vb->y);
+				vb->z = (float)pMap->getQuickHeight(rightXCoord, downYCoord) * MAP_HEIGHT_SCALE;
+				vb->x = ADJUST_FROM_INDEX_TO_REAL(xCoord+cellOffset);
+				vb->y = ADJUST_FROM_INDEX_TO_REAL(yCoord+cellOffset);
 				vb->u1=U[2];
 				vb->v1=V[2];
 				vb->u2=UA[2];
@@ -383,20 +374,9 @@ Int HeightMapRenderObjClass::updateVB(DX8VertexBufferClass	*pVB, VERTEX_FORMAT *
 				vb++;
 
 				//bottom-left sample
-				if (xCoord == pMap->getDrawOrgX()) {
-					vb->x=xCoord;
-					//if (vb->x < 0) vb->x = 0;
-				} else {
-					vb->x=xCoord;
-				}
-				if (yCoord + 1 == pMap->getDrawOrgY() + m_y - 1) {
-					vb->y=yCoord+1;
-				} else {
-					vb->y=yCoord+cellOffset;
-				}
-				vb->z=  ((float)pMap->getDisplayHeight(mapX, mapY+cellOffset))*MAP_HEIGHT_SCALE;
-				vb->x = ADJUST_FROM_INDEX_TO_REAL(vb->x);
-				vb->y = ADJUST_FROM_INDEX_TO_REAL(vb->y);
+				vb->z = (float)pMap->getQuickHeight(xCoord, downYCoord) * MAP_HEIGHT_SCALE;
+				vb->x = ADJUST_FROM_INDEX_TO_REAL(xCoord);
+				vb->y = ADJUST_FROM_INDEX_TO_REAL(yCoord+cellOffset);
 				vb->u1=U[3];
 				vb->v1=V[3];
 				vb->u2=UA[3];
