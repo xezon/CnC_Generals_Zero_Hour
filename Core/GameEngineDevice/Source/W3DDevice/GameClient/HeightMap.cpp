@@ -963,7 +963,7 @@ void HeightMapRenderObjClass::adjustTerrainLOD(Int adj)
 	if (m_shroud)
 		m_shroud->reset();	//need reset here since initHeightData will load new shroud.
 	this->initHeightData(m_map->getDrawWidth(),
-											m_map->getDrawHeight(), m_map, NULL);
+											m_map->getDrawHeight(), m_map, FALSE);
 	staticLightingChanged();
 	if (TheTacticalView) {
 		TheTacticalView->forceRedraw();

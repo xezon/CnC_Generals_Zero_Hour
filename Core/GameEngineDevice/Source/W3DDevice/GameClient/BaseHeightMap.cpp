@@ -363,7 +363,7 @@ void BaseHeightMapRenderObjClass::adjustTerrainLOD(Int adj)
 		newROBJ->initHeightData( m_map->getDrawWidth(),
 																					 m_map->getDrawHeight(),
 																					 m_map,
-																					 NULL);
+																					 FALSE);
 		TheTerrainRenderObject = newROBJ;
 		newROBJ->staticLightingChanged();
 		newROBJ->m_roadBuffer->loadRoads();
@@ -447,7 +447,7 @@ void BaseHeightMapRenderObjClass::ReAcquireResources(void)
 
 	if (m_map)
 	{
-		this->initHeightData(m_x,m_y,m_map, NULL);
+		this->initHeightData(m_x, m_y, m_map, FALSE);
 		// Tell lights to update next time through.
 		m_needFullUpdate = true;
 	}
