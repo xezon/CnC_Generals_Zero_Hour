@@ -1128,16 +1128,8 @@ Int HeightMapRenderObjClass::initHeightData(Int x, Int y, WorldHeightMap *pMap, 
 		//Get number of vertex buffers needed to hold current map
 		//First round dimensions to next multiple of VERTEX_BUFFER_TILE_LENGTH since that's our
 		//block size
-		m_numVBTilesX=1;
-		for (i=VERTEX_BUFFER_TILE_LENGTH+1; i<x;)
-		{	i+=VERTEX_BUFFER_TILE_LENGTH;
-			m_numVBTilesX++;
-		}
-		m_numVBTilesY=1;
-		for (j=VERTEX_BUFFER_TILE_LENGTH+1; j<y;)
-		{	j+=VERTEX_BUFFER_TILE_LENGTH;
-			m_numVBTilesY++;
-		}
+		m_numVBTilesX = (x + VERTEX_BUFFER_TILE_LENGTH - 2) / VERTEX_BUFFER_TILE_LENGTH;
+		m_numVBTilesY = (y + VERTEX_BUFFER_TILE_LENGTH - 2) / VERTEX_BUFFER_TILE_LENGTH;
 
 		m_numBlockColumnsInLastVB=(x-1)%VERTEX_BUFFER_TILE_LENGTH;	//right border within last VB
 		m_numBlockRowsInLastVB=(y-1)%VERTEX_BUFFER_TILE_LENGTH;	//bottom border within last VB
