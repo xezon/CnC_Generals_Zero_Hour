@@ -138,6 +138,8 @@ void HeightMapRenderObjClass::freeIndexVertexBuffers(void)
 	delete[] m_vertexBufferBackup;
 	m_vertexBufferBackup = NULL;
 
+	m_numVBTilesX = 0;
+	m_numVBTilesY = 0;
 	m_numVertexBufferTiles = 0;
 }
 
@@ -1031,7 +1033,7 @@ void HeightMapRenderObjClass::resizeTerrain(Int width, Int height)
 
 	Int dx = width-m_map->getDrawWidth();
 	Int dy = height-m_map->getDrawHeight();
- 	m_map->setDrawWidth(width);
+	m_map->setDrawWidth(width);
 	m_map->setDrawHeight(height);
 	dx /= 2;
 	dy /= 2;
@@ -1042,10 +1044,10 @@ void HeightMapRenderObjClass::resizeTerrain(Int width, Int height)
 	m_map->setDrawOrg(newOrgX,newOrgy);
 	m_originX = 0;
 	m_originY = 0;
+
 	if (m_shroud)
 		m_shroud->reset();
-	//delete m_shroud;
-	//m_shroud = NULL;
+
 	m_needFullUpdate = true;
 	initHeightData(m_map->getDrawWidth(), m_map->getDrawHeight(), m_map, FALSE);
 }
@@ -1511,9 +1513,7 @@ void HeightMapRenderObjClass::updateCenter(CameraClass *camera, Vector3* cameraP
 
 	// determine the ray corresponding to the camera and distance to projection plane
 	const Matrix3D& camera_matrix = camera->Get_Transform();
-
 	Vector3 camera_location  = camera->Get_Position();
-
 	Vector3 rayLocation;
 	Vector3 rayDirection;
 	Vector3 rayDirectionPt;
@@ -1523,7 +1523,6 @@ void HeightMapRenderObjClass::updateCenter(CameraClass *camera, Vector3* cameraP
 	const ViewportClass &viewport = camera->Get_Viewport();
 	Int i, j, minHt;
 
-	Real intersectionZ;
 	minHt = m_map->getMaxHeightValue();
 	for (j=0; j<m_y; j+=4) {
 		for (i=0; i<m_x; i+=4) {
@@ -1531,7 +1530,7 @@ void HeightMapRenderObjClass::updateCenter(CameraClass *camera, Vector3* cameraP
 			if (cur<minHt) minHt = cur;
 		}
 	}
-	intersectionZ = (float)minHt;
+	Real intersectionZ = (Real)minHt;
 	//float aspect = camera->Get_Aspect_Ratio();
 
 	Vector2 min,max;

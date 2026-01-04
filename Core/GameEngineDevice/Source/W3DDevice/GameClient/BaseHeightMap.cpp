@@ -2385,6 +2385,7 @@ void BaseHeightMapRenderObjClass::updateCenter(CameraClass *camera, Vector3* cam
 	if (m_updating) {
 		return;
 	}
+	m_updating = true;
 
 	if (m_treeBuffer) {
 		m_treeBuffer->doFullUpdate();	// Tell the trees to update for view change.
@@ -2392,7 +2393,6 @@ void BaseHeightMapRenderObjClass::updateCenter(CameraClass *camera, Vector3* cam
 	if (m_propBuffer) {
 		m_propBuffer->doFullUpdate();	// Tell the trees to update for view change.
 	}
-	m_updating = true;
 #ifdef DO_ROADS
 	if (m_roadBuffer) {
 		m_roadBuffer->updateCenter();
@@ -2400,9 +2400,6 @@ void BaseHeightMapRenderObjClass::updateCenter(CameraClass *camera, Vector3* cam
 #endif
 	if (m_needFullUpdate) {
 		m_bridgeBuffer->doFullUpdate();
-		m_bridgeBuffer->updateCenter(camera);
-		m_updating = false;
-		return;
 	}
 	m_bridgeBuffer->updateCenter(camera);
 	m_updating = false;
