@@ -69,7 +69,8 @@ public:
 	virtual void updateCenter(CameraClass *camera, Vector3* cameraPivot);
  	virtual void adjustTerrainLOD(Int adj);
 	virtual void reset(void);
-	virtual void oversizeTerrain(Int tilesToOversize);
+	virtual void oversizeTerrain(Int tilesToOversize); ///< Oversize the visible terrain area
+	virtual void resizeTerrain(Int width, Int height); ///< Resize the visible terrain area
 	virtual void staticLightingChanged(void);
 	virtual void doPartialUpdate(const IRegion2D &partialRange, WorldHeightMap *htMap);
   virtual int updateBlock(Int x0, Int y0, Int x1, Int y1, WorldHeightMap *pMap){return 0;};

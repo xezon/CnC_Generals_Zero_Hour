@@ -80,7 +80,8 @@ public:
 	virtual void reset(void);
 	virtual void doPartialUpdate(const IRegion2D &partialRange, WorldHeightMap *htMap);
 
-	virtual void oversizeTerrain(Int tilesToOversize);
+	virtual void oversizeTerrain(Int tilesToOversize); ///< Oversize the visible terrain area
+	virtual void resizeTerrain(Int width, Int height); ///< Resize the visible terrain area
 
 	virtual int updateBlock(Int x0, Int y0, Int x1, Int y1, WorldHeightMap *pMap);
 

@@ -1353,18 +1353,6 @@ Bool BaseHeightMapRenderObjClass::evaluateAsVisibleCliff(Int xIndex, Int yIndex,
 }
 
 //=============================================================================
-// BaseHeightMapRenderObjClass::oversizeTerrain
-//=============================================================================
-/** Sets the terrain oversize amount. */
-//=============================================================================
-void BaseHeightMapRenderObjClass::oversizeTerrain(Int tilesToOversize)
-{
-	// Not needed with flat version. [3/20/2003]
-}
-
-
-
-//=============================================================================
 // BaseHeightMapRenderObjClass::Get_Obj_Space_Bounding_Sphere
 //=============================================================================
 /** WW3D method that returns object bounding sphere used in frustum culling*/

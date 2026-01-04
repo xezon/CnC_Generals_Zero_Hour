@@ -1010,7 +1010,8 @@ void HeightMapRenderObjClass::oversizeTerrain(Int tilesToOversize)
 {
 	Int width = WorldHeightMap::NORMAL_DRAW_WIDTH;
 	Int height = WorldHeightMap::NORMAL_DRAW_HEIGHT;
-	if (tilesToOversize>0 && tilesToOversize<5)
+
+	if (tilesToOversize>0)
 	{
 		width += VERTEX_BUFFER_TILE_LENGTH * tilesToOversize;
 		height += VERTEX_BUFFER_TILE_LENGTH * tilesToOversize;
@@ -1019,6 +1020,15 @@ void HeightMapRenderObjClass::oversizeTerrain(Int tilesToOversize)
 		if (height>m_map->getYExtent())
 			height = m_map->getYExtent();
 	}
+
+	resizeTerrain(width, height);
+}
+
+void HeightMapRenderObjClass::resizeTerrain(Int width, Int height)
+{
+	if (width == m_map->getDrawWidth() && height == m_map->getDrawHeight())
+		return;
+
 	Int dx = width-m_map->getDrawWidth();
 	Int dy = height-m_map->getDrawHeight();
  	m_map->setDrawWidth(width);
@@ -1485,11 +1495,20 @@ void HeightMapRenderObjClass::updateCenter(CameraClass *camera, Vector3* cameraP
 		return; // no need to center.
 	}
 
-	constexpr const Int cellOffset = 1;
+	const Vector3 lookatVector = *cameraPivot - camera->Get_Position();
+	const Real cameraPitch = WWMath::Asin(fabs(lookatVector.Z) / lookatVector.Length());
+	Int newOrgX;
+	Int newOrgY;
 
-#define ORIGINAL_CODE 1
+	if (cameraPitch > DEG_TO_RADF(37.0f))
+	{
+	// TheSuperHackers @info This is the original code to determine the center position for the visible terrain area.
+	// It is relatively expensive and breaks when the frustum planes can longer intersect with the terrain at low camera
+	// pitch or when the camera is too far from the terrain, but it is very accurate when the camera is close to the
+	// terrain. For now, we prefer to keep this code for the original camera pitch and above.
 
-#if ORIGINAL_CODE
+	resizeTerrain(WorldHeightMap::NORMAL_DRAW_WIDTH, WorldHeightMap::NORMAL_DRAW_HEIGHT);
+
 	// determine the ray corresponding to the camera and distance to projection plane
 	const Matrix3D& camera_matrix = camera->Get_Transform();
 
@@ -1576,101 +1595,33 @@ void HeightMapRenderObjClass::updateCenter(CameraClass *camera, Vector3* cameraP
 		limit=WIDE_STEP/2;
 	}
 	calcVis(frustum, m_map, minX-WIDE_STEP/2, minY-WIDE_STEP/2, maxX+WIDE_STEP/2, maxY+WIDE_STEP/2, limit);
-#endif
 
+	newOrgX = (visMaxX+visMinX)/2 - m_x/2;
+	newOrgY = (visMaxY+visMinY)/2 - m_y/2;
+	}
+	else
+	{
+		// TheSuperHackers @tweak xezon 31/12/2025 Increases visible terrain area when lowering the camera pitch.
+		// Note: The default camera pitch in Generals was 37.5, which we prefer to keep the normal draw size for.
+		resizeTerrain(WorldHeightMap::LOW_ANGLE_DRAW_WIDTH, WorldHeightMap::LOW_ANGLE_DRAW_HEIGHT);
 
-
-	if (m_map) {
-
-		Int newOrgX;
-		Int newOrgY;
-
-
-
-#if ORIGINAL_CODE
-		if (visMaxX-visMinX > m_x) {
-			newOrgX = (maxX+minX)/2 - m_x/2.0;
-		} else {
-			newOrgX = (visMaxX+visMinX)/2 - m_x/2.0;
-		}
-
-		if (visMaxY - visMinY > m_y) {
-			newOrgY = visMinY+1;
-		}	else {
-			newOrgY = (visMaxY+visMinY)/2 - m_y/2.0;
-		}
-
-		if (TheTacticalView->getFieldOfView() != 0) {
-			newOrgX = (visMaxX+visMinX)/2 - m_x/2.0;
-			newOrgY = (visMaxY+visMinY)/2 - m_y/2.0;
-		}
-#endif
-
-
-#if 0
-		//  1-------2
-		//   \     /
-		//    4---3
-		Coord3D box[4];
-		W3DViewCornersToWorldAtZ(box[0], box[1], box[2], box[3], *camera, m_map->getMinHeightValue() /*cameraPivot->Z*/);
-		//const Real viewRegion = 1.0f;
-		//W3DViewPointToWorldAtZ(box[0], *camera, Vector2(-viewRegion, viewRegion), cameraPivot->Z);
-		//W3DViewPointToWorldAtZ(box[1], *camera, Vector2(viewRegion, viewRegion), cameraPivot->Z);
-		//W3DViewPointToWorldAtZ(box[2], *camera, Vector2(viewRegion, -viewRegion), cameraPivot->Z);
-		//W3DViewPointToWorldAtZ(box[3], *camera, Vector2(-viewRegion, -viewRegion), cameraPivot->Z);
-
-		//  +-------+
-		//  |       |
-		//  +-------+
-		Region3D bbox;
-		bbox.setFromPointsNoZ(box, ARRAY_SIZE(box));
-		bbox.lo.z = cameraPivot->Z;
-		bbox.hi.z = cameraPivot->Z;
-
-		const Coord3D bboxCenter = bbox.getCenter();
-
-		newOrgX = WWMath::Round(bboxCenter.x/MAP_XY_FACTOR) - m_x/2 + m_map->getBorderSizeInline();
-		newOrgY = WWMath::Round(bboxCenter.y/MAP_XY_FACTOR) - m_y/2 + m_map->getBorderSizeInline();
-#elif 0
-		//Coord3D box[4];
-		//W3DViewCornersToWorldAtZ(box[0], box[1], box[2], box[3], *camera, m_map->getMinHeightValue());
-
-		//Region3D bbox;
-		//bbox.setFromPointsNoZ(box, ARRAY_SIZE(box));
-		//bbox.lo.z = cameraPivot->Z;
-		//bbox.hi.z = cameraPivot->Z;
-		//const Coord3D bboxCenter = bbox.getCenter();
-
-
-		//Vector2 shift1;
-		//shift1.X = bboxCenter.x - cameraPivot->X;
-		//shift1.Y = bboxCenter.y - cameraPivot->Y;
-		//shift1.X *= 1.0f - viewDir.X;
-		//shift1.Y *= 1.0f - viewDir.Y;
-
-		// TheSuperHackers @fix Very fast approximation.
-		// Works perfectly with top down view, good enough with regular view and alright with ground view.
-		// If drawn terrain area is not large enough, can increase NORMAL_DRAW_WIDTH, NORMAL_DRAW_HEIGHT.
+		// TheSuperHackers @fix Very fast approximation. Works well for all camera pitches, but is less accurate
+		// than the original implementation. Using the fast approximation for higher camera pitch would also
+		// require to increase the normal draw width by at least one tile length.
 		const Real visibleTerrainEdgeLen = (m_x+m_y)/2 * MAP_XY_FACTOR;
-		const Real magicEdgeLenScale = 0.25f;
-		Vector3 viewDir = *cameraPivot - camera->Get_Position();
+		const Real magicEdgeLenScale = 0.25f * visibleTerrainEdgeLen;
+		Vector3 viewDir = lookatVector;
 		viewDir.Normalize();
 		Vector2 shiftPivot;
-		shiftPivot.X = viewDir.X * visibleTerrainEdgeLen * magicEdgeLenScale;
-		shiftPivot.Y = viewDir.Y * visibleTerrainEdgeLen * magicEdgeLenScale;
+		shiftPivot.X = viewDir.X * magicEdgeLenScale;
+		shiftPivot.Y = viewDir.Y * magicEdgeLenScale;
+
 		newOrgX = WWMath::Round((cameraPivot->X + shiftPivot.X)/MAP_XY_FACTOR) - m_x/2 + m_map->getBorderSizeInline();
 		newOrgY = WWMath::Round((cameraPivot->Y + shiftPivot.Y)/MAP_XY_FACTOR) - m_y/2 + m_map->getBorderSizeInline();
-#elif 0
-		const Real visibleTerrainEdgeLen = (m_x+m_y)/2 * MAP_XY_FACTOR;
-		const Real edgeLenScale = 0.25f;
-		Vector3 viewDir = *cameraPivot - camera->Get_Position();
-		viewDir.Normalize();
-		Vector2 shift2;
-		shift2.X = cameraPivot->X + viewDir.X * visibleTerrainEdgeLen * edgeLenScale;
-		shift2.Y = cameraPivot->Y + viewDir.Y * visibleTerrainEdgeLen * edgeLenScale;
-		newOrgX = WWMath::Round(shift2.X/MAP_XY_FACTOR) - m_x/2 + m_map->getBorderSizeInline();
-		newOrgY = WWMath::Round(shift2.Y/MAP_XY_FACTOR) - m_y/2 + m_map->getBorderSizeInline();
-#endif
+	}
+
+	{
+		constexpr const Int cellOffset = 1;
 
 		Int deltaX = newOrgX - m_map->getDrawOrgX();
 		Int deltaY = newOrgY - m_map->getDrawOrgY();

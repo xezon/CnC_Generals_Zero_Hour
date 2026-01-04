@@ -124,7 +124,8 @@ public:
  	virtual void adjustTerrainLOD(Int adj);
 	virtual void doPartialUpdate(const IRegion2D &partialRange, WorldHeightMap *htMap) = 0;
 	virtual void staticLightingChanged(void);
-	virtual void oversizeTerrain(Int tilesToOversize);
+	virtual void oversizeTerrain(Int tilesToOversize) = 0; ///< Oversize the visible terrain area
+	virtual void resizeTerrain(Int width, Int height) = 0; ///< Resize the visible terrain area
 	virtual void reset(void);
 
   void redirectToHeightmap( WorldHeightMap *pMap )
