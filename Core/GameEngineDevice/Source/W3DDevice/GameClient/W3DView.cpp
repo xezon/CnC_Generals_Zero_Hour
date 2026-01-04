@@ -775,10 +775,16 @@ void W3DView::setCameraTransform( void )
 	}
 	else
 	{
-		// TheSuperHackers @tweak Now extends far Z for low pitch because more of the world needs to be rendered then.
-		if ((TheGlobalData->m_drawEntireTerrain) || (m_FXPitch < 0.95f || m_zoom > 1.05f || m_pitch < DEG_TO_RADF(37.0f)))
-		{	//need to extend far clip plane so entire terrain can be visible
+		if ((TheGlobalData->m_drawEntireTerrain) || (m_FXPitch < 0.95f || m_zoom > 1.05f))
+		{
+			//need to extend far clip plane so entire terrain can be visible
 			farZ = 1200.0f * MAP_XY_FACTOR;
+		}
+		else if (m_pitch < DEG_TO_RADF(37.0f))
+		{
+			// TheSuperHackers @tweak Need to extend far Z for low pitch because more of the world needs to be rendered.
+			static_assert(WorldHeightMap::LOW_ANGLE_DRAW_WIDTH == WorldHeightMap::LOW_ANGLE_DRAW_HEIGHT, "Expects squared draw area");
+			farZ = (WorldHeightMap::LOW_ANGLE_DRAW_HEIGHT * 0.90f) * MAP_XY_FACTOR;
 		}
 	}
 
