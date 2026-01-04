@@ -79,6 +79,7 @@
 #include "W3DDevice/Common/W3DCameraUtility.h"
 #include "W3DDevice/Common/W3DConvert.h"
 #include "W3DDevice/GameClient/HeightMap.h"
+#include "W3DDevice/GameClient/WorldHeightMap.h"
 #include "W3DDevice/GameClient/W3DAssetManager.h"
 #include "W3DDevice/GameClient/W3DDisplay.h"
 #include "W3DDevice/GameClient/W3DScene.h"
@@ -761,8 +762,9 @@ void W3DView::setCameraTransform( void )
 	// m_3DCamera->Get_Clip_Planes(nearZ, farZ);
 	// Set the near to MAP_XY_FACTOR.  Improves zbuffer resolution.
 	nearZ = MAP_XY_FACTOR;
-	// TheSuperHackers @tweak Extends initial far Z from 1200 because that was not enough at default pitch 37.5
-	farZ = 1300.0f;
+	// TheSuperHackers @bugfix Extends initial far Z from 1200 because that is not enough at default pitch 37.5
+	static_assert(WorldHeightMap::NORMAL_DRAW_WIDTH == WorldHeightMap::NORMAL_DRAW_HEIGHT, "Expects squared draw area");
+	farZ = (WorldHeightMap::NORMAL_DRAW_WIDTH * 1.08f) * MAP_XY_FACTOR;
 
 	if (m_useRealZoomCam)	//WST 10.19.2002
 	{
