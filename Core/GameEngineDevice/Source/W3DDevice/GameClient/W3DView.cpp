@@ -109,10 +109,7 @@ Real TheW3DFrameLengthInMsec = MSEC_PER_LOGICFRAME_REAL; // default is 33msec/fr
 static const Int MAX_REQUEST_CACHE_SIZE = 40;	// Any size larger than 10, or examine code below for changes. jkmcd.
 static const Real DRAWABLE_OVERSCAN = 75.0f;  ///< 3D world coords of how much to overscan in the 3D screen region
 
-
-
-
-
+constexpr const Real NearZ = MAP_XY_FACTOR; ///< Set the near to MAP_XY_FACTOR. Improves z buffer resolution.
 
 //=================================================================================================
 inline Real minf(Real a, Real b) { if (a < b) return a; else return b; }
@@ -127,7 +124,7 @@ static void normAngle(Real &angle)
 }
 
 #define TERRAIN_SAMPLE_SIZE 40.0f
-Real W3DView::getHeightAroundPos(Real x, Real y) const
+Real W3DView::getHeightAroundPos(Real x, Real y, Real terrainSampleSize) const
 {
 	Real terrainHeight = TheTerrainLogic->getGroundHeight(x, y);
 
@@ -147,19 +144,19 @@ Real W3DView::getHeightAroundPos(Real x, Real y) const
 		// (-x)   0    (x)
 		//                
 		//       (x)      
-		terrainHeight += TheTerrainLogic->getGroundHeight(x+TERRAIN_SAMPLE_SIZE, y-TERRAIN_SAMPLE_SIZE);
-		terrainHeight += TheTerrainLogic->getGroundHeight(x-TERRAIN_SAMPLE_SIZE, y-TERRAIN_SAMPLE_SIZE);
-		terrainHeight += TheTerrainLogic->getGroundHeight(x+TERRAIN_SAMPLE_SIZE, y+TERRAIN_SAMPLE_SIZE);
-		terrainHeight += TheTerrainLogic->getGroundHeight(x-TERRAIN_SAMPLE_SIZE, y+TERRAIN_SAMPLE_SIZE);
+		terrainHeight += TheTerrainLogic->getGroundHeight(x+terrainSampleSize, y-terrainSampleSize);
+		terrainHeight += TheTerrainLogic->getGroundHeight(x-terrainSampleSize, y-terrainSampleSize);
+		terrainHeight += TheTerrainLogic->getGroundHeight(x+terrainSampleSize, y+terrainSampleSize);
+		terrainHeight += TheTerrainLogic->getGroundHeight(x-terrainSampleSize, y+terrainSampleSize);
 		terrainHeight /= 5;
 	}
 	else
 	{
 		// find best approximation of max terrain height we can see
-		terrainHeight = max(terrainHeight, TheTerrainLogic->getGroundHeight(x+TERRAIN_SAMPLE_SIZE, y-TERRAIN_SAMPLE_SIZE));
-		terrainHeight = max(terrainHeight, TheTerrainLogic->getGroundHeight(x-TERRAIN_SAMPLE_SIZE, y-TERRAIN_SAMPLE_SIZE));
-		terrainHeight = max(terrainHeight, TheTerrainLogic->getGroundHeight(x+TERRAIN_SAMPLE_SIZE, y+TERRAIN_SAMPLE_SIZE));
-		terrainHeight = max(terrainHeight, TheTerrainLogic->getGroundHeight(x-TERRAIN_SAMPLE_SIZE, y+TERRAIN_SAMPLE_SIZE));
+		terrainHeight = max(terrainHeight, TheTerrainLogic->getGroundHeight(x+terrainSampleSize, y-terrainSampleSize));
+		terrainHeight = max(terrainHeight, TheTerrainLogic->getGroundHeight(x-terrainSampleSize, y-terrainSampleSize));
+		terrainHeight = max(terrainHeight, TheTerrainLogic->getGroundHeight(x+terrainSampleSize, y+terrainSampleSize));
+		terrainHeight = max(terrainHeight, TheTerrainLogic->getGroundHeight(x-terrainSampleSize, y+terrainSampleSize));
 	}
 
 	return terrainHeight;
@@ -383,12 +380,8 @@ void W3DView::buildCameraPosition( Vector3& sourcePos, Vector3& targetPos )
 //-------------------------------------------------------------------------------------------------
 /** @todo This is inefficient. We should construct the matrix directly using vectors. */
 //-------------------------------------------------------------------------------------------------
-void W3DView::buildCameraTransform( Matrix3D *transform )
+void W3DView::buildCameraTransform( Matrix3D *transform, const Vector3 &sourcePos, const Vector3 &targetPos )
 {
-	Vector3 sourcePos;
-	Vector3 targetPos;
-	buildCameraPosition(sourcePos, targetPos);
-
 	//m_3DCamera->Set_View_Plane(DEG_TO_RADF(50.0f));
 	//DEBUG_LOG(("zoom %f, SourceZ %f, posZ %f, groundLevel %f CamOffZ %f",
 	//			zoom, sourcePos.Z, pos.z, groundLevel,m_cameraOffset.z));
@@ -574,8 +567,11 @@ void W3DView::calcCameraAreaConstraints()
 		TheTerrainLogic->getExtent( &mapRegion );
 
 		// Update the 3D camera before using its transform to calculate the constraints with.
+		Vector3 sourcePos;
+		Vector3 targetPos;
+		buildCameraPosition(sourcePos, targetPos);
 		Matrix3D cameraTransform;
-		buildCameraTransform(&cameraTransform);
+		buildCameraTransform(&cameraTransform, sourcePos, targetPos);
 
 		// TheSuperHackers @fix Rotate the camera away from low pitch to prevent the offset from becoming too large.
 		// Note: Camera forward is -z instead of y, because the matrix was created by Matrix3D::Look_At and is not regular.
@@ -758,13 +754,9 @@ void W3DView::setCameraTransform( void )
 
 	m_cameraHasMovedSinceRequest = true;
 
-	Real nearZ, farZ;
-	// m_3DCamera->Get_Clip_Planes(nearZ, farZ);
-	// Set the near to MAP_XY_FACTOR.  Improves zbuffer resolution.
-	nearZ = MAP_XY_FACTOR;
 	// TheSuperHackers @bugfix Extends initial far Z from 1200 because that is not enough at default pitch 37.5
 	static_assert(WorldHeightMap::NORMAL_DRAW_WIDTH == WorldHeightMap::NORMAL_DRAW_HEIGHT, "Expects squared draw area");
-	farZ = (WorldHeightMap::NORMAL_DRAW_WIDTH * 1.08f) * MAP_XY_FACTOR;
+	Real farZ = (WorldHeightMap::NORMAL_DRAW_WIDTH * 1.08f) * MAP_XY_FACTOR;
 
 	if (m_useRealZoomCam)	//WST 10.19.2002
 	{
@@ -788,14 +780,28 @@ void W3DView::setCameraTransform( void )
 		}
 	}
 
-	m_3DCamera->Set_Clip_Planes(nearZ, farZ);
+	m_3DCamera->Set_Clip_Planes(NearZ, farZ);
 
 #if defined(RTS_DEBUG)
 	m_3DCamera->Set_View_Plane( m_FOV, -1 );
 #endif
 
+	Vector3 sourcePos;
+	Vector3 targetPos;
+	buildCameraPosition(sourcePos, targetPos);
+
+	// TheSuperHackers @bugfix Always move camera above the terrain.
+	const Real minAcceptableCameraHeight = getHeightAroundPos(sourcePos.X, sourcePos.Y, 10.0f) + NearZ;
+	if (sourcePos.Z < minAcceptableCameraHeight)
+	{
+		const Real repositionZ = minAcceptableCameraHeight - sourcePos.Z;
+		sourcePos.Z += repositionZ;
+		targetPos.Z += repositionZ;
+	}
+
 	Matrix3D cameraTransform;
-	buildCameraTransform(&cameraTransform);
+	buildCameraTransform(&cameraTransform, sourcePos, targetPos);
+
 	m_3DCamera->Set_Transform(cameraTransform);
 
 	if (TheTerrainRenderObject)

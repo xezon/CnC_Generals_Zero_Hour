@@ -290,15 +290,15 @@ private:
 	Bool m_recalcCameraConstraintsAfterScrolling; ///< Recalculates the camera area constraints after the user has moved the camera
 	Bool m_recalcCamera; ///< Recalculates the camera transform in the next render update
 
-	Real getHeightAroundPos(Real x, Real y) const;
+	Real getHeightAroundPos(Real x, Real y, Real terrainSampleSize = 40.0f) const;
 	Real getCameraOffsetZ() const;
 	Real getDesiredHeight(Real x, Real y) const;
 	Real getDesiredZoom(Real x, Real y) const;
 	Real getMaxHeight(Real x, Real y) const;
 	Real getMaxZoom(Real x, Real y) const;
-	void setCameraTransform( void );								///< set the transform matrix of m_3DCamera, based on m_pos & m_angle
+	void setCameraTransform( void ); ///< set the transform matrix of m_3DCamera, based on m_pos & m_angle
 	void buildCameraPosition( Vector3& sourcePos, Vector3& targetPos );
-	void buildCameraTransform( Matrix3D *transform );			///< calculate (but do not set) the transform matrix of m_3DCamera, based on m_pos & m_angle
+	void buildCameraTransform( Matrix3D *transform, const Vector3 &sourcePos, const Vector3 &targetPos ); ///< calculate (but do not set) the transform matrix of m_3DCamera, based on m_pos & m_angle
 	void setControlledByUser(Bool value);
 	Bool zoomCameraToDesiredHeight();
 	Bool movePivotToGround();
