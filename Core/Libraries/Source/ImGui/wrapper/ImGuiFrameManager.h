@@ -38,5 +38,19 @@ class FrameManager
     static bool s_frameOpen;
 };
 
+class FrameGuard
+{
+public:
+  FrameGuard()
+  {
+    FrameManager::BeginFrame();
+  }
+
+  ~FrameGuard()
+  {
+    FrameManager::EndFrame();
+  }
+};
+
 } // namespace ImGui
 } // namespace rts

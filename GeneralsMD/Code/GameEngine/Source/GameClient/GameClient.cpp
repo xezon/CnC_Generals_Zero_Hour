@@ -517,7 +517,7 @@ void GameClient::update( void )
 {
 	USE_PERF_TIMER(GameClient_update)
 #ifdef RTS_HAS_IMGUI
-	rts::ImGui::FrameManager::BeginFrame();
+	rts::ImGui::FrameGuard imguiFrameGuard;
 	ImGui::ShowDemoWindow();
 #endif
 	// create the FRAME_TICK message
@@ -633,9 +633,6 @@ void GameClient::update( void )
 		TheDisplay->DRAW();
 		TheDisplay->UPDATE();
 
-#ifdef RTS_HAS_IMGUI
-		rts::ImGui::FrameManager::EndFrame();
-#endif
 		return;
 	}
 
@@ -741,9 +738,6 @@ void GameClient::update( void )
 	// need to draw the first frame, then don't draw again until TheGlobalData->m_noDraw
 	if (TheGlobalData->m_noDraw > TheGameLogic->getFrame() && TheGameLogic->getFrame() > 0)
 	{
-#ifdef RTS_HAS_IMGUI
-		rts::ImGui::FrameManager::EndFrame();
-#endif
 		return;
 	}
 #endif
@@ -790,10 +784,6 @@ void GameClient::update( void )
 		// update the in game UI
 		TheInGameUI->UPDATE();
 	}
-
-#ifdef RTS_HAS_IMGUI
-	rts::ImGui::FrameManager::EndFrame();
-#endif
 }
 
 void GameClient::step()
