@@ -91,6 +91,7 @@
 #include "imgui.h"
 #include <imgui_impl_win32.h>
 #include "imgui_impl_dx8.h"
+#include "ImGuiFrameManager.h"
 #endif
 
 const int DEFAULT_RESOLUTION_WIDTH = 640;
@@ -1745,6 +1746,10 @@ void DX8Wrapper::Begin_Scene(void)
 {
 	DX8_THREAD_ASSERT();
 
+#ifdef RTS_HAS_IMGUI
+	rts::ImGui::FrameManager::BeginFrame();
+#endif
+
 #if ENABLE_EMBEDDED_BROWSER
 	DX8WebBrowser::Update();
 #endif
@@ -1757,14 +1762,11 @@ void DX8Wrapper::Begin_Scene(void)
 void DX8Wrapper::End_Scene(bool flip_frames)
 {
 	DX8_THREAD_ASSERT();
+
 #ifdef RTS_HAS_IMGUI
-	{
-		ImDrawData* data = ImGui::GetDrawData();
-		if (data && data->CmdListsCount > 0 ) {
-			ImGui_ImplDX8_RenderDrawData(ImGui::GetDrawData());
-		}
-	}
+	rts::ImGui::FrameManager::EndFrame();
 #endif
+
 	DX8CALL(EndScene());
 
 	DX8WebBrowser::Render(0);

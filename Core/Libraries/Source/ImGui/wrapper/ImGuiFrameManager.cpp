@@ -44,6 +44,7 @@ void rts::ImGui::FrameManager::EndFrame()
     }
 
     ::ImGui::Render();
+    ImGui_ImplDX8_RenderDrawData(::ImGui::GetDrawData());
 
     s_frameOpen = false;
 }
