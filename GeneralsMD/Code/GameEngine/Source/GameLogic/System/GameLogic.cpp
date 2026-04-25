@@ -3867,9 +3867,7 @@ void GameLogic::update()
 		}
 	}
 
-
-
-
+	//TheParticleSystemManager->update();
 
 	// increment world time
 	if (!m_startNewGame)

@@ -86,7 +86,7 @@ int ReplaySimulation::simulateReplaysInThisProcess(const std::vector<AsciiString
 			UnsignedInt totalTimeSec = TheRecorder->getPlaybackFrameCount() / LOGICFRAMES_PER_SECOND;
 			while (TheRecorder->isPlaybackInProgress())
 			{
-				TheGameClient->updateHeadless();
+				//TheGameClient->updateHeadless();
 
 				const int progressFrameInterval = 10*60*LOGICFRAMES_PER_SECOND;
 				if (TheGameLogic->getFrame() != 0 && TheGameLogic->getFrame() % progressFrameInterval == 0)

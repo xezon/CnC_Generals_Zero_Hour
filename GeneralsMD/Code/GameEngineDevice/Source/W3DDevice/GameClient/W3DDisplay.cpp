@@ -1933,7 +1933,7 @@ AGAIN:
                                            //MOVE WITH THE CLIENT TRANSFORMS, NOW.
                                            //REVOLUTIONARY!
                                            //-LORENZEN
-
+				TheParticleSystemManager->draw(); // TEST
 
 			if (TheWaterRenderObj && TheGlobalData->m_waterType == 2)
 				TheWaterRenderObj->updateRenderTargetTextures(primaryW3DView->get3DCamera());	//do a render into each texture

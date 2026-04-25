@@ -33,6 +33,7 @@
 
 #include "Common/GameState.h"
 #include "Common/INI.h"
+#include "Common/FramePacer.h"
 #include "Common/PerfTimer.h"
 #include "Common/ThingFactory.h"
 #include "Common/GameLOD.h"
@@ -64,6 +65,9 @@ ParticleSystemManager *TheParticleSystemManager = nullptr;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+#define ORIGINAL_PARTICLE_UPDATE 0
 
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
@@ -373,6 +377,22 @@ void Particle::applyForce( const Coord3D *force )
 // ------------------------------------------------------------------------------------------------
 Bool Particle::update()
 {
+
+	// monitor lifetime
+	if (m_lifetimeLeft && --m_lifetimeLeft == 0)
+		return false;
+
+	DEBUG_ASSERTCRASH( m_lifetimeLeft, ( "A particle has an infinite lifetime..." ));
+
+	const UnsignedInt frameCount = TheGameClient->getFrame() - m_createTimestamp;
+
+#if !ORIGINAL_PARTICLE_UPDATE
+	// Pass one full logic frame before changing blend rates.
+	if (frameCount == 0)
+		return true;
+#endif
+
+#if ORIGINAL_PARTICLE_UPDATE
 	// integrate acceleration into velocity
 	m_vel.x += m_accel.x;
 	m_vel.y += m_accel.y;
@@ -393,7 +413,7 @@ Bool Particle::update()
 
 	// see if we should even do anything
 	if( windMotion != ParticleSystemInfo::WIND_MOTION_NOT_USED )
-		doWindMotion();
+		doWindMotion(1.0f);
 
 	// update orientation
 #if PARTICLE_USE_XY_ROTATION
@@ -419,44 +439,56 @@ Bool Particle::update()
 	// update size
 	m_size += m_sizeRate;
 	m_sizeRate *= m_sizeRateDamping;
+#endif
 
 	//
 	// Update alpha (if used)
 	//
-
 	if (m_system->getShaderType() != ParticleSystemInfo::ADDITIVE)
 	{
+#if ORIGINAL_PARTICLE_UPDATE
 		m_alpha += m_alphaRate;
+#endif
 
 		if (m_alphaTargetKey < MAX_KEYFRAMES && m_alphaKey[ m_alphaTargetKey ].frame)
 		{
-			if (TheGameClient->getFrame() - m_createTimestamp >= m_alphaKey[ m_alphaTargetKey ].frame)
+			//const UnsignedInt frameCount = TheGameClient->getFrame() - m_createTimestamp;
+			if (frameCount >= m_alphaKey[ m_alphaTargetKey ].frame)
 			{
+#if ORIGINAL_PARTICLE_UPDATE
 				m_alpha = m_alphaKey[ m_alphaTargetKey ].value;
+#endif
 				m_alphaTargetKey++;
 				computeAlphaRate();
 			}
 		}
 		else
+		{
 			m_alphaRate = 0.0f;
+		}
 
+#if ORIGINAL_PARTICLE_UPDATE
 		if (m_alpha < 0.0f)
 			m_alpha = 0.0f;
 		else if (m_alpha > 1.0f)
 			m_alpha = 1.0f;
+#endif
 	}
 
 
 	//
 	// Update color
 	//
+#if ORIGINAL_PARTICLE_UPDATE
 	m_color.red += m_colorRate.red;
 	m_color.green += m_colorRate.green;
 	m_color.blue += m_colorRate.blue;
+#endif
 
 	if (m_colorTargetKey < MAX_KEYFRAMES && m_colorKey[ m_colorTargetKey ].frame)
 	{
-		if (TheGameClient->getFrame() - m_createTimestamp >= m_colorKey[ m_colorTargetKey ].frame)
+		//const UnsignedInt frameCount = TheGameClient->getFrame() - m_createTimestamp;
+		if (frameCount >= m_colorKey[ m_colorTargetKey ].frame)
 		{
 			// can't set, because of colorscale
 			// m_color = m_colorKey[ m_colorTargetKey ].color;
@@ -471,6 +503,7 @@ Bool Particle::update()
 		m_colorRate.blue = 0.0f;
 	}
 
+#if ORIGINAL_PARTICLE_UPDATE
 	/// @todo Rethink this - at least its name
 	m_color.red += m_colorScale;
 	m_color.green += m_colorScale;
@@ -481,7 +514,7 @@ Bool Particle::update()
 	else if (m_color.red > 1.0f)
 		m_color.red = 1.0f;
 
-	if (m_color.red < 0.0f)
+	if (m_color.green < 0.0f)
 		m_color.green = 0.0f;
 	else if (m_color.green > 1.0f)
 		m_color.green = 1.0f;
@@ -491,6 +524,173 @@ Bool Particle::update()
 	else if (m_color.blue > 1.0f)
 		m_color.blue = 1.0f;
 
+	// reset the acceleration for accumulation next frame
+	m_accel.x = 0.0f;
+	m_accel.y = 0.0f;
+	m_accel.z = 0.0f;
+#endif
+
+	// if we've gone totally invisible, destroy ourselves
+	if (isInvisible()) // TEST
+		return false;
+
+	return true;
+}
+
+
+// ------------------------------------------------------------------------------------------------
+// Computes a small compensation factor for damping to reduce frame-rate discrepancies.
+//
+// This function generates a multiplier that slightly adjusts the effective damping when
+// the rendering timestep differs from the logic timestep.
+//
+// When timeScale equals 1.0, the returned value is 1.0 and the damping is unchanged.
+// When timeScale is less than 1.0 (faster render frames), the returned value is greater
+// than 1.0, which slightly increases damping to prevent the attribute from overshooting.
+// When timeScale is greater than 1.0 (slower render frames), the returned value is less
+// than 1.0, which slightly reduces damping to avoid excessive decay.
+//
+// The strength constant controls how strongly the adjustment is applied. It provides a
+// visible improvement in stability across varying frame rates without affecting the
+// overall damping behavior at normal time scale.
+//
+inline Real calcDampScale(Real timeScale)
+{
+	constexpr const Real strength = 0.3f;
+	return 1.0f + strength * (1.0f - timeScale);
+}
+
+// ------------------------------------------------------------------------------------------------
+void Particle::renderUpdate(Real timeScale)
+{
+	const float dampExp = timeScale * calcDampScale(timeScale);
+
+	// integrate acceleration into velocity
+	m_vel.x += m_accel.x * timeScale;
+	m_vel.y += m_accel.y * timeScale;
+	m_vel.z += m_accel.z * timeScale;
+
+	const Real velDamping = pow(m_velDamping, dampExp);
+	m_vel.x *= velDamping;
+	m_vel.y *= velDamping;
+	m_vel.z *= velDamping;
+
+	// integrate velocity into position
+	const Coord3D *driftVel = m_system->getDriftVelocity();
+	m_pos.x += (m_vel.x + driftVel->x) * timeScale;
+	m_pos.y += (m_vel.y + driftVel->y) * timeScale;
+	m_pos.z += (m_vel.z + driftVel->z) * timeScale;
+
+	// integrate the wind (if specified) into position
+	ParticleSystemInfo::WindMotion windMotion = m_system->getWindMotion();
+
+	// see if we should even do anything
+	if( windMotion != ParticleSystemInfo::WIND_MOTION_NOT_USED )
+		doWindMotion(timeScale);
+
+	// update orientation
+#if PARTICLE_USE_XY_ROTATION
+	m_angleX += m_angularRateX * timeScale;
+	m_angleY += m_angularRateY * timeScale;
+#endif
+	m_angleZ += m_angularRateZ * timeScale;
+
+	const Real angularDamping = pow(m_angularDamping, dampExp);
+#if PARTICLE_USE_XY_ROTATION
+	m_angularRateX *= angularDamping;
+	m_angularRateY *= angularDamping;
+#endif
+	m_angularRateZ *= angularDamping;
+
+	if (m_particleUpTowardsEmitter) {
+		// adjust the up position back towards the particle
+		static const Coord2D upVec = { 0.0f, 1.0f };
+		Coord2D emitterDir;
+		emitterDir.x = m_pos.x - m_emitterPos.x;
+		emitterDir.y = m_pos.y - m_emitterPos.y;
+		m_angleZ = (angleBetween(&upVec, &emitterDir) + PI);
+	}
+
+	// update size
+	m_size += m_sizeRate * timeScale;
+	const Real sizeRateDamping = pow(m_sizeRateDamping, dampExp);
+	m_sizeRate *= sizeRateDamping;
+
+	//
+	// Update alpha (if used)
+	//
+	if (m_system->getShaderType() != ParticleSystemInfo::ADDITIVE)
+	{
+		m_alpha += m_alphaRate * timeScale;
+		m_alpha = clamp(0.0f, m_alpha, 1.0f);
+
+		//if (m_alphaTargetKey < MAX_KEYFRAMES && m_alphaKey[ m_alphaTargetKey ].frame)
+		//{
+		//	if (TheGameClient->getFrame() - m_createTimestamp >= m_alphaKey[ m_alphaTargetKey ].frame)
+		//	{
+		//		//m_alpha = m_alphaKey[ m_alphaTargetKey ].value;
+		//		m_alphaTargetKey++;
+		//		computeAlphaRate();
+		//	}
+		//}
+		//else
+		//{
+		//	m_alphaRate = 0.0f;
+		//}
+
+		//if (m_alpha < 0.0f)
+		//	m_alpha = 0.0f;
+		//else if (m_alpha > 1.0f)
+		//	m_alpha = 1.0f;
+	}
+
+	//
+	// Update color
+	//
+	m_color.red += m_colorRate.red * timeScale;
+	m_color.green += m_colorRate.green * timeScale;
+	m_color.blue += m_colorRate.blue * timeScale;
+
+	//if (m_colorTargetKey < MAX_KEYFRAMES && m_colorKey[ m_colorTargetKey ].frame)
+	//{
+	//	if (TheGameClient->getFrame() - m_createTimestamp >= m_colorKey[ m_colorTargetKey ].frame)
+	//	{
+	//		// can't set, because of colorscale
+	//		// m_color = m_colorKey[ m_colorTargetKey ].color;
+	//		m_colorTargetKey++;
+	//		computeColorRate();
+	//	}
+	//}
+	//else
+	//{
+	//	m_colorRate.red = 0.0f;
+	//	m_colorRate.green = 0.0f;
+	//	m_colorRate.blue = 0.0f;
+	//}
+
+	/// @todo Rethink this - at least its name
+	m_color.red += m_colorScale * timeScale;
+	m_color.green += m_colorScale * timeScale;
+	m_color.blue += m_colorScale * timeScale;
+
+	m_color.red = clamp(0.0f, m_color.red, 1.0f);
+	m_color.green = clamp(0.0f, m_color.green, 1.0f);
+	m_color.blue = clamp(0.0f, m_color.blue, 1.0f);
+
+	//if (m_color.red < 0.0f)
+	//	m_color.red = 0.0f;
+	//else if (m_color.red > 1.0f)
+	//	m_color.red = 1.0f;
+
+	//if (m_color.green < 0.0f)
+	//	m_color.green = 0.0f;
+	//else if (m_color.green > 1.0f)
+	//	m_color.green = 1.0f;
+
+	//if (m_color.blue < 0.0f)
+	//	m_color.blue = 0.0f;
+	//else if (m_color.blue > 1.0f)
+	//	m_color.blue = 1.0f;
 
 	// reset the acceleration for accumulation next frame
 	m_accel.x = 0.0f;
@@ -498,21 +698,21 @@ Bool Particle::update()
 	m_accel.z = 0.0f;
 
 	// monitor lifetime
-	if (m_lifetimeLeft && --m_lifetimeLeft == 0)
-		return false;
+	//if (m_lifetimeLeft && --m_lifetimeLeft == 0)
+	//	return false;
 
-	DEBUG_ASSERTCRASH( m_lifetimeLeft, ( "A particle has an infinite lifetime..." ));
+	//DEBUG_ASSERTCRASH( m_lifetimeLeft, ( "A particle has an infinite lifetime..." ));
 
-	// if we've gone totally invisible, destroy ourselves
-	if (isInvisible())
-		return false;
-	return true;
+	//// if we've gone totally invisible, destroy ourselves
+	//if (isInvisible())
+	//	return false;
+	//return true;
 }
 
 // ------------------------------------------------------------------------------------------------
 /** Do wind motion as specified by the particle system template, if present */
 // ------------------------------------------------------------------------------------------------
-void Particle::doWindMotion()
+void Particle::doWindMotion(Real timeScale)
 {
 
 	// get the angle of the wind
@@ -576,7 +776,7 @@ void Particle::doWindMotion()
 	Real distFromWind = v.length();
 	if( distFromWind < noForceDistance )
 	{
-		Real windForceStrength = 2.0f * m_windRandomness;
+		Real windForceStrength = 2.0f * m_windRandomness * timeScale;
 
 		// only apply force if still within the circle of influence
 		if( distFromWind > fullForceDistance )
@@ -1143,7 +1343,7 @@ ParticleSystem::ParticleSystem( const ParticleSystemTemplate *sysTemplate,
 	else
 		m_isForever = true;
 
-	m_accumulatedSizeBonus = 0;
+	m_accumulatedSizeBonus = 0.0f;
 
 	m_velDamping = sysTemplate->m_velDamping;
 
@@ -1916,8 +2116,10 @@ Bool ParticleSystem::update( Int localPlayerIndex  )
 	}
 
 	// update the wind motion
+#if ORIGINAL_PARTICLE_UPDATE
 	if (m_windMotion != ParticleSystemInfo::WIND_MOTION_NOT_USED )
-		updateWindMotion();
+		updateWindMotion(1.0f);
+#endif
 
 	// if this system is attached to a Drawable/Object, update the current transform
 	// matrix so generated particles' are relative to the parent Drawable's
@@ -2000,7 +2202,6 @@ Bool ParticleSystem::update( Int localPlayerIndex  )
 		transformSet = true;
 	}
 
-
 	if (transformSet == false)
 	{
 		if (m_isLocalIdentity == false)
@@ -2027,17 +2228,18 @@ Bool ParticleSystem::update( Int localPlayerIndex  )
 		m_pos = *controlPos;
 	}
 
-
 	//
 	// Generate new particles if the system hasn't been 'stopped' or 'destroyed'
 	// If we are a slave system, do not generate particles ourselves - our master will force us to
 	//
 	if (m_isDestroyed == false)
 	{
-		if (m_isForever || (m_isForever == false && m_systemLifetimeLeft > 0))
+		if (m_isForever || m_systemLifetimeLeft > 0)
 		{
 			if (!isShrouded && m_isStopped == false && m_masterSystem == nullptr)
 			{
+				//if (m_burstDelayLeft > 0) /// TEST
+				//	--m_burstDelayLeft; /// TEST
 				if (m_burstDelayLeft == 0)
 				{
 					ParticlePriorityType priority = getPriority();
@@ -2101,6 +2303,7 @@ Bool ParticleSystem::update( Int localPlayerIndex  )
 	while (p)
 	{
 
+#if ORIGINAL_PARTICLE_UPDATE
 		// apply 'gravity' force
 		if (m_gravity != 0.0f)
 		{
@@ -2110,6 +2313,7 @@ Bool ParticleSystem::update( Int localPlayerIndex  )
 			force.z = m_gravity;
 			p->applyForce( &force );
 		}
+#endif
 
 		if (p->update() == false)
 		{
@@ -2127,7 +2331,6 @@ Bool ParticleSystem::update( Int localPlayerIndex  )
 	//
 	if (m_isDestroyed && !m_systemParticlesHead)
 		return false;
-
 
 	// monitor particle system lifetime
 	if (m_isForever == false)
@@ -2148,10 +2351,255 @@ Bool ParticleSystem::update( Int localPlayerIndex  )
 	return true;
 }
 
+
+// ------------------------------------------------------------------------------------------------
+void ParticleSystem::renderUpdate(Real timeScale/*, Int localPlayerIndex*/)
+{
+	if (TheGlobalData->m_useFX == FALSE)
+		return;
+
+		// do initial delay ... note, this currently delays the lifetime
+	//if (m_delayLeft)
+	//{
+	//	--m_delayLeft;
+
+	//	// system actually "starts" once initial delay is over
+	//	/// @todo reset start time when system is stopped/started
+	//	if (m_delayLeft == 0)
+	//		m_startTimestamp = TheGameClient->getFrame();
+
+	//	return true;
+	//}
+
+	// update the wind motion
+	if (m_windMotion != ParticleSystemInfo::WIND_MOTION_NOT_USED )
+		updateWindMotion(timeScale);
+
+	// if this system is attached to a Drawable/Object, update the current transform
+	// matrix so generated particles' are relative to the parent Drawable's
+	// position and orientation
+	Bool transformSet = false;
+	const Matrix3D *parentXfrm = nullptr;
+	//Bool isShrouded = false;
+
+	if (m_attachedToDrawableID)
+	{
+		Drawable *attachedTo = TheGameClient->findDrawableByID( m_attachedToDrawableID );
+
+		if (attachedTo)
+		{
+			//if (attachedTo->getFullyObscuredByShroud())
+			//	isShrouded = true;
+
+			parentXfrm = attachedTo->getTransformMatrix();
+			m_lastPos = m_pos;
+			m_pos = *attachedTo->getPosition();
+		}
+		//else
+		//{
+		//	// Drawable has been destroyed - lose our attachment to it
+		//	m_attachedToDrawableID = INVALID_DRAWABLE_ID;
+
+		//	// destroy ourselves
+		//	destroy();
+		//}
+	}
+	else if (m_attachedToObjectID)
+	{
+		Object *objectAttachedTo = TheGameLogic->findObjectByID( m_attachedToObjectID );
+
+		if (objectAttachedTo)
+		{
+			//if (!isShrouded)
+			//	isShrouded = (objectAttachedTo->getShroudedStatus(localPlayerIndex) >= OBJECTSHROUD_FOGGED);
+
+			const Drawable * draw = objectAttachedTo->getDrawable();
+			if ( draw )
+				parentXfrm = draw->getTransformMatrix();
+			else
+				parentXfrm = objectAttachedTo->getTransformMatrix();
+
+			m_lastPos = m_pos;
+			m_pos = *objectAttachedTo->getPosition();
+		}
+		//else
+		//{
+		//	// Drawable has been destroyed - lose our attachment to it
+		//	m_attachedToObjectID = INVALID_ID;
+
+		//	// destroy ourselves
+		//	destroy();
+		//}
+	}
+
+	if (parentXfrm)
+	{
+		if (m_skipParentXfrm)
+		{
+			//this particle system is already in world space so no need to apply parent xform.
+			m_transform = m_localTransform;
+		}
+		else
+		{
+			// if system has its own local transform, concatenate them
+			if (m_isLocalIdentity == false)
+	#ifdef ALLOW_TEMPORARIES
+				m_transform = (*parentXfrm) * m_localTransform;
+	#else
+				m_transform.mul(*parentXfrm, m_localTransform);
+	#endif
+			else
+				m_transform = *parentXfrm;
+		}
+
+		m_isIdentity = false;
+		transformSet = true;
+	}
+
+	if (transformSet == false)
+	{
+		if (m_isLocalIdentity == false)
+		{
+			m_transform = m_localTransform;
+			m_isIdentity = false;
+		}
+		else
+		{
+			m_isIdentity = true;
+		}
+	}
+
+	// if we are controlled by a particle, its position is local origin
+	if (m_controlParticle)
+	{
+		const Coord3D *controlPos = m_controlParticle->getPosition();
+		/// @todo Concatenate this, instead of overriding (MSB)
+		m_transform.Set_X_Translation( controlPos->x );
+		m_transform.Set_Y_Translation( controlPos->y );
+		m_transform.Set_Z_Translation( controlPos->z );
+		m_isIdentity = false;
+		m_lastPos = m_pos;
+		m_pos = *controlPos;
+	}
+
+
+	//
+	// Generate new particles if the system hasn't been 'stopped' or 'destroyed'
+	// If we are a slave system, do not generate particles ourselves - our master will force us to
+	//
+	//if (m_isDestroyed == false)
+	//{
+	//	if (m_isForever || (m_isForever == false && m_systemLifetimeLeft > 0))
+	//	{
+	//		if (!isShrouded && m_isStopped == false && m_masterSystem == nullptr)
+	//		{
+	//			if (m_burstDelayLeft == 0)
+	//			{
+	//				ParticlePriorityType priority = getPriority();
+
+	//				// emit a burst of particles
+	//				Int count = REAL_TO_INT(m_burstCount.getValue());
+
+	//				count *= m_countCoeff;
+
+	//				for( Int i=0; i<count; i++ )
+	//				{
+	//					// generate this particle's unique attributes
+	//					const ParticleInfo *info = generateParticleInfo(i, count);
+	//					if (!m_isEmitAboveGroundOnly || (info->m_pos.z >= TheTerrainLogic->getGroundHeight(info->m_pos.x, info->m_pos.y)))
+	//					{
+	//						// actually create a particle
+	//						Particle *p = createParticle( info, priority );
+	//						if (p == nullptr)
+	//							continue;
+
+	//						if (m_attachedSystemName.isEmpty() == false)
+	//						{
+	//							const ParticleSystemTemplate *tmp = TheParticleSystemManager->findTemplate( m_attachedSystemName );
+	//							if (tmp)
+	//							{
+	//								ParticleSystem *sys = TheParticleSystemManager->createParticleSystem( tmp, TRUE );
+	//								sys->setControlParticle( p );
+	//								p->controlParticleSystem( sys );
+	//							}
+	//						}
+
+	//						// create a slave particle, if necessary
+	//						if (m_slaveSystem)
+	//						{
+	//							ParticleInfo mergeInfo = ParticleSystem::mergeRelatedParticleSystems(this, m_slaveSystem, false);
+
+	//							// create slaved particle
+	//							m_slaveSystem->createParticle( &mergeInfo, priority );
+	//						}
+	//					}
+	//				}
+
+	//				// compute next burst delay
+	//				m_burstDelayLeft = (UnsignedInt)m_burstDelay.getValue();
+	//				m_burstDelayLeft *= m_delayCoeff;
+	//			}
+	//			else
+	//			{
+	//				m_burstDelayLeft--;
+	//			}
+
+	//		}
+	//	}
+	//}
+
+	//
+	// Update all particles in the system
+	//
+	Particle *p = m_systemParticlesHead;
+	//Particle *oldParticle;
+	while (p)
+	{
+		// apply 'gravity' force
+		if (m_gravity != 0.0f)
+		{
+			Coord3D force;
+			force.x = 0.0f;
+			force.y = 0.0f;
+			force.z = m_gravity;
+			p->applyForce( &force );
+		}
+
+		p->renderUpdate(timeScale);
+		p = p->m_systemNext;
+	}
+
+	//
+	// If we have been "destroyed", wait for all of our particles to die off,
+	// then destroy ourselves (return false).
+	//
+	//if (m_isDestroyed && !m_systemParticlesHead)
+	//	return false;
+
+
+	//// monitor particle system lifetime
+	//if (m_isForever == false)
+	//{
+	//	// decrement lifetime if not zero
+	//	if (m_systemLifetimeLeft)
+	//		m_systemLifetimeLeft--;
+
+	//	// if there are still particles "in the air", don't destroy yet
+	//	if (getParticleCount())
+	//		return true;
+
+	//	// check if time is up
+	//	if (m_systemLifetimeLeft == 0)
+	//		return false;
+	//}
+
+	//return true;
+}
+
 // ------------------------------------------------------------------------------------------------
 /** Update the wind motion */
 // ------------------------------------------------------------------------------------------------
-void ParticleSystem::updateWindMotion()
+void ParticleSystem::updateWindMotion(Real timeScale)
 {
 
 	switch( m_windMotion )
@@ -2178,7 +2626,7 @@ void ParticleSystem::updateWindMotion()
 			// the angle.  When we are closer to the center we change it faster (more), and when
 			// we are near the edges we change is slower (less)
 			//
-			Real change = (1.0f - (diffFromCenter / halfSpan)) * m_windAngleChange;
+			Real change = (1.0f - (diffFromCenter / halfSpan)) * m_windAngleChange * timeScale;
 
 			// we will always change a little bit
 			#define MINIMUM_CHANGE 0.005f  // lower #'s have softer swings at the edge angles
@@ -2259,7 +2707,7 @@ void ParticleSystem::updateWindMotion()
 				m_windAngleChange = GameClientRandomValueReal( m_windAngleChangeMin, m_windAngleChangeMax );
 
 			// add to our wind angle
-			m_windAngle += m_windAngleChange;
+			m_windAngle += m_windAngleChange * timeScale;
 
 			// keep in 0 to 2PI range just to keep the numbers safe and sane
 			if( m_windAngle > TWO_PI )
@@ -2889,6 +3337,7 @@ ParticleSystemManager::ParticleSystemManager()
 	m_localPlayerIndex = 0;
 
 	m_lastLogicFrameUpdate = 0;
+	m_lastLogicFrameUpdate2 = 0;
 	m_particleCount = 0;
 	m_fieldParticleCount = 0;
 	m_particleSystemCount = 0;
@@ -2975,6 +3424,7 @@ void ParticleSystemManager::reset()
 	m_uniqueSystemID = INVALID_PARTICLE_SYSTEM_ID;
 
 	m_lastLogicFrameUpdate = -1;
+	m_lastLogicFrameUpdate2 = -1;
 	// leave templates as-is
 }
 
@@ -2988,14 +3438,13 @@ void ParticleSystemManager::update()
 		return;
 	}
 
-	// update the last logic frame.
+	//// update the last logic frame.
 	m_lastLogicFrameUpdate = TheGameLogic->getFrame();
 
 	//USE_PERF_TIMER(ParticleSystemManager)
 	ParticleSystemListIt it = m_allParticleSystemList.begin();
 	while( it != m_allParticleSystemList.end() )
 	{
-		// TheSuperHackers @info Must increment the list iterator before potential element erasure from the list.
 		ParticleSystem* sys = *it++;
 		DEBUG_ASSERTCRASH(sys != nullptr, ("ParticleSystemManager::update: ParticleSystem is null"));
 
@@ -3040,6 +3489,28 @@ void ParticleSystemManager::update()
 				}
 			}
 		}
+	}
+}
+
+// ------------------------------------------------------------------------------------------------
+void ParticleSystemManager::draw()
+{
+	//if (m_lastLogicFrameUpdate2 == TheGameLogic->getFrame()) {
+	//	return;
+	//}
+
+	////// update the last logic frame.
+	//m_lastLogicFrameUpdate2 = TheGameLogic->getFrame();
+
+	const Real timeScale = TheFramePacer->getActualLogicTimeScaleOverFpsRatio();
+
+	ParticleSystemListIt it = m_allParticleSystemList.begin();
+	while( it != m_allParticleSystemList.end() )
+	{
+		ParticleSystem* sys = *it++;
+		DEBUG_ASSERTCRASH(sys != nullptr, ("ParticleSystemManager::draw: ParticleSystem is null"));
+
+		sys->renderUpdate(timeScale);
 	}
 }
 

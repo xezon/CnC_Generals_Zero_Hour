@@ -98,7 +98,7 @@ public:
 
 	void step(); ///< Do one fixed time step
 
-	void updateHeadless();
+	//void updateHeadless();
 
 	void addDrawableToLookupTable( Drawable *draw );			///< add drawable ID to hash lookup table
 	void removeDrawableFromLookupTable( Drawable *draw );	///< remove drawable ID from hash lookup table

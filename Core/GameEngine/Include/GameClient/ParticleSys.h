@@ -179,7 +179,9 @@ public:
 	Particle( ParticleSystem *system, const ParticleInfo *data );
 
 	Bool update();												///< update this particle's behavior - return false if dead
-	void doWindMotion();									///< do wind motion (if present) from particle system
+
+	void renderUpdate( Real timeScale );
+	void doWindMotion( Real timeScale ); ///< do wind motion (if present) from particle system
 
 	void applyForce( const Coord3D *force );		///< add the given acceleration
 
@@ -577,7 +579,9 @@ public:
 	void attachToObject( const Object *obj );									///< attach this particle system to an Object
 
 	virtual Bool update( Int localPlayerIndex );								///< update this particle system, return false if dead
-	void updateWindMotion();							///< update wind motion
+
+	void renderUpdate( Real timeScale ); ///< update particle system for render frame
+	void updateWindMotion( Real timeScale ); ///< update wind motion
 
 	void setControlParticle( Particle *p );			///< set control particle
 
@@ -751,7 +755,8 @@ public:
 
 	virtual void init() override;									///< initialize the manager
 	virtual void reset() override;									///< reset the manager and all particle systems
-	virtual void update() override;								///< update all particle systems
+	virtual void update() override;								///< logic update for all particle systems
+	virtual void draw() override;									///< render update for all particle systems
 
 	virtual Int getOnScreenParticleCount() = 0;   ///< returns the number of particles on screen
   virtual void setOnScreenParticleCount(int count);
@@ -828,6 +833,7 @@ protected:
 	UnsignedInt m_particleSystemCount;
 	Int m_onScreenParticleCount;                ///< number of particles displayed on screen per frame
 	UnsignedInt m_lastLogicFrameUpdate;
+	UnsignedInt m_lastLogicFrameUpdate2;
 	Int m_localPlayerIndex;	///<used to tell particle systems which particles can be skipped due to player shroud status
 
 private:
