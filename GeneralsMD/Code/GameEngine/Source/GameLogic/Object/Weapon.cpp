@@ -397,8 +397,8 @@ void WeaponTemplate::reset()
 
 	// No matter what we have now, we want to convert it to frames from msec.
 	// ShotDelay used to use parseDurationUnsignedInt, and we are expanding on that.
-	self->m_minDelayBetweenShots = ceilf(ConvertDurationFromMsecsToFrames((Real)self->m_minDelayBetweenShots));
-	self->m_maxDelayBetweenShots = ceilf(ConvertDurationFromMsecsToFrames((Real)self->m_maxDelayBetweenShots));
+	self->m_minDelayBetweenShots = WWMath::CeilfOrigin(ConvertDurationFromMsecsToFrames((Real)self->m_minDelayBetweenShots));
+	self->m_maxDelayBetweenShots = WWMath::CeilfOrigin(ConvertDurationFromMsecsToFrames((Real)self->m_maxDelayBetweenShots));
 
 }
 
@@ -879,7 +879,7 @@ UnsignedInt WeaponTemplate::fireWeaponTemplate
 		if (distSqr < minAttackRangeSqr-0.5f && !isProjectileDetonation)
 #endif
 		{
-			DEBUG_ASSERTCRASH(distSqr > minAttackRangeSqr*0.8f, ("*** victim is closer than min attack range (%f vs %f) of this weapon -- why did we attempt to fire?",sqrtf(distSqr),sqrtf(minAttackRangeSqr)));
+			DEBUG_ASSERTCRASH(distSqr > minAttackRangeSqr*0.8f, ("*** victim is closer than min attack range (%f vs %f) of this weapon -- why did we attempt to fire?",WWMath::SqrtfOrigin(distSqr),WWMath::SqrtfOrigin(minAttackRangeSqr)));
 
 			//-extraLogging
 			#if defined(RTS_DEBUG)
@@ -905,7 +905,7 @@ UnsignedInt WeaponTemplate::fireWeaponTemplate
 			targetPos.set( victimPos );
 		}
 		Real reAngle = getWeaponRecoilAmount();
-		Real reDir = reAngle != 0.0f ? (atan2(victimPos->y - sourcePos->y, victimPos->x - sourcePos->x)) : 0.0f;
+		Real reDir = reAngle != 0.0f ? (WWMath::Atan2Origin(victimPos->y - sourcePos->y, victimPos->x - sourcePos->x)) : 0.0f;
 		VeterancyLevel v = sourceObj->getVeterancyLevel();
 		const FXList* fx = isProjectileDetonation ? getProjectileDetonateFX(v) : getFireFX(v);
 
@@ -1502,9 +1502,9 @@ void WeaponTemplate::dealDamageInternal(ObjectID sourceID, ObjectID victimID, co
 				Coord3D shockWaveVector = damageDirection;
 
 				// Guard against zero vector. Make vector straight up if that is the case
-				if (fabs(shockWaveVector.x) < WWMATH_EPSILON &&
-						fabs(shockWaveVector.y) < WWMATH_EPSILON &&
-						fabs(shockWaveVector.z) < WWMATH_EPSILON)
+				if (WWMath::FAbsOrigin(shockWaveVector.x) < WWMATH_EPSILON &&
+						WWMath::FAbsOrigin(shockWaveVector.y) < WWMATH_EPSILON &&
+						WWMath::FAbsOrigin(shockWaveVector.z) < WWMATH_EPSILON)
 				{
 					shockWaveVector.z = 1.0f;
 				}
@@ -2117,11 +2117,11 @@ Bool Weapon::computeApproachTarget(const Object *source, const Object *target, c
 		if (source->isAboveTerrain())
 		{
 			// Don't do a 180 degree turn.
-			Real angle = atan2(-dir.y, -dir.x);
+			Real angle = WWMath::Atan2Origin(-dir.y, -dir.x);
 			Real relAngle = source->getOrientation()- angle;
 			if (relAngle>2*PI) relAngle -= 2*PI;
 			if (relAngle<-2*PI) relAngle += 2*PI;
-			if (fabs(relAngle)<PI/2) {
+			if (WWMath::FAbsOrigin(relAngle)<PI/2) {
 				dir.x = -dir.x;
 				dir.y = -dir.y;
 				dir.z = -dir.z;
@@ -2130,7 +2130,7 @@ Bool Weapon::computeApproachTarget(const Object *source, const Object *target, c
 
 		if (angleOffset != 0.0f)
 		{
-			Real angle = atan2(dir.y, dir.x);
+			Real angle = WWMath::Atan2Origin(dir.y, dir.x);
 			dir.x = (Real)Cos(angle + angleOffset);
 			dir.y = (Real)Sin(angle + angleOffset);
 		}
@@ -2177,7 +2177,7 @@ Bool Weapon::computeApproachTarget(const Object *source, const Object *target, c
 
 		if (angleOffset != 0.0f)
 		{
-			Real angle = atan2(dir.y, dir.x);
+			Real angle = WWMath::Atan2Origin(dir.y, dir.x);
 			dir.x = (Real)Cos(angle + angleOffset);
 			dir.y = (Real)Sin(angle + angleOffset);
 		}
@@ -2859,7 +2859,7 @@ Bool Weapon::isWithinTargetPitch(const Object *source, const Object *victim) con
 	const Coord3D* dst = victim->getPosition();
 
 	const Real ACCEPTABLE_DZ = 10.0f;
-	if (fabs(dst->z - src->z) < ACCEPTABLE_DZ)
+	if (WWMath::FAbsOrigin(dst->z - src->z) < ACCEPTABLE_DZ)
 		return true;	// always good enough if dz is small, regardless of pitch
 
 	Real minPitch, maxPitch;

@@ -41,6 +41,15 @@
 #include <float.h>
 #include <assert.h>
 
+// TheSuperHackers @fix VC6 does not support long long or <stdint.h> required by GameMath (gmath.h).
+// Use __has_include because wwmath.h is transitively included by targets that may not link gamemath.
+#if !(defined(_MSC_VER) && _MSC_VER < 1300)
+#if defined(__has_include) && __has_include("gmath.h")
+#include "gmath.h"
+#define USE_DETERMINISTIC_MATH
+#endif
+#endif
+
 /*
 ** Some global constants.
 */
@@ -133,8 +142,75 @@ static WWINLINE float Fast_Asin(float val);
 static WWINLINE float Asin(float val);
 
 
+#ifdef USE_DETERMINISTIC_MATH
+static WWINLINE float		Atan(float x) { return gm_atanf(x); }
+static WWINLINE float		Atan2(float y,float x) { return gm_atan2f(y,x); }
+#else
 static WWINLINE float		Atan(float x) { return static_cast<float>(atan(x)); }
 static WWINLINE float		Atan2(float y,float x) { return static_cast<float>(atan2(y,x)); }
+#endif
+
+// Trig wrappers: replace global Sin/Cos/Tan/ACos/ASin from deleted Trig.cpp.
+// Original Trig.cpp called CRT float functions (sinf, cosf, etc.).
+#ifdef USE_DETERMINISTIC_MATH
+	static WWINLINE float		SinTrig(float x) { return gm_sinf(x); }
+	static WWINLINE float		CosTrig(float x) { return gm_cosf(x); }
+	static WWINLINE float		TanTrig(float x) { return gm_tanf(x); }
+	static WWINLINE float		ACosTrig(float x) { return gm_acosf(x); }
+	static WWINLINE float		ASinTrig(float x) { return gm_asinf(x); }
+#else
+	static WWINLINE float		SinTrig(float x) { return sinf(x); }
+	static WWINLINE float		CosTrig(float x) { return cosf(x); }
+	static WWINLINE float		TanTrig(float x) { return tanf(x); }
+	static WWINLINE float		ACosTrig(float x) { return acosf(x); }
+	static WWINLINE float		ASinTrig(float x) { return asinf(x); }
+#endif
+
+// Origin wrappers: replace bare CRT math calls in GameLogic.
+// Each wrapper preserves the exact type (float vs double) of the vanilla CRT call.
+#ifdef USE_DETERMINISTIC_MATH
+	static WWINLINE double		SqrtOrigin(double x) { return (double)gm_sqrtf((float)x); }
+	static WWINLINE float		SqrtfOrigin(float x) { return gm_sqrtf(x); }
+	static WWINLINE double		Atan2Origin(double y, double x) { return (double)gm_atan2f((float)y, (float)x); }
+	static WWINLINE float		Atan2fOrigin(float y, float x) { return gm_atan2f(y, x); }
+	static WWINLINE double		AtanOrigin(double x) { return (double)gm_atanf((float)x); }
+	static WWINLINE float		AtanfOrigin(float x) { return gm_atanf(x); }
+	static WWINLINE double		ACosOrigin(double x) { return (double)gm_acosf((float)x); }
+	static WWINLINE float		ACosfOrigin(float x) { return gm_acosf(x); }
+	static WWINLINE double		ASinOrigin(double x) { return (double)gm_asinf((float)x); }
+	static WWINLINE float		ASinfOrigin(float x) { return gm_asinf(x); }
+	static WWINLINE double		TanOrigin(double x) { return (double)gm_tanf((float)x); }
+	static WWINLINE float		TanfOrigin(float x) { return gm_tanf(x); }
+	static WWINLINE double		FAbsOrigin(double x) { return (double)gm_fabsf((float)x); }
+	static WWINLINE float		FAbsfOrigin(float x) { return gm_fabsf(x); }
+	static WWINLINE double		PowOrigin(double x, double y) { return (double)gm_powf((float)x, (float)y); }
+	static WWINLINE float		PowfOrigin(float x, float y) { return gm_powf(x, y); }
+	static WWINLINE double		CeilOrigin(double x) { return (double)gm_ceilf((float)x); }
+	static WWINLINE float		CeilfOrigin(float x) { return gm_ceilf(x); }
+	static WWINLINE float		ExpfOrigin(float x) { return gm_expf(x); }
+	static WWINLINE float		Log10fOrigin(float x) { return gm_log10f(x); }
+#else
+	static WWINLINE double		SqrtOrigin(double x) { return sqrt(x); }
+	static WWINLINE float		SqrtfOrigin(float x) { return sqrtf(x); }
+	static WWINLINE double		Atan2Origin(double y, double x) { return atan2(y, x); }
+	static WWINLINE float		Atan2fOrigin(float y, float x) { return atan2f(y, x); }
+	static WWINLINE double		AtanOrigin(double x) { return atan(x); }
+	static WWINLINE float		AtanfOrigin(float x) { return atanf(x); }
+	static WWINLINE double		ACosOrigin(double x) { return acos(x); }
+	static WWINLINE float		ACosfOrigin(float x) { return acosf(x); }
+	static WWINLINE double		ASinOrigin(double x) { return asin(x); }
+	static WWINLINE float		ASinfOrigin(float x) { return asinf(x); }
+	static WWINLINE double		TanOrigin(double x) { return tan(x); }
+	static WWINLINE float		TanfOrigin(float x) { return tanf(x); }
+	static WWINLINE double		FAbsOrigin(double x) { return fabs(x); }
+	static WWINLINE float		FAbsfOrigin(float x) { return fabsf(x); }
+	static WWINLINE double		PowOrigin(double x, double y) { return pow(x, y); }
+	static WWINLINE float		PowfOrigin(float x, float y) { return powf(x, y); }
+	static WWINLINE double		CeilOrigin(double x) { return ceil(x); }
+	static WWINLINE float		CeilfOrigin(float x) { return ceilf(x); }
+	static WWINLINE float		ExpfOrigin(float x) { return expf(x); }
+	static WWINLINE float		Log10fOrigin(float x) { return log10f(x); }
+#endif
 static WWINLINE float		Sign(float val);
 static WWINLINE float		Ceil(float val) { return ceilf(val); }
 static WWINLINE float		Floor(float val) { return floorf(val); }
@@ -313,7 +389,12 @@ WWINLINE bool WWMath::Is_Valid_Double(double x)
 // Float to long
 // ----------------------------------------------------------------------------
 
-#if defined(_MSC_VER) && defined(_M_IX86)
+#if defined(USE_DETERMINISTIC_MATH)
+WWINLINE long WWMath::Float_To_Long(float f)
+{
+	return gm_lrintf(f);
+}
+#elif defined(_MSC_VER) && defined(_M_IX86)
 WWINLINE long WWMath::Float_To_Long(float f)
 {
 	long i;
@@ -334,7 +415,9 @@ WWINLINE long WWMath::Float_To_Long(float f)
 
 WWINLINE long WWMath::Float_To_Long(double f)
 {
-#if defined(_MSC_VER) && defined(_M_IX86)
+#if defined(USE_DETERMINISTIC_MATH)
+	return gm_lrint(f);
+#elif defined(_MSC_VER) && defined(_M_IX86)
 	long retval;
 	__asm fld	qword ptr [f]
 	__asm fistp dword ptr [retval]
@@ -348,7 +431,12 @@ WWINLINE long WWMath::Float_To_Long(double f)
 // Cos
 // ----------------------------------------------------------------------------
 
-#if defined(_MSC_VER) && defined(_M_IX86)
+#if defined(USE_DETERMINISTIC_MATH)
+WWINLINE float WWMath::Cos(float val)
+{
+	return gm_cosf(val);
+}
+#elif defined(_MSC_VER) && defined(_M_IX86)
 WWINLINE float WWMath::Cos(float val)
 {
 	float retval;
@@ -370,7 +458,12 @@ WWINLINE float WWMath::Cos(float val)
 // Sin
 // ----------------------------------------------------------------------------
 
-#if defined(_MSC_VER) && defined(_M_IX86)
+#if defined(USE_DETERMINISTIC_MATH)
+WWINLINE float WWMath::Sin(float val)
+{
+	return gm_sinf(val);
+}
+#elif defined(_MSC_VER) && defined(_M_IX86)
 WWINLINE float WWMath::Sin(float val)
 {
 	float retval;
@@ -516,7 +609,11 @@ WWINLINE float WWMath::Fast_Acos(float val)
 
 WWINLINE float WWMath::Acos(float val)
 {
+#ifdef USE_DETERMINISTIC_MATH
+	return gm_acosf(val);
+#else
 	return (float)acos(val);
+#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -553,14 +650,23 @@ WWINLINE float WWMath::Fast_Asin(float val)
 
 WWINLINE float WWMath::Asin(float val)
 {
+#ifdef USE_DETERMINISTIC_MATH
+	return gm_asinf(val);
+#else
 	return (float)asin(val);
+#endif
 }
 
 // ----------------------------------------------------------------------------
 // Sqrt
 // ----------------------------------------------------------------------------
 
-#if defined(_MSC_VER) && defined(_M_IX86)
+#if defined(USE_DETERMINISTIC_MATH)
+WWINLINE float WWMath::Sqrt(float val)
+{
+	return gm_sqrtf(val);
+}
+#elif defined(_MSC_VER) && defined(_M_IX86)
 WWINLINE float WWMath::Sqrt(float val)
 {
 	float retval;
@@ -608,7 +714,12 @@ WWINLINE int WWMath::Float_To_Int_Floor (const float& f)
 // Inverse square root
 // ----------------------------------------------------------------------------
 
-#if defined(_MSC_VER) && defined(_M_IX86)
+#if defined(USE_DETERMINISTIC_MATH)
+WWINLINE float WWMath::Inv_Sqrt(float val)
+{
+	return 1.0f / gm_sqrtf(val);
+}
+#elif defined(_MSC_VER) && defined(_M_IX86)
 WWINLINE float WWMath::Inv_Sqrt(float a)
 {
 	float retval;

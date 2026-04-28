@@ -1435,7 +1435,7 @@ Bool BuildAssistant::moveObjectsForConstruction( const ThingTemplate *whatToBuil
 	Bool anyUnmovables = false;
 	MemoryPoolObjectHolder hold( iter );
 
-	Real radius = sqrt(pow(gi.getMajorRadius(), 2) + pow(gi.getMinorRadius(), 2));
+	Real radius = WWMath::SqrtOrigin(WWMath::PowOrigin(gi.getMajorRadius(), 2) + WWMath::PowOrigin(gi.getMinorRadius(), 2));
 	radius *= 1.4f;	// Fudge the distance,
 
 	for( Object *them = iter->first(); them; them = iter->next() )

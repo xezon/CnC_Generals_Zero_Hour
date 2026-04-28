@@ -42,12 +42,12 @@ static void appendSimulationMathCrc(XferCRC &xfer)
         tanf(0.3f),
         asinf(0.967302263f),
         acosf(0.967302263f),
-        atanf(0.967302263f) * powf(1.1f, 2.0f),
-        atan2f(0.4f, 1.3f),
+        WWMath::AtanfOrigin(0.967302263f) * WWMath::PowfOrigin(1.1f, 2.0f),
+        WWMath::Atan2fOrigin(0.4f, 1.3f),
         sinhf(0.2f),
         coshf(0.4f) * tanhf(0.5f),
-        sqrtf(55788.84375f),
-        expf(0.1f) * log10f(2.3f),
+        WWMath::SqrtfOrigin(55788.84375f),
+        WWMath::ExpfOrigin(0.1f) * WWMath::Log10fOrigin(2.3f),
         logf(1.4f));
 
     Matrix3D::Multiply(matrix, factorsMatrix, &matrix);
