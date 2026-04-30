@@ -56,3 +56,8 @@ Real ASin(Real x)
 {
 	return WWMath::ASinTrig(x);
 }
+
+double Sqrt(double x)
+{
+	return WWMath::SqrtOrigin(x);
+}

@@ -28,3 +28,4 @@ Real Cos(Real);
 Real Tan(Real);
 Real ACos(Real);
 Real ASin(Real x);
+double Sqrt(double x);
