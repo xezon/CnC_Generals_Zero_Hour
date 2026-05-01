@@ -39,16 +39,16 @@ static void appendSimulationMathCrc(XferCRC &xfer)
     factorsMatrix.Set(
         WWMath::Sin(0.7f) * log10f(2.3f),
         WWMath::Cos(1.1f) * powf(1.1f, 2.0f),
-        tanf(0.3f),
-        asinf(0.967302263f),
-        acosf(0.967302263f),
+        WWMath::TanfOrigin(0.3f),
+        WWMath::ASinfOrigin(0.967302263f),
+        WWMath::ACosfOrigin(0.967302263f),
         WWMath::AtanfOrigin(0.967302263f) * WWMath::PowfOrigin(1.1f, 2.0f),
         WWMath::Atan2fOrigin(0.4f, 1.3f),
-        sinhf(0.2f),
-        coshf(0.4f) * tanhf(0.5f),
+        WWMath::SinhfOrigin(0.2f),
+        WWMath::CoshfOrigin(0.4f) * WWMath::TanhfOrigin(0.5f),
         WWMath::SqrtfOrigin(55788.84375f),
         WWMath::ExpfOrigin(0.1f) * WWMath::Log10fOrigin(2.3f),
-        logf(1.4f));
+        WWMath::LogfOrigin(1.4f));
 
     Matrix3D::Multiply(matrix, factorsMatrix, &matrix);
     matrix.Get_Inverse(matrix);

@@ -46,23 +46,26 @@
 #if !(defined(_MSC_VER) && _MSC_VER < 1300)
 #if defined(__has_include) && __has_include("gmath.h")
 #include "gmath.h"
-#define USE_DETERMINISTIC_MATH
 #endif
+#endif
+
+#if !(defined(_MSC_VER) && _MSC_VER < 1300)
+#define USE_DETERMINISTIC_MATH
 #endif
 
 /*
 ** Some global constants.
 */
-#define WWMATH_EPSILON		0.0001f
-#define WWMATH_EPSILON2		WWMATH_EPSILON * WWMATH_EPSILON
+#define WWMATH_EPSILON				0.0001f
+#define WWMATH_EPSILON2				WWMATH_EPSILON * WWMATH_EPSILON
 #define WWMATH_PI					3.141592654f
-#define WWMATH_TWO_PI			6.283185308f
-#define WWMATH_FLOAT_MAX	(FLT_MAX)
-#define WWMATH_FLOAT_MIN	(FLT_MIN)
-#define WWMATH_SQRT2			1.414213562f
-#define WWMATH_SQRT3			1.732050808f
-#define WWMATH_OOSQRT2		0.707106781f
-#define WWMATH_OOSQRT3		0.577350269f
+#define WWMATH_TWO_PI				6.283185308f
+#define WWMATH_FLOAT_MAX			(FLT_MAX)
+#define WWMATH_FLOAT_MIN			(FLT_MIN)
+#define WWMATH_SQRT2				1.414213562f
+#define WWMATH_SQRT3				1.732050808f
+#define WWMATH_OOSQRT2				0.707106781f
+#define WWMATH_OOSQRT3				0.577350269f
 
 /*
 **	Macros to convert between degrees and radians
@@ -168,6 +171,9 @@ static WWINLINE float		Atan2(float y,float x) { return static_cast<float>(atan2(
 
 // Origin wrappers: replace bare CRT math calls in GameLogic.
 // Each wrapper preserves the exact type (float vs double) of the vanilla CRT call.
+// Note: double overloads narrow to float before calling GameMath (gm_*f).
+// GameMath only provides float-precision functions. All call sites pass float-width
+// values, so the narrowing is lossless in practice.
 #ifdef USE_DETERMINISTIC_MATH
 	static WWINLINE double		SqrtOrigin(double x) { return (double)gm_sqrtf((float)x); }
 	static WWINLINE float		SqrtfOrigin(float x) { return gm_sqrtf(x); }
@@ -189,6 +195,10 @@ static WWINLINE float		Atan2(float y,float x) { return static_cast<float>(atan2(
 	static WWINLINE float		CeilfOrigin(float x) { return gm_ceilf(x); }
 	static WWINLINE float		ExpfOrigin(float x) { return gm_expf(x); }
 	static WWINLINE float		Log10fOrigin(float x) { return gm_log10f(x); }
+	static WWINLINE float		LogfOrigin(float x) { return gm_logf(x); }
+	static WWINLINE float		SinhfOrigin(float x) { return gm_sinhf(x); }
+	static WWINLINE float		CoshfOrigin(float x) { return gm_coshf(x); }
+	static WWINLINE float		TanhfOrigin(float x) { return gm_tanhf(x); }
 #else
 	static WWINLINE double		SqrtOrigin(double x) { return sqrt(x); }
 	static WWINLINE float		SqrtfOrigin(float x) { return sqrtf(x); }
@@ -210,6 +220,10 @@ static WWINLINE float		Atan2(float y,float x) { return static_cast<float>(atan2(
 	static WWINLINE float		CeilfOrigin(float x) { return ceilf(x); }
 	static WWINLINE float		ExpfOrigin(float x) { return expf(x); }
 	static WWINLINE float		Log10fOrigin(float x) { return log10f(x); }
+	static WWINLINE float		LogfOrigin(float x) { return logf(x); }
+	static WWINLINE float		SinhfOrigin(float x) { return sinhf(x); }
+	static WWINLINE float		CoshfOrigin(float x) { return coshf(x); }
+	static WWINLINE float		TanhfOrigin(float x) { return tanhf(x); }
 #endif
 static WWINLINE float		Sign(float val);
 static WWINLINE float		Ceil(float val) { return ceilf(val); }
