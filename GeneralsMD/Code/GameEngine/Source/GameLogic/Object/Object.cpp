@@ -1754,13 +1754,13 @@ inline Bool isPosDifferent(const Coord3D* a, const Coord3D* b)
 	// so we must put in some cleverness...
 	const Real THRESH = 0.01f;
 
-	if (WWMath::FAbsOrigin(a->x - b->x) > THRESH)
+	if (WWMath::FAbs_Origin(a->x - b->x) > THRESH)
 		return true;
 
-	if (WWMath::FAbsOrigin(a->y - b->y) > THRESH)
+	if (WWMath::FAbs_Origin(a->y - b->y) > THRESH)
 		return true;
 
-	if (WWMath::FAbsOrigin(a->z - b->z) > THRESH)
+	if (WWMath::FAbs_Origin(a->z - b->z) > THRESH)
 		return true;
 
 	return false;
@@ -1776,7 +1776,7 @@ inline Bool isAngleDifferent(Real a, Real b)
 
 	const Real THRESH = 0.01f;	// in radians, this is approx 1/2 degree.
 
-	if (WWMath::FAbsOrigin(a - b) > THRESH)
+	if (WWMath::FAbs_Origin(a - b) > THRESH)
 		return true;
 
 	return false;

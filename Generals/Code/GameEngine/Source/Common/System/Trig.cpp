@@ -51,32 +51,32 @@
 
 Real Sin(Real x)
 {
-	return WWMath::SinTrig(x);
+	return WWMath::Sin_Trig(x);
 }
 
 Real Cos(Real x)
 {
-	return WWMath::CosTrig(x);
+	return WWMath::Cos_Trig(x);
 }
 
 Real Tan(Real x)
 {
-	return WWMath::TanTrig(x);
+	return WWMath::Tan_Trig(x);
 }
 
 Real ACos(Real x)
 {
-	return WWMath::ACosTrig(x);
+	return WWMath::ACos_Trig(x);
 }
 
 Real ASin(Real x)
 {
-	return WWMath::ASinTrig(x);
+	return WWMath::ASin_Trig(x);
 }
 
 double Sqrt(double x)
 {
-	return WWMath::SqrtOrigin(x);
+	return WWMath::Sqrt_Origin(x);
 }
 
 #ifdef REGENERATE_TRIG_TABLES

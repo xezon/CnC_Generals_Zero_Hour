@@ -39,18 +39,18 @@ static void appendSimulationMathCrc_Deterministic(XferCRC &xfer)
         0.9f, 1.0f, 2.1f, 1.2f);
 
     factorsMatrix.Set(
-        WWMath::Sin(0.7f) * WWMath::Log10fOrigin(2.3f),
-        WWMath::Cos(1.1f) * WWMath::PowfOrigin(1.1f, 2.0f),
-        WWMath::TanfOrigin(0.3f),
-        WWMath::ASinfOrigin(0.967302263f),
-        WWMath::ACosfOrigin(0.967302263f),
-        WWMath::AtanfOrigin(0.967302263f) * WWMath::PowfOrigin(1.1f, 2.0f),
-        WWMath::Atan2fOrigin(0.4f, 1.3f),
-        WWMath::SinhfOrigin(0.2f),
-        WWMath::CoshfOrigin(0.4f) * WWMath::TanhfOrigin(0.5f),
-        WWMath::SqrtfOrigin(55788.84375f),
-        WWMath::ExpfOrigin(0.1f) * WWMath::Log10fOrigin(2.3f),
-        WWMath::LogfOrigin(1.4f));
+        WWMath::Sin(0.7f) * WWMath::Log10f_Origin(2.3f),
+        WWMath::Cos(1.1f) * WWMath::Powf_Origin(1.1f, 2.0f),
+        WWMath::Tanf_Origin(0.3f),
+        WWMath::ASinf_Origin(0.967302263f),
+        WWMath::ACosf_Origin(0.967302263f),
+        WWMath::Atanf_Origin(0.967302263f) * WWMath::Powf_Origin(1.1f, 2.0f),
+        WWMath::Atan2f_Origin(0.4f, 1.3f),
+        WWMath::Sinhf_Origin(0.2f),
+        WWMath::Coshf_Origin(0.4f) * WWMath::Tanhf_Origin(0.5f),
+        WWMath::Sqrtf_Origin(55788.84375f),
+        WWMath::Expf_Origin(0.1f) * WWMath::Log10f_Origin(2.3f),
+        WWMath::Logf_Origin(1.4f));
 
     Matrix3D::Multiply(matrix, factorsMatrix, &matrix);
     matrix.Get_Inverse(matrix);
@@ -111,6 +111,7 @@ void SimulationMathCrc::runBenchmark(int iterations)
     UnsignedInt crcDet = 0;
     
     setFPMode();
+
     for (i = 0; i < iterations; ++i)
     {
         XferCRC xfer;
@@ -127,6 +128,7 @@ void SimulationMathCrc::runBenchmark(int iterations)
     UnsignedInt crcNat = 0;
     
     setFPMode();
+
     for (i = 0; i < iterations; ++i)
     {
         XferCRC xfer;
@@ -139,7 +141,7 @@ void SimulationMathCrc::runBenchmark(int iterations)
     clock_t endNat = clock();
     double timeNatMs = (double)(endNat - startNat) / CLOCKS_PER_SEC * 1000.0;
 
-    printf("\n================ MATH BENCHMARK (%d iters) ================\n", iterations);
+    printf("\n================ MATH BENCHMARK (%d iterations) ================\n", iterations);
     printf("Deterministic (WWMath): CRC = %08X, Time = %.2f ms\n", crcDet, timeDetMs);
     printf("Native (system math):   CRC = %08X, Time = %.2f ms\n", crcNat, timeNatMs);
     printf("===========================================================\n\n");

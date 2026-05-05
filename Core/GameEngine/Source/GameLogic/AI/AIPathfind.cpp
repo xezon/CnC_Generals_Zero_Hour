@@ -727,9 +727,9 @@ inline Bool isReallyClose(const Coord3D& a, const Coord3D& b)
 {
 	const Real CLOSE_ENOUGH = 0.1f;
 	return
-		WWMath::FAbsOrigin(a.x-b.x) <= CLOSE_ENOUGH &&
-		WWMath::FAbsOrigin(a.y-b.y) <= CLOSE_ENOUGH &&
-		WWMath::FAbsOrigin(a.z-b.z) <= CLOSE_ENOUGH;
+		WWMath::FAbs_Origin(a.x-b.x) <= CLOSE_ENOUGH &&
+		WWMath::FAbs_Origin(a.y-b.y) <= CLOSE_ENOUGH &&
+		WWMath::FAbs_Origin(a.z-b.z) <= CLOSE_ENOUGH;
 }
 
 /**
@@ -921,7 +921,7 @@ void Path::computePointOnPath(
 		// compute distance of point from this path segment
 		Real toDistSqr = sqr(toPos.x) + sqr(toPos.y);
 		Real offsetDistSq = toDistSqr - sqr(alongPathDist);
-		Real offsetDist = (offsetDistSq <= 0.0) ? 0.0 : WWMath::SqrtOrigin(offsetDistSq);
+		Real offsetDist = (offsetDistSq <= 0.0) ? 0.0 : WWMath::Sqrt_Origin(offsetDistSq);
 
 		// If we are basically on the path, return the next path node as the movement goal.
 		// However, the farther off the path we get, the movement goal becomes closer to our
@@ -1011,8 +1011,8 @@ void Path::computePointOnPath(
 				out.posOnPath.x = closeNodePos->x + alongPathDist * segmentDirNorm.x;
 				out.posOnPath.y = closeNodePos->y + alongPathDist * segmentDirNorm.y;
 				out.posOnPath.z = closeNodePos->z;
-				Real dx = WWMath::FAbsOrigin(pos.x - out.posOnPath.x);
-				Real dy = WWMath::FAbsOrigin(pos.y - out.posOnPath.y);
+				Real dx = WWMath::FAbs_Origin(pos.x - out.posOnPath.x);
+				Real dy = WWMath::FAbs_Origin(pos.y - out.posOnPath.y);
 				if (dx<1 && dy<1 && closeNode->getNextOptimized() && closeNode->getNextOptimized()->getNextOptimized()) {
 					out.posOnPath = *closeNode->getNextOptimized()->getNextOptimized()->getPosition();
 				}
@@ -2070,7 +2070,7 @@ UnsignedInt PathfindCell::costToGoal( PathfindCell *goal )
 	Int dy = m_info->m_pos.y - goal->getYIndex();
 #define NO_REAL_DIST
 #ifdef REAL_DIST
-	Int cost = COST_ORTHOGONAL*WWMath::SqrtOrigin(dx*dx + dy*dy);
+	Int cost = COST_ORTHOGONAL*WWMath::Sqrt_Origin(dx*dx + dy*dy);
 #else
 	if (dx<0) dx = -dx;
 	if (dy<0) dy = -dy;
@@ -2096,7 +2096,7 @@ UnsignedInt PathfindCell::costToHierGoal( PathfindCell *goal )
 	}
 	Int dx = m_info->m_pos.x - goal->getXIndex();
 	Int dy = m_info->m_pos.y - goal->getYIndex();
-	Int cost = REAL_TO_INT_FLOOR(COST_ORTHOGONAL*WWMath::SqrtOrigin(dx*dx + dy*dy) + 0.5f);
+	Int cost = REAL_TO_INT_FLOOR(COST_ORTHOGONAL*WWMath::Sqrt_Origin(dx*dx + dy*dy) + 0.5f);
 	return cost;
 }
 
@@ -3963,8 +3963,8 @@ Bool PathfindLayer::isPointOnWall(ObjectID *wallPieces, Int numPieces, const Coo
 		Real pty = pt->y - obj->getPosition()->y;
 
 		// inverse-rotate it to the right coord system
-		Real ptx_new = (Real)WWMath::FAbsOrigin(ptx*c - pty*s);
-		Real pty_new = (Real)WWMath::FAbsOrigin(ptx*s + pty*c);
+		Real ptx_new = (Real)WWMath::FAbs_Origin(ptx*c - pty*s);
+		Real pty_new = (Real)WWMath::FAbs_Origin(ptx*s + pty*c);
 
 		if (ptx_new <= major && pty_new <= minor)
 		{
@@ -6415,7 +6415,7 @@ Int Pathfinder::examineNeighboringCells(PathfindCell *parentCell, PathfindCell *
 				toPos.y = newCellCoord.y * PATHFIND_CELL_SIZE_F ;
 				toPos.z = TheTerrainLogic->getGroundHeight(toPos.x , toPos.y);
 
-				if ( WWMath::FAbsOrigin(fromPos.z - toPos.z)<PATHFIND_CELL_SIZE_F) {
+				if ( WWMath::FAbs_Origin(fromPos.z - toPos.z)<PATHFIND_CELL_SIZE_F) {
 					newCostSoFar += 7*COST_DIAGONAL;
 				}
 			} else if (newCell->getPinched()) {
@@ -6440,7 +6440,7 @@ Int Pathfinder::examineNeighboringCells(PathfindCell *parentCell, PathfindCell *
 				}	else {
 					dx = newCellCoord.x - goalCell->getXIndex();
 					dy = newCellCoord.y - goalCell->getYIndex();
-					costRemaining = COST_ORTHOGONAL*WWMath::SqrtOrigin(dx*dx + dy*dy);
+					costRemaining = COST_ORTHOGONAL*WWMath::Sqrt_Origin(dx*dx + dy*dy);
 					costRemaining -= attackDistance/2;
 					if (costRemaining<0)
 						costRemaining=0;
@@ -6764,7 +6764,7 @@ Path *Pathfinder::internalFindPath( Object *obj, const LocomotorSet& locomotorSe
 		dx = from->x - to->x;
 		dy = from->y - to->y;
 
-		Int count = WWMath::SqrtOrigin(dx*dx+dy*dy)/(PATHFIND_CELL_SIZE_F/2);
+		Int count = WWMath::Sqrt_Origin(dx*dx+dy*dy)/(PATHFIND_CELL_SIZE_F/2);
 		if (count<2) count = 2;
 		Int i;
 		color.green = 0;
@@ -7455,7 +7455,7 @@ Path *Pathfinder::findGroundPath( const Coord3D *from,
 		dx = from->x - to->x;
 		dy = from->y - to->y;
 
-		Int count = WWMath::SqrtOrigin(dx*dx+dy*dy)/(PATHFIND_CELL_SIZE_F/2);
+		Int count = WWMath::Sqrt_Origin(dx*dx+dy*dy)/(PATHFIND_CELL_SIZE_F/2);
 		if (count<2) count = 2;
 		Int i;
 		color.green = 0;
@@ -8159,7 +8159,7 @@ Path *Pathfinder::internal_findHierarchicalPath( Bool isHuman, const LocomotorSu
 		dx = from->x - to->x;
 		dy = from->y - to->y;
 
-		Int count = WWMath::SqrtOrigin(dx*dx+dy*dy)/(PATHFIND_CELL_SIZE_F/2);
+		Int count = WWMath::Sqrt_Origin(dx*dx+dy*dy)/(PATHFIND_CELL_SIZE_F/2);
 		if (count<2) count = 2;
 		Int i;
 		color.green = 0;
@@ -11216,7 +11216,7 @@ Path *Pathfinder::findSafePath( const Object *obj, const LocomotorSet& locomotor
 			farthestDistanceSqr = distSqr;
 			if (cellCount > MAX_CELLS) {
 #ifdef INTENSE_DEBUG
-				DEBUG_LOG(("Took intermediate path, dist %f, goal dist %f", WWMath::SqrtOrigin(farthestDistanceSqr), repulsorRadius));
+				DEBUG_LOG(("Took intermediate path, dist %f, goal dist %f", WWMath::Sqrt_Origin(farthestDistanceSqr), repulsorRadius));
 #endif
 				ok = true; // Already a big search, just take this one.
 			}

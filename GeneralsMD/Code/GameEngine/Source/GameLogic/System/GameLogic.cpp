@@ -849,7 +849,7 @@ static void populateRandomStartPosition( GameInfo *game )
 				{
 					Coord3D p1 = c1->second;
 					Coord3D p2 = c2->second;
-					startSpotDistance[i][j] = WWMath::SqrtOrigin( sqr(p1.x-p2.x) + sqr(p1.y-p2.y) );
+					startSpotDistance[i][j] = WWMath::Sqrt_Origin( sqr(p1.x-p2.x) + sqr(p1.y-p2.y) );
 				}
 			}
 			else
@@ -3739,19 +3739,13 @@ void GameLogic::update()
 		TheTerrainLogic->UPDATE();
 	}
 
-#ifdef RUN_MATH_BENCHMARK_REPLAY400_FLAG
-	static int s_replayStartFrame = -1;
+#if RUN_MATH_BENCHMARK_REPLAY400_FLAG
 	static bool s_benchmarkRun = false;
 
-	if (!s_benchmarkRun && TheRecorder && TheRecorder->isPlaybackMode())
+	if (!s_benchmarkRun && m_frame == 400)
 	{
-		if (s_replayStartFrame == -1) {
-			s_replayStartFrame = m_frame;
-		}
-		else if (m_frame == s_replayStartFrame + 400) {
-			SimulationMathCrc::runBenchmark(10000);
-			s_benchmarkRun = true;
-		}
+		SimulationMathCrc::runBenchmark(10000);
+		s_benchmarkRun = true;
 	}
 #endif
 

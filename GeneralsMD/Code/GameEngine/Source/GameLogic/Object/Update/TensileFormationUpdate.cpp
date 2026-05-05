@@ -348,7 +348,7 @@ UpdateSleepTime TensileFormationUpdate::update()
 	else
 		draw->clearModelConditionFlags(MAKE_MODELCONDITION_MASK(MODELCONDITION_MOVING));
 
-	if ( WWMath::FAbsOrigin( pos->z - newPos.z ) > 0.2f && m_life < 100)
+	if ( WWMath::FAbs_Origin( pos->z - newPos.z ) > 0.2f && m_life < 100)
 		draw->setModelConditionFlags(MAKE_MODELCONDITION_MASK(MODELCONDITION_FREEFALL));
 	else
 		draw->clearModelConditionFlags(MAKE_MODELCONDITION_MASK(MODELCONDITION_FREEFALL));

@@ -232,7 +232,7 @@ void GenerateMinefieldBehavior::placeMinesAlongLine(const Coord3D& posStart, con
 
 	Real dx = posEnd.x - posStart.x;
 	Real dy = posEnd.y - posStart.y;
-	Real len = WWMath::SqrtOrigin(sqr(dx) + sqr(dy));
+	Real len = WWMath::Sqrt_Origin(sqr(dx) + sqr(dy));
 	Real mineRadius = mineTemplate->getTemplateGeometryInfo().getBoundingCircleRadius();
 	Real mineDiameter = mineRadius * 2.0f;
 	Real mineJitter = mineRadius*d->m_randomJitter;

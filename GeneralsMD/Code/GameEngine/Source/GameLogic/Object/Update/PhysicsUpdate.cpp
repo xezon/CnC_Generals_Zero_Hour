@@ -103,7 +103,7 @@ static Real heightToSpeed(Real height)
 {
 	// don't bother trying to remember how far we've fallen; instead,
 	// back-calc it from our speed & gravity... v = sqrt(2*g*h)
-	return WWMath::SqrtOrigin(WWMath::FAbsOrigin(2.0f * TheGlobalData->m_gravity * height));
+	return WWMath::Sqrt_Origin(WWMath::FAbs_Origin(2.0f * TheGlobalData->m_gravity * height));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -513,7 +513,7 @@ Bool PhysicsBehavior::handleBounce(Real oldZ, Real newZ, Real groundZ, Coord3D* 
 		Real vz = getVelocity()->z;
 		if (oldZ > groundZ && vz < 0.0f)
 		{
-			desiredAccelZ = WWMath::FAbsOrigin(vz) * stiffness;
+			desiredAccelZ = WWMath::FAbs_Origin(vz) * stiffness;
 		}
 
 		bounceForce->x = 0.0f;
@@ -555,7 +555,7 @@ Bool PhysicsBehavior::handleBounce(Real oldZ, Real newZ, Real groundZ, Coord3D* 
 inline Bool isVerySmall3D(const Coord3D& v)
 {
 	const Real THRESH = 0.01f;
-	return (WWMath::FAbsOrigin(v.x) < THRESH && WWMath::FAbsOrigin(v.y) < THRESH && WWMath::FAbsOrigin(v.z) < THRESH);
+	return (WWMath::FAbs_Origin(v.x) < THRESH && WWMath::FAbs_Origin(v.y) < THRESH && WWMath::FAbs_Origin(v.z) < THRESH);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -655,9 +655,9 @@ UpdateSleepTime PhysicsBehavior::update()
 
 		// when vel gets tiny, just clamp to zero
 		const Real THRESH = 0.001f;
-		if (WWMath::FAbsfOrigin(m_vel.x) < THRESH) m_vel.x = 0.0f;
-		if (WWMath::FAbsfOrigin(m_vel.y) < THRESH) m_vel.y = 0.0f;
-		if (WWMath::FAbsfOrigin(m_vel.z) < THRESH) m_vel.z = 0.0f;
+		if (WWMath::FAbsf_Origin(m_vel.x) < THRESH) m_vel.x = 0.0f;
+		if (WWMath::FAbsf_Origin(m_vel.y) < THRESH) m_vel.y = 0.0f;
+		if (WWMath::FAbsf_Origin(m_vel.z) < THRESH) m_vel.z = 0.0f;
 
 		m_velMag = INVALID_VEL_MAG;
 
@@ -689,9 +689,9 @@ UpdateSleepTime PhysicsBehavior::update()
 		// Check when to clear the stunned status
 		if (getIsStunned())
 		{
-			if ( (WWMath::FAbsOrigin(m_vel.x) < STUN_RELIEF_EPSILON &&
-				    WWMath::FAbsOrigin(m_vel.y) < STUN_RELIEF_EPSILON &&
-				    WWMath::FAbsOrigin(m_vel.z) < STUN_RELIEF_EPSILON)
+			if ( (WWMath::FAbs_Origin(m_vel.x) < STUN_RELIEF_EPSILON &&
+				    WWMath::FAbs_Origin(m_vel.y) < STUN_RELIEF_EPSILON &&
+				    WWMath::FAbs_Origin(m_vel.z) < STUN_RELIEF_EPSILON)
           ||
            obj->isSignificantlyAboveTerrain() == FALSE )
 			{
@@ -737,8 +737,8 @@ UpdateSleepTime PhysicsBehavior::update()
 			if (offset != 0.0f)
 			{
 				Vector3 xvec = mtx.Get_X_Vector();
-				Real xy = WWMath::SqrtfOrigin(sqr(xvec.X) + sqr(xvec.Y));
-				Real pitchAngle = WWMath::Atan2Origin(xvec.Z, xy);
+				Real xy = WWMath::Sqrtf_Origin(sqr(xvec.X) + sqr(xvec.Y));
+				Real pitchAngle = WWMath::Atan2_Origin(xvec.Z, xy);
 				Real remainingAngle = (offset > 0) ? ((PI/2) - pitchAngle) : (-(PI/2) + pitchAngle);
 				Real s = Sin(remainingAngle);
 				pitchRateToUse *= s;
@@ -864,8 +864,8 @@ UpdateSleepTime PhysicsBehavior::update()
 			// going down hills don't injure themselves (unless the hill is really steep)
 			const Real MIN_ANGLE_TAN = 3.0f;	//	roughly 71 degrees
 			const Real TINY_DELTA = 0.01f;
-			if ((WWMath::FAbsOrigin(m_vel.x) <= TINY_DELTA || WWMath::FAbsOrigin(activeVelZ / m_vel.x) >= MIN_ANGLE_TAN) &&
-				(WWMath::FAbsOrigin(m_vel.y) <= TINY_DELTA || WWMath::FAbsOrigin(activeVelZ / m_vel.y) >= MIN_ANGLE_TAN))
+			if ((WWMath::FAbs_Origin(m_vel.x) <= TINY_DELTA || WWMath::FAbs_Origin(activeVelZ / m_vel.x) >= MIN_ANGLE_TAN) &&
+				(WWMath::FAbs_Origin(m_vel.y) <= TINY_DELTA || WWMath::FAbs_Origin(activeVelZ / m_vel.y) >= MIN_ANGLE_TAN))
 			{
 				Real damageAmt = netSpeed * getMass() * d->m_fallHeightDamageFactor;
 
@@ -944,7 +944,7 @@ Real PhysicsBehavior::getVelocityMagnitude() const
 {
 	if (m_velMag == INVALID_VEL_MAG)
 	{
-		m_velMag = (Real)WWMath::SqrtfOrigin( sqr(m_vel.x) + sqr(m_vel.y) + sqr(m_vel.z) );
+		m_velMag = (Real)WWMath::Sqrtf_Origin( sqr(m_vel.x) + sqr(m_vel.y) + sqr(m_vel.z) );
 	}
 	return m_velMag;
 }
@@ -966,7 +966,7 @@ Real PhysicsBehavior::getForwardSpeed2D() const
 	Real speedSquared = vx*vx + vy*vy;
 //	DEBUG_ASSERTCRASH( speedSquared != 0, ("zero speedSquared will overflow sqrtf()!") );// lorenzen... sanity check
 
-	Real speed = (Real)WWMath::SqrtfOrigin( speedSquared );
+	Real speed = (Real)WWMath::Sqrtf_Origin( speedSquared );
 
 	if (dot >= 0.0f)
 		return speed;
@@ -989,7 +989,7 @@ Real PhysicsBehavior::getForwardSpeed3D() const
 
 	Real dot = vx + vy + vz;
 
-	Real speed = (Real)WWMath::SqrtfOrigin( vx*vx + vy*vy + vz*vz );
+	Real speed = (Real)WWMath::Sqrtf_Origin( vx*vx + vy*vy + vz*vz );
 
 	if (dot >= 0.0f)
 		return speed;
@@ -1012,7 +1012,7 @@ Bool PhysicsBehavior::wasPreviouslyOverlapped(Object *obj) const
 //-------------------------------------------------------------------------------------------------
 void PhysicsBehavior::scrubVelocityZ( Real desiredVelocity )
 {
-	if (WWMath::FAbsOrigin(desiredVelocity) < 0.001f)
+	if (WWMath::FAbs_Origin(desiredVelocity) < 0.001f)
 	{
 		m_vel.z = 0;
 	}
@@ -1036,7 +1036,7 @@ void PhysicsBehavior::scrubVelocity2D( Real desiredVelocity )
 	}
 	else
 	{
-		Real curVelocity = WWMath::SqrtfOrigin(m_vel.x*m_vel.x + m_vel.y*m_vel.y);
+		Real curVelocity = WWMath::Sqrtf_Origin(m_vel.x*m_vel.x + m_vel.y*m_vel.y);
 		if (desiredVelocity > curVelocity)
 		{
 			return;
@@ -1119,9 +1119,9 @@ void PhysicsBehavior::doBounceSound(const Coord3D& prevPos)
 
 //Real vel = fabs(getVelocity()->z);
 // can't use velocity, because it's already been updated this frame, and will be zero... (srj)
-	Real vel = WWMath::FAbsOrigin(prevPos.z - getObject()->getPosition()->z);
+	Real vel = WWMath::FAbs_Origin(prevPos.z - getObject()->getPosition()->z);
 
-	Real mass = WWMath::FAbsOrigin(getMass());
+	Real mass = WWMath::FAbs_Origin(getMass());
 	if (vel > NORMAL_VEL_Z) {
 		vel = NORMAL_VEL_Z;
 	}
@@ -1321,7 +1321,7 @@ void PhysicsBehavior::onCollide( Object *other, const Coord3D *loc, const Coord3
 
 	m_lastCollidee = other->getID();
 
-	Real dist = WWMath::SqrtfOrigin(distSqr);
+	Real dist = WWMath::Sqrtf_Origin(distSqr);
 	Real overlap = usRadius + themRadius - dist;
 
 	// if objects are coincident, dist is zero, so force would be infinite -- clearly
@@ -1462,7 +1462,7 @@ static Bool perpsLogicallyEqual( Real perpOne, Real perpTwo )
 {
 	// Equality with a wiggle fudge.
   const Real PERP_RANGE = 0.15f;
-	return WWMath::FAbsOrigin( perpOne - perpTwo ) <= PERP_RANGE;
+	return WWMath::FAbs_Origin( perpOne - perpTwo ) <= PERP_RANGE;
 }
 
 //-------------------------------------------------------------------------------------------------

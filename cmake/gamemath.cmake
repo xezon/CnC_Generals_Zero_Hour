@@ -12,5 +12,5 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(gamemath)
 
 # Ensure GameMath includes are available to ALL targets
-# to prevent ODR violations and ensure USE_DETERMINISTIC_MATH activates consistently.
+# to prevent one-definition-rule violations and ensure USE_DETERMINISTIC_MATH activates consistently.
 include_directories(${gamemath_SOURCE_DIR}/include)

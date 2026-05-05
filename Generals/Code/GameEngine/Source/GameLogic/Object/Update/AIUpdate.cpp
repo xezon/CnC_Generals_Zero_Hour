@@ -1282,8 +1282,8 @@ Bool AIUpdateInterface::blockedBy(Object *other)
 
 	// If we are near our final goal, don't get stuck.
 	if (goalCell.x>0 && goalCell.y>0) {
-		Real dx = WWMath::FAbsOrigin(goalPos.x-pos.x);
-		Real dy = WWMath::FAbsOrigin(goalPos.y-pos.y);
+		Real dx = WWMath::FAbs_Origin(goalPos.x-pos.x);
+		Real dy = WWMath::FAbs_Origin(goalPos.y-pos.y);
 		if (dx<PATHFIND_CELL_SIZE_F && dy<PATHFIND_CELL_SIZE_F) {
 			return FALSE; // If we're approaching our goal, ignore obstacles.
 		}
@@ -1398,7 +1398,7 @@ Bool AIUpdateInterface::needToRotate()
 		deltaAngle = ThePartitionManager->getRelativeAngle2D( getObject(), &info.posOnPath );
 	}
 
-	if (WWMath::FAbsOrigin(deltaAngle)>PI/30)
+	if (WWMath::FAbs_Origin(deltaAngle)>PI/30)
 	{
 		return TRUE;
 	}
@@ -2230,7 +2230,7 @@ UpdateSleepTime AIUpdateInterface::doLocomotor()
 							}
 							else
 							{
-								Real dist = WWMath::SqrtfOrigin(dSqr);
+								Real dist = WWMath::Sqrtf_Origin(dSqr);
 								if (dist<1) dist = 1;
 								pos.x += 2*PATHFIND_CELL_SIZE_F*dx/(dist*LOGICFRAMES_PER_SECOND);
 								pos.y += 2*PATHFIND_CELL_SIZE_F*dy/(dist*LOGICFRAMES_PER_SECOND);
@@ -2424,7 +2424,7 @@ Real AIUpdateInterface::getLocomotorDistanceToGoal()
 					dest = m_path->getLastNode()->getPosition();
 				}
 				Real distance = ThePartitionManager->getDistanceSquared( me, dest, FROM_CENTER_3D );
-				return WWMath::SqrtOrigin( distance );// Other paths return dots of normalized vectors, so one sqrt ain't so bad
+				return WWMath::Sqrt_Origin( distance );// Other paths return dots of normalized vectors, so one sqrt ain't so bad
 			}
 			else
 			{
@@ -2456,7 +2456,7 @@ Real AIUpdateInterface::getLocomotorDistanceToGoal()
 				{
 					if (sqr(dist) > distSqr)
 					{
-						return WWMath::SqrtOrigin(distSqr);
+						return WWMath::Sqrt_Origin(distSqr);
 					}
 					else
 					{
@@ -2465,7 +2465,7 @@ Real AIUpdateInterface::getLocomotorDistanceToGoal()
 				}
 
 				if (dist<PATHFIND_CELL_SIZE_F || sqr(dist) < distSqr)
-					return WWMath::SqrtfOrigin(distSqr);
+					return WWMath::Sqrtf_Origin(distSqr);
 				else
 					return dist;
 

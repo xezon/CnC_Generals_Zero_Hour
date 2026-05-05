@@ -51,7 +51,7 @@ if (NOT IS_VS6_BUILD)
         add_compile_options(/Zc:__cplusplus)
     else()
         add_compile_options(-Wsuggest-override)
-        # TheSuperHackers @fix Prevent FMA contraction (a*b+c -> fmadd) which skips intermediate
+        # Prevent FMA contraction (a*b+c -> fmadd) which skips intermediate
         # rounding and breaks cross-platform deterministic math parity with MSVC (/fp:precise).
         add_compile_options(-ffp-contract=off)
     endif()

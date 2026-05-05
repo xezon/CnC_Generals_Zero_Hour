@@ -516,8 +516,8 @@ public:
 
 		Coord3D intermedPt;
 		Bool intermed = false;
-		Real orient = WWMath::Atan2Origin(ppinfo.runwayPrep.y - ppinfo.parkingSpace.y, ppinfo.runwayPrep.x - ppinfo.parkingSpace.x);
-		if (WWMath::FAbsOrigin(stdAngleDiff(orient, ppinfo.parkingOrientation)) > PI/128)
+		Real orient = WWMath::Atan2_Origin(ppinfo.runwayPrep.y - ppinfo.parkingSpace.y, ppinfo.runwayPrep.x - ppinfo.parkingSpace.x);
+		if (WWMath::FAbs_Origin(stdAngleDiff(orient, ppinfo.parkingOrientation)) > PI/128)
 		{
 			intermedPt.z = (ppinfo.parkingSpace.z + ppinfo.runwayPrep.z) * 0.5f;
 			intermed = intersectInfiniteLine2D(
@@ -1071,7 +1071,7 @@ public:
 		}
 		else
 		{
-			Real dist = WWMath::SqrtfOrigin(dSqr);
+			Real dist = WWMath::Sqrtf_Origin(dSqr);
 			if (dist<1) dist = 1;
 			pos.x += PATHFIND_CELL_SIZE_F*dx/(dist*LOGICFRAMES_PER_SECOND);
 			pos.y += PATHFIND_CELL_SIZE_F*dy/(dist*LOGICFRAMES_PER_SECOND);
@@ -1199,7 +1199,7 @@ public:
 			return STATE_FAILURE;
 
 		const Real THRESH = 0.001f;
-		if (WWMath::FAbsOrigin(stdAngleDiff(jet->getOrientation(), ppinfo.parkingOrientation)) <= THRESH)
+		if (WWMath::FAbs_Origin(stdAngleDiff(jet->getOrientation(), ppinfo.parkingOrientation)) <= THRESH)
 			return STATE_SUCCESS;
 
 		// magically position it correctly.
@@ -2297,7 +2297,7 @@ void JetAIUpdate::positionLockon()
 	Real dx = getObject()->getPosition()->x - pos.x;
 	Real dy = getObject()->getPosition()->y - pos.y;
 	if (dx || dy)
-		m_lockonDrawable->setOrientation(WWMath::Atan2Origin(dy, dx));
+		m_lockonDrawable->setOrientation(WWMath::Atan2_Origin(dy, dx));
 
 	// the Gaussian sum, to avoid keeping a running total:
 	//
