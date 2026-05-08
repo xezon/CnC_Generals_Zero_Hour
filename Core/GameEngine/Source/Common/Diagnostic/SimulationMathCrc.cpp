@@ -118,7 +118,8 @@ void SimulationMathCrc::runBenchmark(int iterations)
         xfer.open("SimMathDet");
         appendSimulationMathCrc_Deterministic(xfer);
         xfer.close();
-        if (i == 0) crcDet = xfer.getCRC();
+		if (i == 0)
+			crcDet = xfer.getCRC();
     }
     _fpreset();
     clock_t endDet = clock();
@@ -135,7 +136,8 @@ void SimulationMathCrc::runBenchmark(int iterations)
         xfer.open("SimMathNat");
         appendSimulationMathCrc_Native(xfer);
         xfer.close();
-        if (i == 0) crcNat = xfer.getCRC();
+		if (i == 0)
+			crcNat = xfer.getCRC();
     }
     _fpreset();
     clock_t endNat = clock();
