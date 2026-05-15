@@ -766,6 +766,8 @@ public:
 	virtual Int getOnScreenParticleCount() = 0;   ///< returns the number of particles on screen
   virtual void setOnScreenParticleCount(int count);
 
+	virtual Bool isDummy() const { return false; }
+
 	ParticleSystemTemplate *findTemplate( const AsciiString &name ) const;
 	ParticleSystemTemplate *findParentTemplate( const AsciiString &name, int parentNum ) const;
 	ParticleSystemTemplate *newTemplate( const AsciiString &name );
@@ -846,13 +848,19 @@ private:
 };
 
 // TheSuperHackers @feature bobtista 31/01/2026
-// ParticleSystemManager that does nothing. Used for Headless Mode.
+// ParticleSystemManager that does nothing. Cannot create particle systems and templates. Used for Headless Mode.
 class ParticleSystemManagerDummy : public ParticleSystemManager
 {
 public:
+	virtual void init() override {}
+	virtual void reset() override {}
+	virtual void update() override {}
+
 	virtual Int getOnScreenParticleCount() override { return 0; }
 	virtual void doParticles(RenderInfoClass &rinfo) override {}
 	virtual void queueParticleRender() override {}
+
+	virtual Bool isDummy() const override { return true; }
 
 protected:
 	virtual void crc( Xfer *xfer ) override {}
