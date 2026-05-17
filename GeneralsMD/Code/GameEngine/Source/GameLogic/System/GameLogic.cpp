@@ -3912,9 +3912,9 @@ void GameLogic::update()
 		}
 	}
 
-
-
-
+	const Int localPlayerIndex = rts::getObservedOrLocalPlayer()->getPlayerIndex();
+	TheParticleSystemManager->setLocalPlayerIndex(localPlayerIndex);
+	TheParticleSystemManager->update();
 
 	// increment world time
 	if (!m_startNewGame)

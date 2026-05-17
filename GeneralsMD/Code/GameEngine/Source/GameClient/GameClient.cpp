@@ -739,12 +739,8 @@ void GameClient::update()
 #endif
 
 	// update all particle systems
-	if( !freezeTime )
 	{
-		// update particle systems
-		TheParticleSystemManager->setLocalPlayerIndex(localPlayerIndex);
-//		TheParticleSystemManager->update();
-
+		//TheParticleSystemManager->draw(); //LORENZEN AND WILCZYNSKI MOVED THIS TO W3DDisplay
 	}
 
 	// update the terrain visuals

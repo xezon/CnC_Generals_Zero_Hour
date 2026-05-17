@@ -33,6 +33,7 @@
 
 #include "Common/GameState.h"
 #include "Common/INI.h"
+#include "Common/FramePacer.h"
 #include "Common/PerfTimer.h"
 #include "Common/ThingFactory.h"
 #include "Common/GameLOD.h"
@@ -297,7 +298,7 @@ Particle::Particle( ParticleSystem *system, const ParticleInfo *info )
 
 	m_lifetime = info->m_lifetime;
 	m_lifetimeLeft = info->m_lifetime;
-	m_createTimestamp = TheGameClient->getFrame();
+	m_createTimestamp = TheGameLogic->getFrame();
 	m_personality = 0;
 
 	m_size = info->m_size;
@@ -372,7 +373,29 @@ void Particle::applyForce( const Coord3D *force )
 // ------------------------------------------------------------------------------------------------
 Bool Particle::update()
 {
-	draw();
+	// monitor lifetime
+	if (m_lifetimeLeft && --m_lifetimeLeft == 0)
+		return false;
+
+	DEBUG_ASSERTCRASH( m_lifetimeLeft, ( "A particle has an infinite lifetime..." ));
+
+	const UnsignedInt frameCount = TheGameLogic->getFrame() - m_createTimestamp;
+
+	if (frameCount == 0)
+	{
+		// TheSuperHackers @info Pass one full logic frame before trying to update and delete this potentially now
+		// invisible particle, because the later render update may fade it in and make it visible.
+		return true;
+	}
+
+#if PRESERVE_RETAIL_PARTICLES
+	// This delay is required to preserve the look of the original particle color and alpha key frames,
+	// because originally the color and alpha rates were accumulated before the key frames advanced.
+	// This setup can cause visual glitches, such as greenish flames with Dragon Tanks and Inferno Cannons.
+	constexpr const UnsignedInt KeyFrameDelay = 1;
+#else
+	constexpr const UnsignedInt KeyFrameDelay = 0;
+#endif
 
 	//
 	// Update alpha (if used)
@@ -381,9 +404,8 @@ Bool Particle::update()
 	{
 		if (m_alphaTargetKey < MAX_KEYFRAMES && m_alphaKey[ m_alphaTargetKey ].frame)
 		{
-			if (TheGameClient->getFrame() - m_createTimestamp >= m_alphaKey[ m_alphaTargetKey ].frame)
+			if (frameCount >= m_alphaKey[ m_alphaTargetKey ].frame + KeyFrameDelay)
 			{
-				m_alpha = m_alphaKey[ m_alphaTargetKey ].value;
 				m_alphaTargetKey++;
 				computeAlphaRate();
 			}
@@ -392,8 +414,6 @@ Bool Particle::update()
 		{
 			m_alphaRate = 0.0f;
 		}
-
-		m_alpha = clamp(0.0f, m_alpha, 1.0f);
 	}
 
 	//
@@ -401,10 +421,8 @@ Bool Particle::update()
 	//
 	if (m_colorTargetKey < MAX_KEYFRAMES && m_colorKey[ m_colorTargetKey ].frame)
 	{
-		if (TheGameClient->getFrame() - m_createTimestamp >= m_colorKey[ m_colorTargetKey ].frame)
+		if (frameCount >= m_colorKey[ m_colorTargetKey ].frame + KeyFrameDelay)
 		{
-			// can't set, because of colorscale
-			// m_color = m_colorKey[ m_colorTargetKey ].color;
 			m_colorTargetKey++;
 			computeColorRate();
 		}
@@ -416,13 +434,8 @@ Bool Particle::update()
 		m_colorRate.blue = 0.0f;
 	}
 
-	// monitor lifetime
-	if (m_lifetimeLeft && --m_lifetimeLeft == 0)
-		return false;
-
-	DEBUG_ASSERTCRASH( m_lifetimeLeft, ( "A particle has an infinite lifetime..." ));
-
 	// if we've gone totally invisible, destroy ourselves
+	// TheSuperHackers @todo This check is shady for particles that fade in first. A more robust logic would be good.
 	if (isInvisible())
 		return false;
 
@@ -430,41 +443,68 @@ Bool Particle::update()
 }
 
 // ------------------------------------------------------------------------------------------------
-void Particle::draw()
+// Get frame-rate independent damping from fixed-time-step damping.
+// Example:
+//   damping = 0.95
+//   timeScale = 0.5 -> sqrt(0.95)
+//   timeScale = 2.0 -> 0.95^2
+//
+static inline Real scaleDamping(Real damping, Real timeScale)
+{
+	return pow(damping, timeScale);
+}
+
+// ------------------------------------------------------------------------------------------------
+// Get frame-rate independent equivalent of:
+//   vel += accel;
+//   vel *= damping;
+//
+static inline Real scaleAccelDamping(Real damping, Real timeScale)
+{
+	if (fabs(damping - 1.0f) < 0.00001f)
+		return timeScale;
+
+	const Real decay = pow(damping, timeScale);
+
+	return damping * (1.0f - decay) / (1.0f - damping);
+}
+
+// ------------------------------------------------------------------------------------------------
+void Particle::draw(Real timeScale)
 {
 	// integrate acceleration into velocity
-	m_vel.x += m_accel.x;
-	m_vel.y += m_accel.y;
-	m_vel.z += m_accel.z;
-
-	m_vel.x *= m_velDamping;
-	m_vel.y *= m_velDamping;
-	m_vel.z *= m_velDamping;
+	const Real velDecay = scaleDamping(m_velDamping, timeScale);
+	const Real accelDecay = scaleAccelDamping(m_velDamping, timeScale);
+	m_vel.x = m_vel.x * velDecay + m_accel.x * accelDecay;
+	m_vel.y = m_vel.y * velDecay + m_accel.y * accelDecay;
+	m_vel.z = m_vel.z * velDecay + m_accel.z * accelDecay;
 
 	// integrate velocity into position
 	const Coord3D *driftVel = m_system->getDriftVelocity();
-	m_pos.x += m_vel.x + driftVel->x;
-	m_pos.y += m_vel.y + driftVel->y;
-	m_pos.z += m_vel.z + driftVel->z;
+	m_pos.x += (m_vel.x + driftVel->x) * timeScale;
+	m_pos.y += (m_vel.y + driftVel->y) * timeScale;
+	m_pos.z += (m_vel.z + driftVel->z) * timeScale;
 
 	// integrate the wind (if specified) into position
 	ParticleSystemInfo::WindMotion windMotion = m_system->getWindMotion();
 
 	// see if we should even do anything
 	if( windMotion != ParticleSystemInfo::WIND_MOTION_NOT_USED )
-		doWindMotion();
+		doWindMotion(timeScale);
 
 	// update orientation
 #if PARTICLE_USE_XY_ROTATION
-	m_angleX += m_angularRateX;
-	m_angleY += m_angularRateY;
+	m_angleX += m_angularRateX * timeScale;
+	m_angleY += m_angularRateY * timeScale;
 #endif
-	m_angleZ += m_angularRateZ;
+	m_angleZ += m_angularRateZ * timeScale;
+
+	const Real angularDecay = scaleDamping(m_angularDamping, timeScale);
 #if PARTICLE_USE_XY_ROTATION
-	m_angularRateX *= m_angularDamping;
-	m_angularRateY *= m_angularDamping;
+	m_angularRateX *= angularDecay;
+	m_angularRateY *= angularDecay;
 #endif
-	m_angularRateZ *= m_angularDamping;
+	m_angularRateZ *= angularDecay;
 
 	if (m_particleUpTowardsEmitter)
 	{
@@ -477,25 +517,26 @@ void Particle::draw()
 	}
 
 	// update size
-	m_size += m_sizeRate;
-	m_sizeRate *= m_sizeRateDamping;
+	m_size += m_sizeRate * timeScale;
+	const Real sizeDecay = scaleDamping(m_sizeRateDamping, timeScale);
+	m_sizeRate *= sizeDecay;
 
 	//
 	// Update alpha (if used)
 	//
 	if (m_system->getShaderType() != ParticleSystemInfo::ADDITIVE)
 	{
-		m_alpha += m_alphaRate;
+		m_alpha += m_alphaRate * timeScale;
 		m_alpha = clamp(0.0f, m_alpha, 1.0f);
 	}
 
 	//
 	// Update color
 	//
-	m_color += m_colorRate;
+	m_color += m_colorRate * timeScale;
 
 	/// @todo Rethink this - at least its name
-	m_color += m_colorScale;
+	m_color += m_colorScale * timeScale;
 
 	m_color.red = clamp(0.0f, m_color.red, 1.0f);
 	m_color.green = clamp(0.0f, m_color.green, 1.0f);
@@ -510,7 +551,7 @@ void Particle::draw()
 // ------------------------------------------------------------------------------------------------
 /** Do wind motion as specified by the particle system template, if present */
 // ------------------------------------------------------------------------------------------------
-void Particle::doWindMotion()
+void Particle::doWindMotion(Real timeScale)
 {
 
 	// get the angle of the wind
@@ -574,7 +615,7 @@ void Particle::doWindMotion()
 	Real distFromWind = v.length();
 	if( distFromWind < noForceDistance )
 	{
-		Real windForceStrength = 2.0f * m_windRandomness;
+		Real windForceStrength = 2.0f * m_windRandomness * timeScale;
 
 		// only apply force if still within the circle of influence
 		if( distFromWind > fullForceDistance )
@@ -1144,14 +1185,14 @@ ParticleSystem::ParticleSystem( const ParticleSystemTemplate *sysTemplate,
 
 	m_delayLeft = (UnsignedInt)sysTemplate->m_initialDelay.getValue();
 
-	m_startTimestamp = TheGameClient->getFrame();
+	m_startTimestamp = TheGameLogic->getFrame();
 	m_systemLifetimeLeft = sysTemplate->m_systemLifetime;
 	if (sysTemplate->m_systemLifetime)
 		m_isForever = false;
 	else
 		m_isForever = true;
 
-	m_accumulatedSizeBonus = 0;
+	m_accumulatedSizeBonus = 0.0f;
 
 	m_velDamping = sysTemplate->m_velDamping;
 
@@ -1749,7 +1790,7 @@ Particle *ParticleSystem::createParticle( const ParticleInfo *info,
 
 		//
 		// Check if particle is below priorities we allow for this FPS or if it being skipped because
-		// all particesl are being skipped (excluding special fps independent particles at
+		// all particles are being skipped (excluding special fps independent particles at
 		// getMinDynamicParticleSkipPriority())
 		//
 		if( priority < TheGameLODManager->getMinDynamicParticlePriority() ||
@@ -1916,14 +1957,10 @@ Bool ParticleSystem::update( Int localPlayerIndex  )
 		// system actually "starts" once initial delay is over
 		/// @todo reset start time when system is stopped/started
 		if (m_delayLeft == 0)
-			m_startTimestamp = TheGameClient->getFrame();
+			m_startTimestamp = TheGameLogic->getFrame();
 
 		return true;
 	}
-
-	// update the wind motion
-	if (m_windMotion != ParticleSystemInfo::WIND_MOTION_NOT_USED )
-		updateWindMotion();
 
 	//
 	// Update shrouding and drawable/object lifetime for the particle system
@@ -1943,7 +1980,7 @@ Bool ParticleSystem::update( Int localPlayerIndex  )
 	//
 	if (m_isDestroyed == false)
 	{
-		if (m_isForever || (m_isForever == false && m_systemLifetimeLeft > 0))
+		if (m_isForever || m_systemLifetimeLeft > 0)
 		{
 			if (!visibilityState.isShrouded && m_isStopped == false && m_masterSystem == nullptr)
 			{
@@ -2009,17 +2046,6 @@ Bool ParticleSystem::update( Int localPlayerIndex  )
 	Particle *oldParticle;
 	while (p)
 	{
-
-		// apply 'gravity' force
-		if (m_gravity != 0.0f)
-		{
-			Coord3D force;
-			force.x = 0.0f;
-			force.y = 0.0f;
-			force.z = m_gravity;
-			p->applyForce( &force );
-		}
-
 		if (p->update() == false)
 		{
 			oldParticle = p;
@@ -2036,7 +2062,6 @@ Bool ParticleSystem::update( Int localPlayerIndex  )
 	//
 	if (m_isDestroyed && !m_systemParticlesHead)
 		return false;
-
 
 	// monitor particle system lifetime
 	if (m_isForever == false)
@@ -2220,9 +2245,38 @@ ParticleSystem::VisibilityState ParticleSystem::updateVisibility( Int localPlaye
 }
 
 // ------------------------------------------------------------------------------------------------
+void ParticleSystem::draw(Real timeScale)
+{
+	if (TheGlobalData->m_useFX == FALSE)
+		return;
+
+	if (m_windMotion != ParticleSystemInfo::WIND_MOTION_NOT_USED )
+		updateWindMotion(timeScale);
+
+	updateTransform();
+
+	Particle *p = m_systemParticlesHead;
+	while (p)
+	{
+		// apply 'gravity' force
+		if (m_gravity != 0.0f)
+		{
+			Coord3D force;
+			force.x = 0.0f;
+			force.y = 0.0f;
+			force.z = m_gravity;
+			p->applyForce( &force );
+		}
+
+		p->draw(timeScale);
+		p = p->m_systemNext;
+	}
+}
+
+// ------------------------------------------------------------------------------------------------
 /** Update the wind motion */
 // ------------------------------------------------------------------------------------------------
-void ParticleSystem::updateWindMotion()
+void ParticleSystem::updateWindMotion(Real timeScale)
 {
 
 	switch( m_windMotion )
@@ -2249,7 +2303,7 @@ void ParticleSystem::updateWindMotion()
 			// the angle.  When we are closer to the center we change it faster (more), and when
 			// we are near the edges we change is slower (less)
 			//
-			Real change = (1.0f - (diffFromCenter / halfSpan)) * m_windAngleChange;
+			Real change = (1.0f - (diffFromCenter / halfSpan)) * m_windAngleChange * timeScale;
 
 			// we will always change a little bit
 			#define MINIMUM_CHANGE 0.005f  // lower #'s have softer swings at the edge angles
@@ -2330,7 +2384,7 @@ void ParticleSystem::updateWindMotion()
 				m_windAngleChange = GameClientRandomValueReal( m_windAngleChangeMin, m_windAngleChangeMax );
 
 			// add to our wind angle
-			m_windAngle += m_windAngleChange;
+			m_windAngle += m_windAngleChange * timeScale;
 
 			// keep in 0 to 2PI range just to keep the numbers safe and sane
 			if( m_windAngle > TWO_PI )
@@ -2957,7 +3011,6 @@ ParticleSystemManager::ParticleSystemManager()
 	m_onScreenParticleCount = 0;
 	m_localPlayerIndex = 0;
 
-	m_lastLogicFrameUpdate = 0;
 	m_particleCount = 0;
 	m_fieldParticleCount = 0;
 	m_particleSystemCount = 0;
@@ -3043,7 +3096,6 @@ void ParticleSystemManager::reset()
 
 	m_uniqueSystemID = INVALID_PARTICLE_SYSTEM_ID;
 
-	m_lastLogicFrameUpdate = -1;
 	// leave templates as-is
 }
 
@@ -3053,18 +3105,10 @@ void ParticleSystemManager::reset()
 //DECLARE_PERF_TIMER(ParticleSystemManager)
 void ParticleSystemManager::update()
 {
-	if (m_lastLogicFrameUpdate == TheGameLogic->getFrame()) {
-		return;
-	}
-
-	// update the last logic frame.
-	m_lastLogicFrameUpdate = TheGameLogic->getFrame();
-
 	//USE_PERF_TIMER(ParticleSystemManager)
 	ParticleSystemListIt it = m_allParticleSystemList.begin();
 	while( it != m_allParticleSystemList.end() )
 	{
-		// TheSuperHackers @info Must increment the list iterator before potential element erasure from the list.
 		ParticleSystem* sys = *it++;
 		DEBUG_ASSERTCRASH(sys != nullptr, ("ParticleSystemManager::update: ParticleSystem is null"));
 
@@ -3109,6 +3153,21 @@ void ParticleSystemManager::update()
 				}
 			}
 		}
+	}
+}
+
+// ------------------------------------------------------------------------------------------------
+void ParticleSystemManager::draw()
+{
+	const Real timeScale = TheFramePacer->getActualLogicTimeScaleOverFpsRatio();
+
+	ParticleSystemListIt it = m_allParticleSystemList.begin();
+	while( it != m_allParticleSystemList.end() )
+	{
+		ParticleSystem* sys = *it++;
+		DEBUG_ASSERTCRASH(sys != nullptr, ("ParticleSystemManager::draw: ParticleSystem is null"));
+
+		sys->draw(timeScale);
 	}
 }
 
