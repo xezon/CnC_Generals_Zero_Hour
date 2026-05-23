@@ -419,7 +419,7 @@ WWINLINE void Vector3::Normalize()
 	float len2 = Length2();
 	if (len2 != 0.0f)
 	{
-		float oolen = WWMath::Inv_Sqrt(len2);
+		float oolen = WWMath::Inv_Sqrt_Legacy(len2);
 		X *= oolen;
 		Y *= oolen;
 		Z *= oolen;
@@ -432,7 +432,7 @@ WWINLINE Vector3 Normalize(const Vector3 & vec)
 	float len2 = vec.Length2();
 	if (len2 != 0.0f)
 	{
-		float oolen = WWMath::Inv_Sqrt(len2);
+		float oolen = WWMath::Inv_Sqrt_Legacy(len2);
 		return vec * oolen;
 	}
 	return vec;

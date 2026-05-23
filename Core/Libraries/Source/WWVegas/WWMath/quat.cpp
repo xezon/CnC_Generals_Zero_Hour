@@ -114,7 +114,7 @@ void Quaternion::Normalize()
 	if (0.0f == len2) {
 		return;
 	} else {
-		float inv_mag = WWMath::Inv_Sqrt(len2);
+		float inv_mag = WWMath::Inv_Sqrt_Legacy(len2);
 
 		X *= inv_mag;
 		Y *= inv_mag;

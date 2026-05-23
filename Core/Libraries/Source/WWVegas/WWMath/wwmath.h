@@ -121,7 +121,7 @@ static WWINLINE int Float_To_Int_Floor(const float& f);
 static WWINLINE float Cos(float val);
 static WWINLINE float Sin(float val);
 static WWINLINE float Sqrt_Legacy(float val);
-static WWINLINE float Inv_Sqrt(float a);
+static WWINLINE float Inv_Sqrt_Legacy(float a);
 static WWINLINE long  Float_To_Long(float f);
 
 static WWINLINE float Fast_Sin(float val);
@@ -696,13 +696,13 @@ WWINLINE int WWMath::Float_To_Int_Floor (const float& f)
 // ----------------------------------------------------------------------------
 
 #if USE_DETERMINISTIC_MATH
-WWINLINE float WWMath::Inv_Sqrt(float val)
+WWINLINE float WWMath::Inv_Sqrt_Legacy(float val)
 {
 	return 1.0f / gm_sqrtf(val);
 }
 #elif defined(_MSC_VER) && defined(_M_IX86)
 // Some 30% faster inverse square root than regular C++ compiled, from Intel's math library
-WWINLINE float WWMath::Inv_Sqrt(float a)
+WWINLINE float WWMath::Inv_Sqrt_Legacy(float a)
 {
 	float retval;
 
@@ -753,7 +753,7 @@ WWINLINE float WWMath::Inv_Sqrt(float a)
 	return retval;
 }
 #else
-WWINLINE float WWMath::Inv_Sqrt(float val)
+WWINLINE float WWMath::Inv_Sqrt_Legacy(float val)
 {
 	return 1.0f / (float)sqrt(val);
 }
