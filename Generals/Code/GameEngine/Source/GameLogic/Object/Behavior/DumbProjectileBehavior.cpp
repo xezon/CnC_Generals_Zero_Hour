@@ -177,7 +177,7 @@ static Bool calcTrajectory(
 
 	// calc the two possible pitches that will cover the given horizontal range.
 	// (this is actually only true if dz==0, but is a good first guess)
-	Real gravity = WWMath::Fabs_Origin(TheGlobalData->m_gravity);
+	Real gravity = WWMath::Fabs(TheGlobalData->m_gravity);
 	Real gravityTwoDZ = gravity * 2.0f * dz;
 
 	// let's start by aiming directly for it. we know this isn't right (unless gravity
@@ -186,7 +186,7 @@ static Bool calcTrajectory(
 	// if the angle isn't pretty shallow, we can get a better initial guess by using
 	// the code below...
 	const Real SHALLOW_ANGLE = 0.5f * PI / 180.0f;
-	if (WWMath::Fabs_Origin(theta) > SHALLOW_ANGLE)
+	if (WWMath::Fabs(theta) > SHALLOW_ANGLE)
 	{
 		Real t = horizDist / velocity;
 		Real vz = (dz/t + 0.5f*gravity*t);

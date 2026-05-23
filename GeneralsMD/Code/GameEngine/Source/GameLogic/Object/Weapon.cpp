@@ -1502,9 +1502,9 @@ void WeaponTemplate::dealDamageInternal(ObjectID sourceID, ObjectID victimID, co
 				Coord3D shockWaveVector = damageDirection;
 
 				// Guard against zero vector. Make vector straight up if that is the case
-				if (WWMath::Fabs_Origin(shockWaveVector.x) < WWMATH_EPSILON &&
-						WWMath::Fabs_Origin(shockWaveVector.y) < WWMATH_EPSILON &&
-						WWMath::Fabs_Origin(shockWaveVector.z) < WWMATH_EPSILON)
+				if (WWMath::Fabs(shockWaveVector.x) < WWMATH_EPSILON &&
+						WWMath::Fabs(shockWaveVector.y) < WWMATH_EPSILON &&
+						WWMath::Fabs(shockWaveVector.z) < WWMATH_EPSILON)
 				{
 					shockWaveVector.z = 1.0f;
 				}
@@ -2121,7 +2121,7 @@ Bool Weapon::computeApproachTarget(const Object *source, const Object *target, c
 			Real relAngle = source->getOrientation()- angle;
 			if (relAngle>2*PI) relAngle -= 2*PI;
 			if (relAngle<-2*PI) relAngle += 2*PI;
-			if (WWMath::Fabs_Origin(relAngle)<PI/2) {
+			if (WWMath::Fabs(relAngle)<PI/2) {
 				dir.x = -dir.x;
 				dir.y = -dir.y;
 				dir.z = -dir.z;
@@ -2859,7 +2859,7 @@ Bool Weapon::isWithinTargetPitch(const Object *source, const Object *victim) con
 	const Coord3D* dst = victim->getPosition();
 
 	const Real ACCEPTABLE_DZ = 10.0f;
-	if (WWMath::Fabs_Origin(dst->z - src->z) < ACCEPTABLE_DZ)
+	if (WWMath::Fabs(dst->z - src->z) < ACCEPTABLE_DZ)
 		return true;	// always good enough if dz is small, regardless of pitch
 
 	Real minPitch, maxPitch;

@@ -386,7 +386,7 @@ Bool TurretAI::friend_turnTowardsAngle(Real desiredAngle, Real rateModifier, Rea
 	Real angleDiff = normalizeAngle(desiredAngle - actualAngle);
 
 	// Are we close enough to the desired angle to just snap there?
-	if (WWMath::Fabs_Origin(angleDiff) < turnRate)
+	if (WWMath::Fabs(angleDiff) < turnRate)
 	{
 		// we are centered
 		actualAngle = desiredAngle;
@@ -409,7 +409,7 @@ Bool TurretAI::friend_turnTowardsAngle(Real desiredAngle, Real rateModifier, Rea
 	if( m_angle != origAngle )
 		getOwner()->reactToTurretChange( m_whichTurret, origAngle, m_pitch );
 
-	Bool aligned = WWMath::Fabs_Origin(m_angle - desiredAngle) <= relThresh;
+	Bool aligned = WWMath::Fabs(m_angle - desiredAngle) <= relThresh;
 
 	return aligned;
 }
@@ -427,7 +427,7 @@ Bool TurretAI::friend_turnTowardsPitch(Real desiredPitch, Real rateModifier)
 	Real pitchRate = getPitchRate() * rateModifier;
 	Real pitchDiff = normalizeAngle(desiredPitch - actualPitch);
 
-	if (WWMath::Fabs_Origin(pitchDiff) < pitchRate)
+	if (WWMath::Fabs(pitchDiff) < pitchRate)
 	{
 		// we are centered
 		actualPitch = desiredPitch;
@@ -1070,7 +1070,7 @@ StateReturnType TurretAIAimTurretState::update()
 			turret->friend_setPositiveSweep(!turret->friend_getPositiveSweep());
 
 		Real angleDiff = normalizeAngle(relAngle - turret->getTurretAngle());
-		turnAlignedToNemesis = (WWMath::Fabs_Origin(angleDiff) < sweep);
+		turnAlignedToNemesis = (WWMath::Fabs(angleDiff) < sweep);
 	}
 
 	Bool pitchAlignedToNemesis = true;

@@ -517,7 +517,7 @@ public:
 		Coord3D intermedPt;
 		Bool intermed = false;
 		Real orient = WWMath::Atan2(ppinfo.runwayPrep.y - ppinfo.parkingSpace.y, ppinfo.runwayPrep.x - ppinfo.parkingSpace.x);
-		if (WWMath::Fabs_Origin(stdAngleDiff(orient, ppinfo.parkingOrientation)) > PI/128)
+		if (WWMath::Fabs(stdAngleDiff(orient, ppinfo.parkingOrientation)) > PI/128)
 		{
 			intermedPt.z = (ppinfo.parkingSpace.z + ppinfo.runwayPrep.z) * 0.5f;
 			intermed = intersectInfiniteLine2D(
@@ -1199,7 +1199,7 @@ public:
 			return STATE_FAILURE;
 
 		const Real THRESH = 0.001f;
-		if (WWMath::Fabs_Origin(stdAngleDiff(jet->getOrientation(), ppinfo.parkingOrientation)) <= THRESH)
+		if (WWMath::Fabs(stdAngleDiff(jet->getOrientation(), ppinfo.parkingOrientation)) <= THRESH)
 			return STATE_SUCCESS;
 
 		// magically position it correctly.

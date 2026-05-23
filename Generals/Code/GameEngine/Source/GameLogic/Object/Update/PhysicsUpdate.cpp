@@ -95,7 +95,7 @@ static Real heightToSpeed(Real height)
 {
 	// don't bother trying to remember how far we've fallen; instead,
 	// back-calc it from our speed & gravity... v = sqrt(2*g*h)
-	return WWMath::Sqrt(WWMath::Fabs_Origin(2.0f * TheGlobalData->m_gravity * height));
+	return WWMath::Sqrt(WWMath::Fabs(2.0f * TheGlobalData->m_gravity * height));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -440,7 +440,7 @@ Bool PhysicsBehavior::handleBounce(Real oldZ, Real newZ, Real groundZ, Coord3D* 
 		Real vz = getVelocity()->z;
 		if (oldZ > groundZ && vz < 0.0f)
 		{
-			desiredAccelZ = WWMath::Fabs_Origin(vz) * stiffness;
+			desiredAccelZ = WWMath::Fabs(vz) * stiffness;
 		}
 
 		bounceForce->x = 0.0f;
@@ -472,7 +472,7 @@ Bool PhysicsBehavior::handleBounce(Real oldZ, Real newZ, Real groundZ, Coord3D* 
 inline Bool isVerySmall3D(const Coord3D& v)
 {
 	const Real THRESH = 0.01f;
-	return (WWMath::Fabs_Origin(v.x) < THRESH && WWMath::Fabs_Origin(v.y) < THRESH && WWMath::Fabs_Origin(v.z) < THRESH);
+	return (WWMath::Fabs(v.x) < THRESH && WWMath::Fabs(v.y) < THRESH && WWMath::Fabs(v.z) < THRESH);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -739,8 +739,8 @@ UpdateSleepTime PhysicsBehavior::update()
 			// going down hills don't injure themselves (unless the hill is really steep)
 			const Real MIN_ANGLE_TAN = 3.0f;	//	roughly 71 degrees
 			const Real TINY_DELTA = 0.01f;
-			if ((WWMath::Fabs_Origin(m_vel.x) <= TINY_DELTA || WWMath::Fabs_Origin(activeVelZ / m_vel.x) >= MIN_ANGLE_TAN) &&
-				(WWMath::Fabs_Origin(m_vel.y) <= TINY_DELTA || WWMath::Fabs_Origin(activeVelZ / m_vel.y) >= MIN_ANGLE_TAN))
+			if ((WWMath::Fabs(m_vel.x) <= TINY_DELTA || WWMath::Fabs(activeVelZ / m_vel.x) >= MIN_ANGLE_TAN) &&
+				(WWMath::Fabs(m_vel.y) <= TINY_DELTA || WWMath::Fabs(activeVelZ / m_vel.y) >= MIN_ANGLE_TAN))
 			{
 				Real damageAmt = netSpeed * getMass() * d->m_fallHeightDamageFactor;
 
@@ -887,7 +887,7 @@ Bool PhysicsBehavior::wasPreviouslyOverlapped(Object *obj) const
 //-------------------------------------------------------------------------------------------------
 void PhysicsBehavior::scrubVelocityZ( Real desiredVelocity )
 {
-	if (WWMath::Fabs_Origin(desiredVelocity) < 0.001f)
+	if (WWMath::Fabs(desiredVelocity) < 0.001f)
 	{
 		m_vel.z = 0;
 	}
@@ -994,9 +994,9 @@ void PhysicsBehavior::doBounceSound(const Coord3D& prevPos)
 
 //Real vel = fabs(getVelocity()->z);
 // can't use velocity, because it's already been updated this frame, and will be zero... (srj)
-	Real vel = WWMath::Fabs_Origin(prevPos.z - getObject()->getPosition()->z);
+	Real vel = WWMath::Fabs(prevPos.z - getObject()->getPosition()->z);
 
-	Real mass = WWMath::Fabs_Origin(getMass());
+	Real mass = WWMath::Fabs(getMass());
 	if (vel > NORMAL_VEL_Z) {
 		vel = NORMAL_VEL_Z;
 	}
@@ -1337,7 +1337,7 @@ static Bool perpsLogicallyEqual( Real perpOne, Real perpTwo )
 {
 	// Equality with a wiggle fudge.
   const Real PERP_RANGE = 0.15f;
-	return WWMath::Fabs_Origin( perpOne - perpTwo ) <= PERP_RANGE;
+	return WWMath::Fabs( perpOne - perpTwo ) <= PERP_RANGE;
 }
 
 //-------------------------------------------------------------------------------------------------

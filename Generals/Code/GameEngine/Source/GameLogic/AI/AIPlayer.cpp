@@ -488,7 +488,7 @@ Object *AIPlayer::buildStructureNow(const ThingTemplate *bldgPlan, BuildListInfo
 		{
 			Coord3D rallyPoint;
 			Bool gotOffset = false;
-			if (WWMath::Fabs_Origin(info->getRallyOffset()->x) > 1.0f || WWMath::Fabs_Origin(info->getRallyOffset()->y)>1.0f) {
+			if (WWMath::Fabs(info->getRallyOffset()->x) > 1.0f || WWMath::Fabs(info->getRallyOffset()->y)>1.0f) {
 				gotOffset;
 			}
 			if (!exitInterface->getNaturalRallyPoint(rallyPoint)) {
@@ -668,7 +668,7 @@ Object *AIPlayer::buildStructureWithDozer(const ThingTemplate *bldgPlan, BuildLi
 		{
 			Coord3D rallyPoint;
 			Bool gotOffset = false;
-			if (WWMath::Fabs_Origin(info->getRallyOffset()->x) > 1.0f || WWMath::Fabs_Origin(info->getRallyOffset()->y)>1.0f) {
+			if (WWMath::Fabs(info->getRallyOffset()->x) > 1.0f || WWMath::Fabs(info->getRallyOffset()->y)>1.0f) {
 				gotOffset;
 			}
 			if (!exitInterface->getNaturalRallyPoint(rallyPoint)) {
