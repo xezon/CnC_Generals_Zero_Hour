@@ -110,8 +110,8 @@ static void			Shutdown();
 // These are meant to be a collection of small math utility functions to be optimized at some point.
 static WWINLINE float Fabsf(float val);
 
-static WWINLINE int Float_To_Int_Chop(const float& f);
-static WWINLINE int Float_To_Int_Floor(const float& f);
+static WWINLINE int Float_To_Int_Chop(float f);
+static WWINLINE int Float_To_Int_Floor(float f);
 
 static WWINLINE float Cos(float val);
 static WWINLINE float Sin(float val);
@@ -664,7 +664,7 @@ WWINLINE float WWMath::Sqrt_Legacy(float val)
 }
 #endif
 
-WWINLINE int WWMath::Float_To_Int_Chop(const float& f)
+WWINLINE int WWMath::Float_To_Int_Chop(float f)
 {
     int a	= *reinterpret_cast<const int*>(&f);				// take bit pattern of float into a register
     int sign	= (a>>31);												// sign = 0xFFFFFFFF if original value is negative, 0 if positive
@@ -674,7 +674,7 @@ WWINLINE int WWMath::Float_To_Int_Chop(const float& f)
     return ((r ^ (sign)) - sign ) &~ (exponent>>31);			// add original sign. If exponent was negative, make return value 0.
 }
 
-WWINLINE int WWMath::Float_To_Int_Floor (const float& f)
+WWINLINE int WWMath::Float_To_Int_Floor(float f)
 {
 	int a			= *reinterpret_cast<const int*>(&f);			// take bit pattern of float into a register
 	int sign		= (a>>31);												// sign = 0xFFFFFFFF if original value is negative, 0 if positive
