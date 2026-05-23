@@ -29,41 +29,36 @@
 
 #include "PreRTS.h"
 
-#include <math.h>
-#include <limits.h>
-
 #include "Lib/BaseType.h"
 #include "Lib/trig.h"
-#include "WWMath/wwmath.h"
 
-// TheSuperHackers @refactor Redirect trig functions to deterministic WWMath wrappers.
+#if defined(__has_include)
+	#if __has_include("gmath.h")
+		#include "gmath.h"
+		#ifndef USE_DETERMINISTIC_MATH
+		#define USE_DETERMINISTIC_MATH (1)
+		#endif
+	#else
+		#include <math.h>
+	#endif
+#else
+	#include <math.h>
+#endif
 
-Real Sin(Real x)
-{
-	return WWMath::Sin_Trig(x);
-}
-
-Real Cos(Real x)
-{
-	return WWMath::Cos_Trig(x);
-}
-
-Real Tan(Real x)
-{
-	return WWMath::Tan_Trig(x);
-}
-
-Real ACos(Real x)
-{
-	return WWMath::ACos_Trig(x);
-}
-
-Real ASin(Real x)
-{
-	return WWMath::Asin_Trig(x);
-}
-
-double Sqrt(double x)
-{
-	return WWMath::Sqrt_Origin(x);
-}
+#if USE_DETERMINISTIC_MATH
+Real Sin(Real x) { return gm_sinf(x); }
+Real Cos(Real x) { return gm_cosf(x); }
+Real Tan(Real x) { return gm_tanf(x); }
+Real ACos(Real x) { return gm_acosf(x); }
+Real ASin(Real x) { return gm_asinf(x); }
+Real Sqrt(Real x) { return gm_sqrtf(x); }
+double Sqrt(double x) { return gm_sqrt(x); }
+#else
+Real Sin(Real x) { return sinf(x); }
+Real Cos(Real x) { return cosf(x); }
+Real Tan(Real x) { return tanf(x); }
+Real ACos(Real x) { return acosf(x); }
+Real ASin(Real x) { return asinf(x); }
+Real Sqrt(Real x) { return (Real)sqrt((double)x); }
+double Sqrt(double x) { return sqrt(x); }
+#endif

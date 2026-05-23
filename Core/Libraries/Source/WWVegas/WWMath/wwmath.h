@@ -42,9 +42,13 @@
 #include <assert.h>
 
 // Use __has_include because wwmath.h is transitively included by targets that may not link gamemath.
-#if defined(__has_include) && __has_include("gmath.h")
-#include "gmath.h"
-#define USE_DETERMINISTIC_MATH (1)
+#if defined(__has_include)
+	#if __has_include("gmath.h")
+		#include "gmath.h"
+		#ifndef USE_DETERMINISTIC_MATH
+		#define USE_DETERMINISTIC_MATH (1)
+		#endif
+	#endif
 #endif
 
 /*
@@ -146,22 +150,6 @@ static WWINLINE float		Atan2(float y,float x) { return gm_atan2f(y,x); }
 #else
 static WWINLINE float		Atan(float x) { return static_cast<float>(atan(x)); }
 static WWINLINE float		Atan2(float y,float x) { return static_cast<float>(atan2(y,x)); }
-#endif
-
-// Trig wrappers: replace global Sin/Cos/Tan/ACos/ASin from deleted Trig.cpp.
-// Original Trig.cpp called CRT float functions (sinf, cosf, etc.).
-#if USE_DETERMINISTIC_MATH
-	static WWINLINE float		Sin_Trig(float x) { return gm_sinf(x); }
-	static WWINLINE float		Cos_Trig(float x) { return gm_cosf(x); }
-	static WWINLINE float		Tan_Trig(float x) { return gm_tanf(x); }
-	static WWINLINE float		Acos_Trig(float x) { return gm_acosf(x); }
-	static WWINLINE float		Asin_Trig(float x) { return gm_asinf(x); }
-#else
-	static WWINLINE float		Sin_Trig(float x) { return sinf(x); }
-	static WWINLINE float		Cos_Trig(float x) { return cosf(x); }
-	static WWINLINE float		Tan_Trig(float x) { return tanf(x); }
-	static WWINLINE float		Acos_Trig(float x) { return acosf(x); }
-	static WWINLINE float		Asin_Trig(float x) { return asinf(x); }
 #endif
 
 // Origin wrappers: replace bare CRT math calls in GameLogic.
