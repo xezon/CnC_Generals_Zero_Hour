@@ -1538,8 +1538,8 @@ void RingMeshClass::Generate(float radius, int slices)
 
 	for (index = 0; index < Vertex_ct; index += 2) {
 
-		float x_pos = -WWMath::Sin (angle);
-		float y_pos = WWMath::Cos (angle);
+		float x_pos = -WWMath::Sinf (angle);
+		float y_pos = WWMath::Cosf (angle);
 
 		//
 		//	Place the inner index
