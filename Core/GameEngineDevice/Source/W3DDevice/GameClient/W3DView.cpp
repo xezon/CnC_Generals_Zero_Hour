@@ -3263,7 +3263,7 @@ static Real makeQuadraticS(Real t)
 		tPrime = 0.5 * (2*t*2*t);
 	} else {
 		tPrime = (t-0.5)*2;
-		tPrime = WWMath::Sqrt(tPrime);
+		tPrime = WWMath::Sqrt_Legacy(tPrime);
 		tPrime = 0.5 + 0.5*(tPrime);
 	}
 	return tPrime*0.5 + t*0.5;

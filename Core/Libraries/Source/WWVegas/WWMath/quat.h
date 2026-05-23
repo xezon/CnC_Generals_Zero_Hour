@@ -87,7 +87,7 @@ public:
 	WWINLINE float Length2() const { return (X*X + Y*Y + Z*Z + W*W); }
 
 	// Magnitude of the quaternion
-	WWINLINE float Length() const { return WWMath::Sqrt(Length2()); }
+	WWINLINE float Length() const { return WWMath::Sqrt_Legacy(Length2()); }
 
 	// Make the quaternion unit length
 	void Normalize();

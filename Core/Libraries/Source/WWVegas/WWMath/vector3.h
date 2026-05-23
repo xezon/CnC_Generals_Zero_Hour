@@ -452,7 +452,7 @@ WWINLINE Vector3 Normalize(const Vector3 & vec)
  *========================================================================*/
 WWINLINE float Vector3::Length() const
 {
-	return WWMath::Sqrt(Length2());
+	return WWMath::Sqrt_Legacy(Length2());
 }
 
 /**************************************************************************

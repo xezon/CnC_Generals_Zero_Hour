@@ -356,7 +356,7 @@ WWINLINE Vector2 Normalize(const Vector2 & vec)
  *========================================================================*/
 WWINLINE float Vector2::Length() const
 {
-	return (float)WWMath::Sqrt(Length2());
+	return (float)WWMath::Sqrt_Legacy(Length2());
 }
 
 /**************************************************************************
@@ -638,7 +638,7 @@ WWINLINE float Distance(float x1, float y1, float x2, float y2)
 	float x_diff = x1 - x2;
 	float y_diff = y1 - y2;
 
-	return (WWMath::Sqrt((x_diff * x_diff) + (y_diff * y_diff)));
+	return (WWMath::Sqrt_Legacy((x_diff * x_diff) + (y_diff * y_diff)));
 }
 
 

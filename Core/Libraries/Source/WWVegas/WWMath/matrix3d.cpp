@@ -372,7 +372,7 @@ void Matrix3D::Look_At_Dir(const Vector3 &pos, const Vector3 &dir, float roll)
 	float dz = dir.Z;
 
 	// length of projection onto XY plane
-	float len2 = (float)WWMath::Sqrt(dx*dx + dy*dy);
+	float len2 = (float)WWMath::Sqrt_Legacy(dx*dx + dy*dy);
 
 	// pitch
 	sinp = dz;
