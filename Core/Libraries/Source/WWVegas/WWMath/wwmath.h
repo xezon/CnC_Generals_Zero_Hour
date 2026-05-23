@@ -130,9 +130,9 @@ static WWINLINE float Fast_Cos(float val);
 static WWINLINE float Fast_Inv_Cos(float val);
 
 static WWINLINE float Fast_Acos(float val);
-static WWINLINE float Acos(float val);
+static WWINLINE float Acos_Legacy(float val);
 static WWINLINE float Fast_Asin(float val);
-static WWINLINE float Asin(float val);
+static WWINLINE float Asin_Legacy(float val);
 
 // Origin wrappers: replace bare CRT math calls in GameLogic.
 // Each wrapper preserves the exact type (float vs double) of the vanilla CRT call.
@@ -564,7 +564,7 @@ WWINLINE float WWMath::Fast_Acos(float val)
 {
 	// Near -1 and +1, the table becomes too inaccurate
 	if (WWMath::Fabs(val) > 0.975f) {
-		return WWMath::Acos(val);
+		return WWMath::Acos_Legacy(val);
 	}
 
 	val*=float(ARC_TABLE_SIZE/2);
@@ -588,7 +588,7 @@ WWINLINE float WWMath::Fast_Acos(float val)
 // Arc cos
 // ----------------------------------------------------------------------------
 
-WWINLINE float WWMath::Acos(float val)
+WWINLINE float WWMath::Acos_Legacy(float val)
 {
 #if USE_DETERMINISTIC_MATH
 	return gm_acosf(val);
@@ -605,7 +605,7 @@ WWINLINE float WWMath::Fast_Asin(float val)
 {
 	// Near -1 and +1, the table becomes too inaccurate
 	if (WWMath::Fabs(val) > 0.975f) {
-		return WWMath::Asin(val);
+		return WWMath::Asin_Legacy(val);
 	}
 
 	val*=float(ARC_TABLE_SIZE/2);
@@ -629,7 +629,7 @@ WWINLINE float WWMath::Fast_Asin(float val)
 // Arc sin
 // ----------------------------------------------------------------------------
 
-WWINLINE float WWMath::Asin(float val)
+WWINLINE float WWMath::Asin_Legacy(float val)
 {
 #if USE_DETERMINISTIC_MATH
 	return gm_asinf(val);

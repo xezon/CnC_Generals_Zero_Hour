@@ -200,7 +200,7 @@ Quaternion Trackball(float x0, float y0, float x1, float y1, float sphsize)
 	// Avoid problems with out of control values
 	if (t >  1.0f) t =  1.0f;
 	if (t < -1.0f) t = -1.0f;
-	phi = 2.0f * WWMath::Asin(t);
+	phi = 2.0f * WWMath::Asin_Legacy(t);
 
 	return Axis_To_Quat(a, phi);
 }
@@ -324,7 +324,7 @@ normal_slerp:
 // ----------------------------------------------------------------------------
 // normal slerp!
 //	else {
-//		theta = WWMath::Acos(cos_t);
+//		theta = WWMath::Acos_Legacy(cos_t);
 //		sin_t = WWMath::Sin(theta);
 //		oo_sin_t = 1.0 / sin_t;
 //		beta = WWMath::Sin(theta - alpha*theta) * oo_sin_t;
@@ -512,7 +512,7 @@ void Slerp(Quaternion& res, const Quaternion & p,const Quaternion & q,float alph
 	} else {
 
 		// normal slerp!
-		theta = WWMath::Acos(cos_t);
+		theta = WWMath::Acos_Legacy(cos_t);
 		float sin_t = WWMath::Sin(theta);
 		oo_sin_t = 1.0f / sin_t;
 		beta = WWMath::Sin(theta - alpha*theta) * oo_sin_t;
@@ -567,7 +567,7 @@ void Slerp_Setup(const Quaternion & p,const Quaternion & q,SlerpInfoStruct * sle
 	} else {
 
 		slerpinfo->Linear = false;
-		slerpinfo->Theta = WWMath::Acos(cos_t);
+		slerpinfo->Theta = WWMath::Acos_Legacy(cos_t);
 		slerpinfo->SinT = WWMath::Sin(slerpinfo->Theta);
 
 	}

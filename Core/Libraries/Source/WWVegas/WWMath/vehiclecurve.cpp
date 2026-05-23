@@ -102,7 +102,7 @@ Find_Tangent
 		//	Determine the offset angle (from the line between the point and center)
 		// where the 2 tangent points lie.
 		//
-		float angle_offset	= WWMath::Acos (radius / dist);
+		float angle_offset	= WWMath::Acos_Legacy (radius / dist);
 		float base_angle		= WWMath::Atan2_Legacy (delta_x, -delta_y);
 		base_angle = WWMath::Wrap (base_angle, 0, DEG_TO_RADF (360));
 
