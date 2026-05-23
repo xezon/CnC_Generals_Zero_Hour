@@ -39,18 +39,18 @@ static void appendSimulationMathCrc_Deterministic(XferCRC &xfer)
         0.9f, 1.0f, 2.1f, 1.2f);
 
     factorsMatrix.Set(
-        WWMath::Sin(0.7f) * WWMath::Log10f_Origin(2.3f),
+        WWMath::Sin(0.7f) * WWMath::Log10f(2.3f),
         WWMath::Cos(1.1f) * WWMath::Powf(1.1f, 2.0f),
         WWMath::Tanf(0.3f),
         WWMath::Asinf(0.967302263f),
         WWMath::Acosf(0.967302263f),
         WWMath::Atanf(0.967302263f) * WWMath::Powf(1.1f, 2.0f),
         WWMath::Atan2f(0.4f, 1.3f),
-        WWMath::Sinhf_Origin(0.2f),
-        WWMath::Coshf_Origin(0.4f) * WWMath::Tanhf_Origin(0.5f),
+        WWMath::Sinhf(0.2f),
+        WWMath::Coshf(0.4f) * WWMath::Tanhf(0.5f),
         WWMath::Sqrtf(55788.84375f),
-        WWMath::Expf_Origin(0.1f) * WWMath::Log10f_Origin(2.3f),
-        WWMath::Logf_Origin(1.4f));
+        WWMath::Expf(0.1f) * WWMath::Log10f(2.3f),
+        WWMath::Logf(1.4f));
 
     Matrix3D::Multiply(matrix, factorsMatrix, &matrix);
     matrix.Get_Inverse(matrix);

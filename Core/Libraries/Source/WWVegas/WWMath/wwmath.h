@@ -154,12 +154,12 @@ static WWINLINE double	Ceil(double x) { return gm_ceil(x); }
 static WWINLINE float		Ceilf(float x) { return gm_ceilf(x); }
 static WWINLINE double	Floor(double x) { return gm_floor(x); }
 static WWINLINE float		Floorf(float x) { return gm_floorf(x); }
-static WWINLINE float		Expf_Origin(float x) { return gm_expf(x); }
-static WWINLINE float		Log10f_Origin(float x) { return gm_log10f(x); }
-static WWINLINE float		Logf_Origin(float x) { return gm_logf(x); }
-static WWINLINE float		Sinhf_Origin(float x) { return gm_sinhf(x); }
-static WWINLINE float		Coshf_Origin(float x) { return gm_coshf(x); }
-static WWINLINE float		Tanhf_Origin(float x) { return gm_tanhf(x); }
+static WWINLINE float		Expf(float x) { return gm_expf(x); }
+static WWINLINE float		Log10f(float x) { return gm_log10f(x); }
+static WWINLINE float		Logf(float x) { return gm_logf(x); }
+static WWINLINE float		Sinhf(float x) { return gm_sinhf(x); }
+static WWINLINE float		Coshf(float x) { return gm_coshf(x); }
+static WWINLINE float		Tanhf(float x) { return gm_tanhf(x); }
 #else
 static WWINLINE double	Sqrt(double x) { return sqrt(x); }
 static WWINLINE float		Sqrtf(float x) { return sqrtf(x); }
@@ -183,12 +183,12 @@ static WWINLINE double	Ceil(double x) { return ceil(x); }
 static WWINLINE float		Ceilf(float x) { return ceilf(x); }
 static WWINLINE double	Floor(double x) { return floor(x); }
 static WWINLINE float		Floorf(float x) { return floorf(x); }
-static WWINLINE float		Expf_Origin(float x) { return expf(x); }
-static WWINLINE float		Log10f_Origin(float x) { return log10f(x); }
-static WWINLINE float		Logf_Origin(float x) { return logf(x); }
-static WWINLINE float		Sinhf_Origin(float x) { return sinhf(x); }
-static WWINLINE float		Coshf_Origin(float x) { return coshf(x); }
-static WWINLINE float		Tanhf_Origin(float x) { return tanhf(x); }
+static WWINLINE float		Expf(float x) { return expf(x); }
+static WWINLINE float		Log10f(float x) { return log10f(x); }
+static WWINLINE float		Logf(float x) { return logf(x); }
+static WWINLINE float		Sinhf(float x) { return sinhf(x); }
+static WWINLINE float		Coshf(float x) { return coshf(x); }
+static WWINLINE float		Tanhf(float x) { return tanhf(x); }
 #endif
 
 static WWINLINE double	Round(double x) { return Floor(x + 0.5); }
