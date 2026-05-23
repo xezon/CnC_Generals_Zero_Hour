@@ -155,8 +155,8 @@ static WWINLINE double	Fabs_Origin(double x) { return gm_fabs(x); }
 static WWINLINE float		Fabsf_Origin(float x) { return gm_fabsf(x); }
 static WWINLINE double	Pow_Origin(double x, double y) { return gm_pow(x, y); }
 static WWINLINE float		Powf_Origin(float x, float y) { return gm_powf(x, y); }
-static WWINLINE double	Ceil_Origin(double x) { return gm_ceil(x); }
-static WWINLINE float		Ceilf_Origin(float x) { return gm_ceilf(x); }
+static WWINLINE double	Ceil(double x) { return gm_ceil(x); }
+static WWINLINE float		Ceilf(float x) { return gm_ceilf(x); }
 static WWINLINE double	Floor(double x) { return gm_floor(x); }
 static WWINLINE float		Floorf(float x) { return gm_floorf(x); }
 static WWINLINE float		Expf_Origin(float x) { return gm_expf(x); }
@@ -184,8 +184,8 @@ static WWINLINE double	Fabs_Origin(double x) { return fabs(x); }
 static WWINLINE float		Fabsf_Origin(float x) { return fabsf(x); }
 static WWINLINE double	Pow_Origin(double x, double y) { return pow(x, y); }
 static WWINLINE float		Powf_Origin(float x, float y) { return powf(x, y); }
-static WWINLINE double	Ceil_Origin(double x) { return ceil(x); }
-static WWINLINE float		Ceilf_Origin(float x) { return ceilf(x); }
+static WWINLINE double	Ceil(double x) { return ceil(x); }
+static WWINLINE float		Ceilf(float x) { return ceilf(x); }
 static WWINLINE double	Floor(double x) { return floor(x); }
 static WWINLINE float		Floorf(float x) { return floorf(x); }
 static WWINLINE float		Expf_Origin(float x) { return expf(x); }

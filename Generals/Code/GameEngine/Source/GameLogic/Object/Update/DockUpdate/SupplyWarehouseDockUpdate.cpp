@@ -170,7 +170,7 @@ void SupplyWarehouseDockUpdate::setDockCrippled( Bool setting )
 void SupplyWarehouseDockUpdate::setCashValue( Int cashValue )
 {
 	// A script can tell us our set value, and we need to figure out the boxes needed to provide that.
-	m_boxesStored = WWMath::Ceil_Origin(cashValue / (float)TheGlobalData->m_baseValuePerSupplyBox);
+	m_boxesStored = WWMath::Ceil(cashValue / (float)TheGlobalData->m_baseValuePerSupplyBox);
 	Drawable *draw = getObject()->getDrawable();
 	if( draw )
 	{

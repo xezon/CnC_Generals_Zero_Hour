@@ -441,7 +441,7 @@ Bool DumbProjectileBehavior::calcFlightPath(Bool recalcNumSegments)
 	if (recalcNumSegments)
 	{
 		Real flightDistance = flightCurve.getApproximateLength();
-		m_flightPathSegments = WWMath::Ceil_Origin( flightDistance / m_flightPathSpeed );
+		m_flightPathSegments = WWMath::Ceil( flightDistance / m_flightPathSpeed );
 	}
 	flightCurve.getSegmentPoints( m_flightPathSegments, &m_flightPath );
 	DEBUG_ASSERTCRASH(m_flightPathSegments == m_flightPath.size(), ("m_flightPathSegments mismatch"));

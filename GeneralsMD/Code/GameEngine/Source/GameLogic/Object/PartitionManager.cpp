@@ -2643,7 +2643,7 @@ static void calcHeights(const Region3D& world, Real cellSize, Int x, Int y, Real
 	Real xbase = world.lo.x + (x * cellSize);
 	Real ybase = world.lo.y + (y * cellSize);
 	const Real ROUGH_STEP_SIZE = MAP_XY_FACTOR;	// no point in stepping smaller than grid scale
-	Real numSteps = WWMath::Ceilf_Origin(cellSize / ROUGH_STEP_SIZE);
+	Real numSteps = WWMath::Ceilf(cellSize / ROUGH_STEP_SIZE);
 	Real step = cellSize / numSteps;
 	loZ = HUGE_DIST;		// huge positive
 	hiZ = -HUGE_DIST;		// huge negative
