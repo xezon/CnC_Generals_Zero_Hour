@@ -191,7 +191,6 @@ static WWINLINE float		Coshf_Origin(float x) { return coshf(x); }
 static WWINLINE float		Tanhf_Origin(float x) { return tanhf(x); }
 #endif
 
-static WWINLINE float		Sign(float val);
 static WWINLINE double	Round(double x) { return Floor(x + 0.5); }
 static WWINLINE float		Roundf(float x) { return Floorf(x + 0.5f); }
 static WWINLINE bool		Fast_Is_Float_Positive(const float & val);
@@ -243,17 +242,6 @@ WWINLINE float WWMath::Fabsf(float val)
 #else
 	return fabsf(val);
 #endif
-}
-
-WWINLINE float WWMath::Sign(float val)
-{
-	if (val > 0.0f) {
-		return +1.0f;
-	}
-	if (val < 0.0f) {
-		return -1.0f;
-	}
-	return 0.0f;
 }
 
 WWINLINE bool WWMath::Fast_Is_Float_Positive(const float & val)
