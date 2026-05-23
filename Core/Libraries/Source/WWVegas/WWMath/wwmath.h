@@ -149,8 +149,8 @@ static WWINLINE double	Acos(double x) { return gm_acos(x); }
 static WWINLINE float		Acosf(float x) { return gm_acosf(x); }
 static WWINLINE double	Asin(double x) { return gm_asin(x); }
 static WWINLINE float		Asinf(float x) { return gm_asinf(x); }
-static WWINLINE double	Tan_Origin(double x) { return gm_tan(x); }
-static WWINLINE float		Tanf_Origin(float x) { return gm_tanf(x); }
+static WWINLINE double	Tan(double x) { return gm_tan(x); }
+static WWINLINE float		Tanf(float x) { return gm_tanf(x); }
 static WWINLINE double	Fabs_Origin(double x) { return gm_fabs(x); }
 static WWINLINE float		Fabsf_Origin(float x) { return gm_fabsf(x); }
 static WWINLINE double	Pow_Origin(double x, double y) { return gm_pow(x, y); }
@@ -176,8 +176,8 @@ static WWINLINE double	Acos(double x) { return acos(x); }
 static WWINLINE float		Acosf(float x) { return acosf(x); }
 static WWINLINE double	Asin(double x) { return asin(x); }
 static WWINLINE float		Asinf(float x) { return asinf(x); }
-static WWINLINE double	Tan_Origin(double x) { return tan(x); }
-static WWINLINE float		Tanf_Origin(float x) { return tanf(x); }
+static WWINLINE double	Tan(double x) { return tan(x); }
+static WWINLINE float		Tanf(float x) { return tanf(x); }
 static WWINLINE double	Fabs_Origin(double x) { return fabs(x); }
 static WWINLINE float		Fabsf_Origin(float x) { return fabsf(x); }
 static WWINLINE double	Pow_Origin(double x, double y) { return pow(x, y); }
