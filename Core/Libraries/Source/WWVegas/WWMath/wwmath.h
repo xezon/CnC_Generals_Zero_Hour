@@ -166,10 +166,10 @@ static WWINLINE float		Tanhf_Origin(float x) { return gm_tanhf(x); }
 #else
 static WWINLINE double	Sqrt(double x) { return sqrt(x); }
 static WWINLINE float		Sqrtf(float x) { return sqrtf(x); }
-static WWINLINE float		Atan2_Legacy(float y,float x) { return static_cast<float>(atan2(y,x)); }
+static WWINLINE float		Atan2_Legacy(float y,float x) { return (float)atan2((double)y,(double)x); }
 static WWINLINE double	Atan2(double y, double x) { return atan2(y, x); }
 static WWINLINE float		Atan2f(float y, float x) { return atan2f(y, x); }
-static WWINLINE float		Atan_Legacy(float x) { return static_cast<float>(atan(x)); }
+static WWINLINE float		Atan_Legacy(float x) { return (float)atan((double)x) }
 static WWINLINE double	Atan(double x) { return atan(x); }
 static WWINLINE float		Atanf(float x) { return atanf(x); }
 static WWINLINE double	Acos(double x) { return acos(x); }
@@ -592,7 +592,7 @@ WWINLINE float WWMath::Acos_Legacy(float val)
 #if USE_DETERMINISTIC_MATH
 	return gm_acosf(val);
 #else
-	return (float)acos(val);
+	return (float)acos((double)val);
 #endif
 }
 
@@ -633,7 +633,7 @@ WWINLINE float WWMath::Asin_Legacy(float val)
 #if USE_DETERMINISTIC_MATH
 	return gm_asinf(val);
 #else
-	return (float)asin(val);
+	return (float)asin((double)val);
 #endif
 }
 
@@ -660,7 +660,7 @@ WWINLINE float WWMath::Sqrt_Legacy(float val)
 #else
 WWINLINE float WWMath::Sqrt_Legacy(float val)
 {
-	return (float)sqrt(val);
+	return (float)sqrt((double)val);
 }
 #endif
 
@@ -754,7 +754,7 @@ WWINLINE float WWMath::Inv_Sqrt_Legacy(float a)
 #else
 WWINLINE float WWMath::Inv_Sqrt_Legacy(float val)
 {
-	return 1.0f / (float)sqrt(val);
+	return 1.0f / (float)sqrt((double)val);
 }
 #endif
 
