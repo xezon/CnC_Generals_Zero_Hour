@@ -154,11 +154,17 @@ static WWINLINE double	Ceil(double x) { return gm_ceil(x); }
 static WWINLINE float		Ceilf(float x) { return gm_ceilf(x); }
 static WWINLINE double	Floor(double x) { return gm_floor(x); }
 static WWINLINE float		Floorf(float x) { return gm_floorf(x); }
+static WWINLINE double	Exp(double x) { return gm_exp(x); }
 static WWINLINE float		Expf(float x) { return gm_expf(x); }
+static WWINLINE double	Log10(double x) { return gm_log10(x); }
 static WWINLINE float		Log10f(float x) { return gm_log10f(x); }
+static WWINLINE double	Log(double x) { return gm_log(x); }
 static WWINLINE float		Logf(float x) { return gm_logf(x); }
+static WWINLINE double	Sinh(double x) { return gm_sinh(x); }
 static WWINLINE float		Sinhf(float x) { return gm_sinhf(x); }
+static WWINLINE double	Cosh(double x) { return gm_cosh(x); }
 static WWINLINE float		Coshf(float x) { return gm_coshf(x); }
+static WWINLINE double	Tanh(double x) { return gm_tanh(x); }
 static WWINLINE float		Tanhf(float x) { return gm_tanhf(x); }
 #else
 static WWINLINE double	Sqrt(double x) { return sqrt(x); }
@@ -183,11 +189,17 @@ static WWINLINE double	Ceil(double x) { return ceil(x); }
 static WWINLINE float		Ceilf(float x) { return ceilf(x); }
 static WWINLINE double	Floor(double x) { return floor(x); }
 static WWINLINE float		Floorf(float x) { return floorf(x); }
+static WWINLINE double	Exp(double x) { return exp(x); }
 static WWINLINE float		Expf(float x) { return expf(x); }
+static WWINLINE double	Log10(double x) { return log10(x); }
 static WWINLINE float		Log10f(float x) { return log10f(x); }
+static WWINLINE double	Log(double x) { return log(x); }
 static WWINLINE float		Logf(float x) { return logf(x); }
+static WWINLINE double	Sinh(double x) { return sinh(x); }
 static WWINLINE float		Sinhf(float x) { return sinhf(x); }
+static WWINLINE double	Cosh(double x) { return cosh(x); }
 static WWINLINE float		Coshf(float x) { return coshf(x); }
+static WWINLINE double	Tanh(double x) { return tanh(x); }
 static WWINLINE float		Tanhf(float x) { return tanhf(x); }
 #endif
 
