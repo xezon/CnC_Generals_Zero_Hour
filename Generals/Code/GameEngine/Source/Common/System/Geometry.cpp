@@ -180,10 +180,10 @@ void GeometryInfo::calcPitches(const Coord3D& thisPos, const GeometryInfo& that,
 	/** @todo srj -- this could be better, by calcing it for all the corners, not just top-center
 		and bottom-center... oh well */
 	dz = (thatPos.z + that.getMaxHeightAbovePosition()) - thisCenter.z;
-	maxPitch = WWMath::Atan2_Origin(dz, dxy);
+	maxPitch = WWMath::Atan2(dz, dxy);
 
 	dz = (thatPos.z - that.getMaxHeightBelowPosition()) - thisCenter.z;
-	minPitch = WWMath::Atan2_Origin(dz, dxy);
+	minPitch = WWMath::Atan2(dz, dxy);
 }
 
 //=============================================================================

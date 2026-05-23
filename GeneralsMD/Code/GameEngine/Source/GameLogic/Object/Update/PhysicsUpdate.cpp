@@ -738,7 +738,7 @@ UpdateSleepTime PhysicsBehavior::update()
 			{
 				Vector3 xvec = mtx.Get_X_Vector();
 				Real xy = WWMath::Sqrtf_Origin(sqr(xvec.X) + sqr(xvec.Y));
-				Real pitchAngle = WWMath::Atan2_Origin(xvec.Z, xy);
+				Real pitchAngle = WWMath::Atan2(xvec.Z, xy);
 				Real remainingAngle = (offset > 0) ? ((PI/2) - pitchAngle) : (-(PI/2) + pitchAngle);
 				Real s = Sin(remainingAngle);
 				pitchRateToUse *= s;
