@@ -108,12 +108,7 @@ static void			Init();
 static void			Shutdown();
 
 // These are meant to be a collection of small math utility functions to be optimized at some point.
-static WWINLINE float Fabs(float val)
-{
-	int value=*(int*)&val;
-	value&=0x7fffffff;
-	return *(float*)&value;
-}
+static WWINLINE float Fabsf(float val);
 
 static WWINLINE int Float_To_Int_Chop(const float& f);
 static WWINLINE int Float_To_Int_Floor(const float& f);
@@ -236,6 +231,19 @@ static WWINLINE bool			Is_Valid_Double(double x);
 static WWINLINE float Normalize_Angle(float angle); // Normalizes the angle to the range -PI..PI
 
 };
+
+WWINLINE float WWMath::Fabsf(float val)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_fabsf(val);
+#elif defined(_MSC_VER) && defined(_M_IX86)
+	int value=*(int*)&val;
+	value&=0x7fffffff;
+	return *(float*)&value;
+#else
+	return fabsf(val);
+#endif
+}
 
 WWINLINE float WWMath::Sign(float val)
 {
@@ -566,7 +574,7 @@ WWINLINE float WWMath::Fast_Inv_Cos(float val)
 WWINLINE float WWMath::Fast_Acos(float val)
 {
 	// Near -1 and +1, the table becomes too inaccurate
-	if (Fabs(val) > 0.975f) {
+	if (Fabsf(val) > 0.975f) {
 		return Acos_Legacy(val);
 	}
 
@@ -607,7 +615,7 @@ WWINLINE float WWMath::Acos_Legacy(float val)
 WWINLINE float WWMath::Fast_Asin(float val)
 {
 	// Near -1 and +1, the table becomes too inaccurate
-	if (Fabs(val) > 0.975f) {
+	if (Fabsf(val) > 0.975f) {
 		return Asin_Legacy(val);
 	}
 

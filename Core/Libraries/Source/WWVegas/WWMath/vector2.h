@@ -309,7 +309,7 @@ WWINLINE bool operator != (const Vector2 &a,const Vector2 &b)
  *========================================================================*/
 WWINLINE bool Equal_Within_Epsilon(const Vector2 &a,const Vector2 &b,float epsilon)
 {
-   return( (WWMath::Fabs(a.X - b.X) < epsilon) && (WWMath::Fabs(a.Y - b.Y) < epsilon) );
+   return( (WWMath::Fabsf(a.X - b.X) < epsilon) && (WWMath::Fabsf(a.Y - b.Y) < epsilon) );
 }
 
 /**************************************************************************
@@ -597,8 +597,8 @@ WWINLINE float Quick_Distance(float x1, float y1, float x2, float y2)
 	float x_diff = x1 - x2;
 	float y_diff = y1 - y2;
 
-	WWMath::Fabs(x_diff);
-	WWMath::Fabs(y_diff);
+	WWMath::Fabsf(x_diff);
+	WWMath::Fabsf(y_diff);
 
 	if (x_diff > y_diff)
 	{

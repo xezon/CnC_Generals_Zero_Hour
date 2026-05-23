@@ -60,9 +60,9 @@
  *=============================================================================================*/
 WWINLINE CollisionMath::OverlapType CollisionMath::Overlap_Test(const AABoxClass & box,const Vector3 & point)
 {
-	if (WWMath::Fabs(point.X - box.Center.X) > box.Extent.X) return POS;
-	if (WWMath::Fabs(point.Y - box.Center.Y) > box.Extent.Y) return POS;
-	if (WWMath::Fabs(point.Z - box.Center.Z) > box.Extent.Z) return POS;
+	if (WWMath::Fabsf(point.X - box.Center.X) > box.Extent.X) return POS;
+	if (WWMath::Fabsf(point.Y - box.Center.Y) > box.Extent.Y) return POS;
+	if (WWMath::Fabsf(point.Z - box.Center.Z) > box.Extent.Z) return POS;
 
 	return NEG;
 }
@@ -84,9 +84,9 @@ WWINLINE CollisionMath::OverlapType CollisionMath::Overlap_Test(const AABoxClass
 	Vector3 dc;
 	Vector3::Subtract(box2.Center,box.Center,&dc);
 
-	if (box.Extent.X + box2.Extent.X < WWMath::Fabs(dc.X)) return POS;
-	if (box.Extent.Y + box2.Extent.Y < WWMath::Fabs(dc.Y)) return POS;
-	if (box.Extent.Z + box2.Extent.Z < WWMath::Fabs(dc.Z)) return POS;
+	if (box.Extent.X + box2.Extent.X < WWMath::Fabsf(dc.X)) return POS;
+	if (box.Extent.Y + box2.Extent.Y < WWMath::Fabsf(dc.Y)) return POS;
+	if (box.Extent.Z + box2.Extent.Z < WWMath::Fabsf(dc.Z)) return POS;
 
 	if (	(dc.X + box2.Extent.X <= box.Extent.X) &&
 			(dc.Y + box2.Extent.Y <= box.Extent.Y) &&
