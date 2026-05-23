@@ -131,79 +131,40 @@ static WWINLINE float Acos_Legacy(float val);
 static WWINLINE float Fast_Asin(float val);
 static WWINLINE float Asin_Legacy(float val);
 
-// Origin wrappers: replace bare CRT math calls in GameLogic.
-// Each wrapper preserves the exact type (float vs double) of the vanilla CRT call.
-#if USE_DETERMINISTIC_MATH
-static WWINLINE double	Sqrt(double x) { return gm_sqrt(x); }
-static WWINLINE float		Sqrtf(float x) { return gm_sqrtf(x); }
-static WWINLINE float		Atan2_Legacy(float x, float y) { return gm_atan2f(x, y); }
-static WWINLINE double	Atan2(double x, double y) { return gm_atan2(x, y); }
-static WWINLINE float		Atan2f(float x, float y) { return gm_atan2f(x, y); }
-static WWINLINE float		Atan_Legacy(float x) { return gm_atanf(x); }
-static WWINLINE double	Atan(double x) { return gm_atan(x); }
-static WWINLINE float		Atanf(float x) { return gm_atanf(x); }
-static WWINLINE double	Acos(double x) { return gm_acos(x); }
-static WWINLINE float		Acosf(float x) { return gm_acosf(x); }
-static WWINLINE double	Asin(double x) { return gm_asin(x); }
-static WWINLINE float		Asinf(float x) { return gm_asinf(x); }
-static WWINLINE double	Tan(double x) { return gm_tan(x); }
-static WWINLINE float		Tanf(float x) { return gm_tanf(x); }
-static WWINLINE double	Fabs(double x) { return gm_fabs(x); }
-static WWINLINE float		Fabsf_Legacy(float x) { return gm_fabsf(x); }
-static WWINLINE double	Pow(double x, double y) { return gm_pow(x, y); }
-static WWINLINE float		Powf(float x, float y) { return gm_powf(x, y); }
-static WWINLINE double	Ceil(double x) { return gm_ceil(x); }
-static WWINLINE float		Ceilf(float x) { return gm_ceilf(x); }
-static WWINLINE double	Floor(double x) { return gm_floor(x); }
-static WWINLINE float		Floorf(float x) { return gm_floorf(x); }
-static WWINLINE double	Exp(double x) { return gm_exp(x); }
-static WWINLINE float		Expf(float x) { return gm_expf(x); }
-static WWINLINE double	Log10(double x) { return gm_log10(x); }
-static WWINLINE float		Log10f(float x) { return gm_log10f(x); }
-static WWINLINE double	Log(double x) { return gm_log(x); }
-static WWINLINE float		Logf(float x) { return gm_logf(x); }
-static WWINLINE double	Sinh(double x) { return gm_sinh(x); }
-static WWINLINE float		Sinhf(float x) { return gm_sinhf(x); }
-static WWINLINE double	Cosh(double x) { return gm_cosh(x); }
-static WWINLINE float		Coshf(float x) { return gm_coshf(x); }
-static WWINLINE double	Tanh(double x) { return gm_tanh(x); }
-static WWINLINE float		Tanhf(float x) { return gm_tanhf(x); }
-#else
-static WWINLINE double	Sqrt(double x) { return sqrt(x); }
-static WWINLINE float		Sqrtf(float x) { return sqrtf(x); }
-static WWINLINE float		Atan2_Legacy(float x, float y) { return (float)atan2((double)x, (double)y); }
-static WWINLINE double	Atan2(double x, double y) { return atan2(x, y); }
-static WWINLINE float		Atan2f(float x, float y) { return atan2f(x, y); }
-static WWINLINE float		Atan_Legacy(float x) { return (float)atan((double)x) }
-static WWINLINE double	Atan(double x) { return atan(x); }
-static WWINLINE float		Atanf(float x) { return atanf(x); }
-static WWINLINE double	Acos(double x) { return acos(x); }
-static WWINLINE float		Acosf(float x) { return acosf(x); }
-static WWINLINE double	Asin(double x) { return asin(x); }
-static WWINLINE float		Asinf(float x) { return asinf(x); }
-static WWINLINE double	Tan(double x) { return tan(x); }
-static WWINLINE float		Tanf(float x) { return tanf(x); }
-static WWINLINE double	Fabs(double x) { return fabs(x); }
-static WWINLINE float		Fabsf_Legacy(float x) { return fabsf(x); }
-static WWINLINE double	Pow(double x, double y) { return pow(x, y); }
-static WWINLINE float		Powf(float x, float y) { return powf(x, y); }
-static WWINLINE double	Ceil(double x) { return ceil(x); }
-static WWINLINE float		Ceilf(float x) { return ceilf(x); }
-static WWINLINE double	Floor(double x) { return floor(x); }
-static WWINLINE float		Floorf(float x) { return floorf(x); }
-static WWINLINE double	Exp(double x) { return exp(x); }
-static WWINLINE float		Expf(float x) { return expf(x); }
-static WWINLINE double	Log10(double x) { return log10(x); }
-static WWINLINE float		Log10f(float x) { return log10f(x); }
-static WWINLINE double	Log(double x) { return log(x); }
-static WWINLINE float		Logf(float x) { return logf(x); }
-static WWINLINE double	Sinh(double x) { return sinh(x); }
-static WWINLINE float		Sinhf(float x) { return sinhf(x); }
-static WWINLINE double	Cosh(double x) { return cosh(x); }
-static WWINLINE float		Coshf(float x) { return coshf(x); }
-static WWINLINE double	Tanh(double x) { return tanh(x); }
-static WWINLINE float		Tanhf(float x) { return tanhf(x); }
-#endif
+static WWINLINE double Sqrt(double x);
+static WWINLINE float  Sqrtf(float x);
+static WWINLINE float  Atan2_Legacy(float x, float y);
+static WWINLINE double Atan2(double x, double y);
+static WWINLINE float  Atan2f(float x, float y);
+static WWINLINE float  Atan_Legacy(float x);
+static WWINLINE double Atan(double x);
+static WWINLINE float  Atanf(float x);
+static WWINLINE double Acos(double x);
+static WWINLINE float  Acosf(float x);
+static WWINLINE double Asin(double x);
+static WWINLINE float  Asinf(float x);
+static WWINLINE double Tan(double x);
+static WWINLINE float  Tanf(float x);
+static WWINLINE double Fabs(double x);
+static WWINLINE float  Fabsf_Legacy(float x);
+static WWINLINE double Pow(double x, double y);
+static WWINLINE float  Powf(float x, float y);
+static WWINLINE double Ceil(double x);
+static WWINLINE float  Ceilf(float x);
+static WWINLINE double Floor(double x);
+static WWINLINE float  Floorf(float x);
+static WWINLINE double Exp(double x);
+static WWINLINE float  Expf(float x);
+static WWINLINE double Log10(double x);
+static WWINLINE float  Log10f(float x);
+static WWINLINE double Log(double x);
+static WWINLINE float  Logf(float x);
+static WWINLINE double Sinh(double x);
+static WWINLINE float  Sinhf(float x);
+static WWINLINE double Cosh(double x);
+static WWINLINE float  Coshf(float x);
+static WWINLINE double Tanh(double x);
+static WWINLINE float  Tanhf(float x);
 
 static WWINLINE double	Round(double x) { return Floor(x + 0.5); }
 static WWINLINE float		Roundf(float x) { return Floorf(x + 0.5f); }
@@ -656,6 +617,311 @@ WWINLINE float WWMath::Asin_Legacy(float val)
 	return gm_asinf(val);
 #else
 	return (float)asin((double)val);
+#endif
+}
+
+WWINLINE double WWMath::Sqrt(double x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_sqrt(x);
+#else
+	return sqrt(x);
+#endif
+}
+
+WWINLINE float WWMath::Sqrtf(float x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_sqrtf(x);
+#else
+	return sqrtf(x);
+#endif
+}
+
+WWINLINE float WWMath::Atan2_Legacy(float x, float y)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_atan2f(x, y);
+#else
+	return (float)atan2((double)x, (double)y);
+#endif
+}
+
+WWINLINE double WWMath::Atan2(double x, double y)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_atan2(x, y);
+#else
+	return atan2(x, y);
+#endif
+}
+
+WWINLINE float WWMath::Atan2f(float x, float y)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_atan2f(x, y);
+#else
+	return atan2f(x, y);
+#endif
+}
+
+WWINLINE float WWMath::Atan_Legacy(float x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_atanf(x);
+#else
+	return (float)atan((double)x);
+#endif
+}
+
+WWINLINE double WWMath::Atan(double x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_atan(x);
+#else
+	return atan(x);
+#endif
+}
+
+WWINLINE float WWMath::Atanf(float x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_atanf(x);
+#else
+	return atanf(x);
+#endif
+}
+
+WWINLINE double WWMath::Acos(double x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_acos(x);
+#else
+	return acos(x);
+#endif
+}
+
+WWINLINE float WWMath::Acosf(float x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_acosf(x);
+#else
+	return acosf(x);
+#endif
+}
+
+WWINLINE double WWMath::Asin(double x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_asin(x);
+#else
+	return asin(x);
+#endif
+}
+WWINLINE float WWMath::Asinf(float x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_asinf(x);
+#else
+	return asinf(x);
+#endif
+}
+
+WWINLINE double WWMath::Tan(double x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_tan(x);
+#else
+	return tan(x);
+#endif
+}
+
+WWINLINE float WWMath::Tanf(float x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_tanf(x);
+#else
+	return tanf(x);
+#endif
+}
+
+WWINLINE double WWMath::Fabs(double x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_fabs(x);
+#else
+	return fabs(x);
+#endif
+}
+
+WWINLINE float WWMath::Fabsf_Legacy(float x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_fabsf(x);
+#else
+	return fabsf(x);
+#endif
+}
+
+WWINLINE double WWMath::Pow(double x, double y)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_pow(x, y);
+#else
+	return pow(x, y);
+#endif
+}
+
+WWINLINE float WWMath::Powf(float x, float y)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_powf(x, y);
+#else
+	return powf(x, y);
+#endif
+}
+
+WWINLINE double WWMath::Ceil(double x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_ceil(x);
+#else
+	return ceil(x);
+#endif
+}
+
+WWINLINE float WWMath::Ceilf(float x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_ceilf(x);
+#else
+	return ceilf(x);
+#endif
+}
+
+WWINLINE double WWMath::Floor(double x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_floor(x);
+#else
+	return floor(x);
+#endif
+}
+
+WWINLINE float WWMath::Floorf(float x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_floorf(x);
+#else
+	return floorf(x);
+#endif
+}
+
+WWINLINE double WWMath::Exp(double x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_exp(x);
+#else
+	return exp(x);
+#endif
+}
+
+WWINLINE float WWMath::Expf(float x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_expf(x);
+#else
+	return expf(x);
+#endif
+}
+
+WWINLINE double WWMath::Log10(double x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_log10(x);
+#else
+	return log10(x);
+#endif
+}
+
+WWINLINE float WWMath::Log10f(float x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_log10f(x);
+#else
+	return log10f(x);
+#endif
+}
+
+WWINLINE double WWMath::Log(double x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_log(x);
+#else
+	return log(x);
+#endif
+}
+
+WWINLINE float WWMath::Logf(float x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_logf(x);
+#else
+	return logf(x);
+#endif
+}
+
+WWINLINE double WWMath::Sinh(double x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_sinh(x);
+#else
+	return sinh(x);
+#endif
+}
+
+WWINLINE float WWMath::Sinhf(float x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_sinhf(x);
+#else
+	return sinhf(x);
+#endif
+}
+
+WWINLINE double WWMath::Cosh(double x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_cosh(x);
+#else
+	return cosh(x);
+#endif
+}
+
+WWINLINE float WWMath::Coshf(float x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_coshf(x);
+#else
+	return coshf(x);
+#endif
+}
+
+WWINLINE double WWMath::Tanh(double x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_tanh(x);
+#else
+	return tanh(x);
+#endif
+}
+
+WWINLINE float WWMath::Tanhf(float x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_tanhf(x);
+#else
+	return tanhf(x);
 #endif
 }
 
