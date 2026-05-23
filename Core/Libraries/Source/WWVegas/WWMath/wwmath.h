@@ -247,10 +247,12 @@ WWINLINE float WWMath::Fabsf(float val)
 {
 #if USE_DETERMINISTIC_MATH
 	return gm_fabsf(val);
+
 #elif defined(_MSC_VER) && defined(_M_IX86)
 	int value=*(int*)&val;
 	value&=0x7fffffff;
 	return *(float*)&value;
+
 #else
 	return fabsf(val);
 #endif
@@ -381,41 +383,37 @@ WWINLINE bool WWMath::Is_Valid_Double(double x)
 // Float to long
 // ----------------------------------------------------------------------------
 
+WWINLINE long WWMath::Float_To_Long(float f)
+{
 #if USE_DETERMINISTIC_MATH
-WWINLINE long WWMath::Float_To_Long(float f)
-{
 	return gm_lrintf(f);
-}
-#elif defined(_MSC_VER) && defined(_M_IX86)
-WWINLINE long WWMath::Float_To_Long(float f)
-{
-	long i;
 
+#elif defined(_MSC_VER) && defined(_M_IX86)
+	long i;
 	__asm {
 		fld [f]
 		fistp [i]
 	}
-
 	return i;
-}
+
 #else
-WWINLINE long WWMath::Float_To_Long(float f)
-{
-	return (long) f;
-}
+	return (long)f;
 #endif
+}
 
 WWINLINE long WWMath::Float_To_Long(double f)
 {
 #if USE_DETERMINISTIC_MATH
 	return gm_lrint(f);
+
 #elif defined(_MSC_VER) && defined(_M_IX86)
 	long retval;
-	__asm fld	qword ptr [f]
+	__asm fld qword ptr [f]
 	__asm fistp dword ptr [retval]
 	return retval;
+
 #else
-	return (long) f;
+	return (long)f;
 #endif
 }
 
@@ -423,14 +421,12 @@ WWINLINE long WWMath::Float_To_Long(double f)
 // Cos
 // ----------------------------------------------------------------------------
 
+WWINLINE float WWMath::Cos(float val)
+{
 #if USE_DETERMINISTIC_MATH
-WWINLINE float WWMath::Cos(float val)
-{
 	return gm_cosf(val);
-}
+
 #elif defined(_MSC_VER) && defined(_M_IX86)
-WWINLINE float WWMath::Cos(float val)
-{
 	float retval;
 	__asm {
 		fld [val]
@@ -438,26 +434,22 @@ WWINLINE float WWMath::Cos(float val)
 		fstp [retval]
 	}
 	return retval;
-}
+
 #else
-WWINLINE float WWMath::Cos(float val)
-{
 	return cosf(val);
-}
 #endif
+}
 
 // ----------------------------------------------------------------------------
 // Sin
 // ----------------------------------------------------------------------------
 
+WWINLINE float WWMath::Sin(float val)
+{
 #if USE_DETERMINISTIC_MATH
-WWINLINE float WWMath::Sin(float val)
-{
 	return gm_sinf(val);
-}
+
 #elif defined(_MSC_VER) && defined(_M_IX86)
-WWINLINE float WWMath::Sin(float val)
-{
 	float retval;
 	__asm {
 		fld [val]
@@ -465,13 +457,11 @@ WWINLINE float WWMath::Sin(float val)
 		fstp [retval]
 	}
 	return retval;
-}
+
 #else
-WWINLINE float WWMath::Sin(float val)
-{
 	return sinf(val);
-}
 #endif
+}
 
 // ----------------------------------------------------------------------------
 // Fast, table based sin
@@ -653,14 +643,12 @@ WWINLINE float WWMath::Asin_Legacy(float val)
 // Sqrt
 // ----------------------------------------------------------------------------
 
+WWINLINE float WWMath::Sqrt_Legacy(float val)
+{
 #if USE_DETERMINISTIC_MATH
-WWINLINE float WWMath::Sqrt_Legacy(float val)
-{
 	return gm_sqrtf(val);
-}
+
 #elif defined(_MSC_VER) && defined(_M_IX86)
-WWINLINE float WWMath::Sqrt_Legacy(float val)
-{
 	float retval;
 	__asm {
 		fld [val]
@@ -668,13 +656,11 @@ WWINLINE float WWMath::Sqrt_Legacy(float val)
 		fstp [retval]
 	}
 	return retval;
-}
+
 #else
-WWINLINE float WWMath::Sqrt_Legacy(float val)
-{
 	return (float)sqrt((double)val);
-}
 #endif
+}
 
 WWINLINE int WWMath::Float_To_Int_Chop(float f)
 {
@@ -706,15 +692,13 @@ WWINLINE int WWMath::Float_To_Int_Floor(float f)
 // Inverse square root
 // ----------------------------------------------------------------------------
 
-#if USE_DETERMINISTIC_MATH
-WWINLINE float WWMath::Inv_Sqrt_Legacy(float val)
-{
-	return 1.0f / gm_sqrtf(val);
-}
-#elif defined(_MSC_VER) && defined(_M_IX86)
-// Some 30% faster inverse square root than regular C++ compiled, from Intel's math library
 WWINLINE float WWMath::Inv_Sqrt_Legacy(float a)
 {
+#if USE_DETERMINISTIC_MATH
+	return 1.0f / gm_sqrtf(a);
+
+#elif defined(_MSC_VER) && defined(_M_IX86)
+	// Some 30% faster inverse square root than regular C++ compiled, from Intel's math library
 	float retval;
 
 	__asm {
@@ -762,13 +746,11 @@ WWINLINE float WWMath::Inv_Sqrt_Legacy(float a)
 	}
 
 	return retval;
-}
+
 #else
-WWINLINE float WWMath::Inv_Sqrt_Legacy(float val)
-{
-	return 1.0f / (float)sqrt((double)val);
-}
+	return 1.0f / (float)sqrt((double)a);
 #endif
+}
 
 WWINLINE float WWMath::Normalize_Angle(float angle)
 {
