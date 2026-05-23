@@ -154,14 +154,14 @@ static WWINLINE float		Atan2(float y,float x) { return static_cast<float>(atan2(
 	static WWINLINE float		Sin_Trig(float x) { return gm_sinf(x); }
 	static WWINLINE float		Cos_Trig(float x) { return gm_cosf(x); }
 	static WWINLINE float		Tan_Trig(float x) { return gm_tanf(x); }
-	static WWINLINE float		ACos_Trig(float x) { return gm_acosf(x); }
-	static WWINLINE float		ASin_Trig(float x) { return gm_asinf(x); }
+	static WWINLINE float		Acos_Trig(float x) { return gm_acosf(x); }
+	static WWINLINE float		Asin_Trig(float x) { return gm_asinf(x); }
 #else
 	static WWINLINE float		Sin_Trig(float x) { return sinf(x); }
 	static WWINLINE float		Cos_Trig(float x) { return cosf(x); }
 	static WWINLINE float		Tan_Trig(float x) { return tanf(x); }
-	static WWINLINE float		ACos_Trig(float x) { return acosf(x); }
-	static WWINLINE float		ASin_Trig(float x) { return asinf(x); }
+	static WWINLINE float		Acos_Trig(float x) { return acosf(x); }
+	static WWINLINE float		Asin_Trig(float x) { return asinf(x); }
 #endif
 
 // Origin wrappers: replace bare CRT math calls in GameLogic.
@@ -176,14 +176,14 @@ static WWINLINE float		Atan2(float y,float x) { return static_cast<float>(atan2(
 	static WWINLINE float		Atan2f_Origin(float y, float x) { return gm_atan2f(y, x); }
 	static WWINLINE double		Atan_Origin(double x) { return (double)gm_atanf((float)x); }
 	static WWINLINE float		Atanf_Origin(float x) { return gm_atanf(x); }
-	static WWINLINE double		ACos_Origin(double x) { return (double)gm_acosf((float)x); }
-	static WWINLINE float		ACosf_Origin(float x) { return gm_acosf(x); }
-	static WWINLINE double		ASin_Origin(double x) { return (double)gm_asinf((float)x); }
-	static WWINLINE float		ASinf_Origin(float x) { return gm_asinf(x); }
+	static WWINLINE double		Acos_Origin(double x) { return (double)gm_acosf((float)x); }
+	static WWINLINE float		Acosf_Origin(float x) { return gm_acosf(x); }
+	static WWINLINE double		Asin_Origin(double x) { return (double)gm_asinf((float)x); }
+	static WWINLINE float		Asinf_Origin(float x) { return gm_asinf(x); }
 	static WWINLINE double		Tan_Origin(double x) { return (double)gm_tanf((float)x); }
 	static WWINLINE float		Tanf_Origin(float x) { return gm_tanf(x); }
-	static WWINLINE double		FAbs_Origin(double x) { return (double)gm_fabsf((float)x); }
-	static WWINLINE float		FAbsf_Origin(float x) { return gm_fabsf(x); }
+	static WWINLINE double		Fabs_Origin(double x) { return (double)gm_fabsf((float)x); }
+	static WWINLINE float		Fabsf_Origin(float x) { return gm_fabsf(x); }
 	static WWINLINE double		Pow_Origin(double x, double y) { return (double)gm_powf((float)x, (float)y); }
 	static WWINLINE float		Powf_Origin(float x, float y) { return gm_powf(x, y); }
 	static WWINLINE double		Ceil_Origin(double x) { return (double)gm_ceilf((float)x); }
@@ -201,14 +201,14 @@ static WWINLINE float		Atan2(float y,float x) { return static_cast<float>(atan2(
 	static WWINLINE float		Atan2f_Origin(float y, float x) { return atan2f(y, x); }
 	static WWINLINE double		Atan_Origin(double x) { return atan(x); }
 	static WWINLINE float		Atanf_Origin(float x) { return atanf(x); }
-	static WWINLINE double		ACos_Origin(double x) { return acos(x); }
-	static WWINLINE float		ACosf_Origin(float x) { return acosf(x); }
-	static WWINLINE double		ASin_Origin(double x) { return asin(x); }
-	static WWINLINE float		ASinf_Origin(float x) { return asinf(x); }
+	static WWINLINE double		Acos_Origin(double x) { return acos(x); }
+	static WWINLINE float		Acosf_Origin(float x) { return acosf(x); }
+	static WWINLINE double		Asin_Origin(double x) { return asin(x); }
+	static WWINLINE float		Asinf_Origin(float x) { return asinf(x); }
 	static WWINLINE double		Tan_Origin(double x) { return tan(x); }
 	static WWINLINE float		Tanf_Origin(float x) { return tanf(x); }
-	static WWINLINE double		FAbs_Origin(double x) { return fabs(x); }
-	static WWINLINE float		FAbsf_Origin(float x) { return fabsf(x); }
+	static WWINLINE double		Fabs_Origin(double x) { return fabs(x); }
+	static WWINLINE float		Fabsf_Origin(float x) { return fabsf(x); }
 	static WWINLINE double		Pow_Origin(double x, double y) { return pow(x, y); }
 	static WWINLINE float		Powf_Origin(float x, float y) { return powf(x, y); }
 	static WWINLINE double		Ceil_Origin(double x) { return ceil(x); }

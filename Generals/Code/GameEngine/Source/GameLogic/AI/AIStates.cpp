@@ -524,7 +524,7 @@ StateReturnType AIRappelState::onEnter()
 		obj->setLayer(layerAtDest);
 
 	AIUpdateInterface *ai = obj->getAI();
-	Real MAX_RAPPEL_RATE = WWMath::FAbs_Origin(TheGlobalData->m_gravity) * LOGICFRAMES_PER_SECOND * 2.5f;
+	Real MAX_RAPPEL_RATE = WWMath::Fabs_Origin(TheGlobalData->m_gravity) * LOGICFRAMES_PER_SECOND * 2.5f;
 	m_rappelRate = -min(ai->getDesiredSpeed(), MAX_RAPPEL_RATE);
 
 	return STATE_CONTINUE;
@@ -4933,7 +4933,7 @@ StateReturnType AIAttackAimAtTargetState::update()
 		//DEBUG_LOG(("AIM: desired %f, actual %f, delta %f, aimDelta %f, goalpos %f %f",rad2deg(obj->getOrientation() + relAngle),rad2deg(obj->getOrientation()),rad2deg(relAngle),rad2deg(aimDelta),victim->getPosition()->x,victim->getPosition()->y));
 		if (m_canTurnInPlace)
 		{
-			if (WWMath::FAbs_Origin(relAngle) > aimDelta)
+			if (WWMath::Fabs_Origin(relAngle) > aimDelta)
 			{
 				Real desiredAngle = source->getOrientation() + relAngle;
 				sourceAI->setLocomotorGoalOrientation(desiredAngle);
@@ -4945,7 +4945,7 @@ StateReturnType AIAttackAimAtTargetState::update()
 			sourceAI->setLocomotorGoalPositionExplicit(m_isAttackingObject ? *victim->getPosition() : *getMachineGoalPosition());
 		}
 
-		if (WWMath::FAbs_Origin(relAngle) < aimDelta /*&& !m_preAttackFrames*/ )
+		if (WWMath::Fabs_Origin(relAngle) < aimDelta /*&& !m_preAttackFrames*/ )
 		{
 			AIUpdateInterface* victimAI = victim ? victim->getAI() : nullptr;
 			// add ourself as a targeter BEFORE calling isTemporarilyPreventingAimSuccess().
@@ -6989,7 +6989,7 @@ StateReturnType AIFaceState::update()
 	Real relAngle = ThePartitionManager->getRelativeAngle2D( obj, pos );
 
 	const Real REL_THRESH = 0.035f;	// about 2 degrees. (getRelativeAngle2D is current only accurate to about 1.25 degrees)
-	if( WWMath::FAbs_Origin( relAngle ) < REL_THRESH )
+	if( WWMath::Fabs_Origin( relAngle ) < REL_THRESH )
 	{
 		return STATE_SUCCESS;
 	}

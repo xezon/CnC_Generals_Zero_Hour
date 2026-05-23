@@ -727,9 +727,9 @@ inline Bool isReallyClose(const Coord3D& a, const Coord3D& b)
 {
 	const Real CLOSE_ENOUGH = 0.1f;
 	return
-		WWMath::FAbs_Origin(a.x-b.x) <= CLOSE_ENOUGH &&
-		WWMath::FAbs_Origin(a.y-b.y) <= CLOSE_ENOUGH &&
-		WWMath::FAbs_Origin(a.z-b.z) <= CLOSE_ENOUGH;
+		WWMath::Fabs_Origin(a.x-b.x) <= CLOSE_ENOUGH &&
+		WWMath::Fabs_Origin(a.y-b.y) <= CLOSE_ENOUGH &&
+		WWMath::Fabs_Origin(a.z-b.z) <= CLOSE_ENOUGH;
 }
 
 /**
@@ -1011,8 +1011,8 @@ void Path::computePointOnPath(
 				out.posOnPath.x = closeNodePos->x + alongPathDist * segmentDirNorm.x;
 				out.posOnPath.y = closeNodePos->y + alongPathDist * segmentDirNorm.y;
 				out.posOnPath.z = closeNodePos->z;
-				Real dx = WWMath::FAbs_Origin(pos.x - out.posOnPath.x);
-				Real dy = WWMath::FAbs_Origin(pos.y - out.posOnPath.y);
+				Real dx = WWMath::Fabs_Origin(pos.x - out.posOnPath.x);
+				Real dy = WWMath::Fabs_Origin(pos.y - out.posOnPath.y);
 				if (dx<1 && dy<1 && closeNode->getNextOptimized() && closeNode->getNextOptimized()->getNextOptimized()) {
 					out.posOnPath = *closeNode->getNextOptimized()->getNextOptimized()->getPosition();
 				}
@@ -3963,8 +3963,8 @@ Bool PathfindLayer::isPointOnWall(ObjectID *wallPieces, Int numPieces, const Coo
 		Real pty = pt->y - obj->getPosition()->y;
 
 		// inverse-rotate it to the right coord system
-		Real ptx_new = (Real)WWMath::FAbs_Origin(ptx*c - pty*s);
-		Real pty_new = (Real)WWMath::FAbs_Origin(ptx*s + pty*c);
+		Real ptx_new = (Real)WWMath::Fabs_Origin(ptx*c - pty*s);
+		Real pty_new = (Real)WWMath::Fabs_Origin(ptx*s + pty*c);
 
 		if (ptx_new <= major && pty_new <= minor)
 		{
@@ -6415,7 +6415,7 @@ Int Pathfinder::examineNeighboringCells(PathfindCell *parentCell, PathfindCell *
 				toPos.y = newCellCoord.y * PATHFIND_CELL_SIZE_F ;
 				toPos.z = TheTerrainLogic->getGroundHeight(toPos.x , toPos.y);
 
-				if ( WWMath::FAbs_Origin(fromPos.z - toPos.z)<PATHFIND_CELL_SIZE_F) {
+				if ( WWMath::Fabs_Origin(fromPos.z - toPos.z)<PATHFIND_CELL_SIZE_F) {
 					newCostSoFar += 7*COST_DIAGONAL;
 				}
 			} else if (newCell->getPinched()) {

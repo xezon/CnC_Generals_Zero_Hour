@@ -66,12 +66,12 @@ Real Tan(Real x)
 
 Real ACos(Real x)
 {
-	return WWMath::ACos_Trig(x);
+	return WWMath::Acos_Trig(x);
 }
 
 Real ASin(Real x)
 {
-	return WWMath::ASin_Trig(x);
+	return WWMath::Asin_Trig(x);
 }
 
 double Sqrt(double x)

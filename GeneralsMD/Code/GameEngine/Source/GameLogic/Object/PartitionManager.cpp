@@ -415,13 +415,13 @@ static void testRotatedPointsAgainstRect(
 		Real pty = pts->y - a->position.y;
 
 		// inverse-rotate it to the right coord system
-		Real ptx_new = (Real)WWMath::FAbs_Origin(ptx*c - pty*s);
-		Real pty_new = (Real)WWMath::FAbs_Origin(ptx*s + pty*c);
+		Real ptx_new = (Real)WWMath::Fabs_Origin(ptx*c - pty*s);
+		Real pty_new = (Real)WWMath::Fabs_Origin(ptx*s + pty*c);
 
 		#ifdef INTENSE_DEBUG
 		Real mag_a = sqr(ptx)+sqr(pty);
 		Real mag_b = sqr(ptx_new)+sqr(pty_new);
-		DEBUG_ASSERTCRASH(WWMath::FAbs_Origin(mag_a - mag_b) <= 1.0, ("hmm, unlikely"));
+		DEBUG_ASSERTCRASH(WWMath::Fabs_Origin(mag_a - mag_b) <= 1.0, ("hmm, unlikely"));
 		#endif
 
 		if (ptx_new <= major && pty_new <= minor)
@@ -3810,7 +3810,7 @@ Bool PartitionManager::tryPosition( const Coord3D *center,
 		pos.z = TheTerrainLogic->getGroundHeight( pos.x, pos.y );
 	}
 
-	if (WWMath::FAbs_Origin(pos.z - center->z) > options->maxZDelta)
+	if (WWMath::Fabs_Origin(pos.z - center->z) > options->maxZDelta)
 		return FALSE;
 
 	//

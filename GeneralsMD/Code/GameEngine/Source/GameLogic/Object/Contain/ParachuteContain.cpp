@@ -304,7 +304,7 @@ UpdateSleepTime ParachuteContain::update()
 	if (!m_opened)
 	{
 		// see if we need to open.
-		if (WWMath::FAbs_Origin(m_startZ - parachute->getPosition()->z) >= d->m_paraOpenDist)
+		if (WWMath::Fabs_Origin(m_startZ - parachute->getPosition()->z) >= d->m_paraOpenDist)
 		{
 			m_opened = true;
 			parachute->clearAndSetModelConditionState(MODELCONDITION_FREEFALL, MODELCONDITION_PARACHUTING);

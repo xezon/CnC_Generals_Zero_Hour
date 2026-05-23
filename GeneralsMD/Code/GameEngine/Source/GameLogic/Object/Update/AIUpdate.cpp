@@ -1296,8 +1296,8 @@ Bool AIUpdateInterface::blockedBy(Object *other)
 
 	// If we are near our final goal, don't get stuck.
 	if (goalCell.x>0 && goalCell.y>0) {
-		Real dx = WWMath::FAbs_Origin(goalPos.x-pos.x);
-		Real dy = WWMath::FAbs_Origin(goalPos.y-pos.y);
+		Real dx = WWMath::Fabs_Origin(goalPos.x-pos.x);
+		Real dy = WWMath::Fabs_Origin(goalPos.y-pos.y);
 		if (dx<PATHFIND_CELL_SIZE_F && dy<PATHFIND_CELL_SIZE_F) {
 			return FALSE; // If we're approaching our goal, ignore obstacles.
 		}
@@ -1412,7 +1412,7 @@ Bool AIUpdateInterface::needToRotate()
 		deltaAngle = ThePartitionManager->getRelativeAngle2D( getObject(), &info.posOnPath );
 	}
 
-	if (WWMath::FAbs_Origin(deltaAngle)>PI/30)
+	if (WWMath::Fabs_Origin(deltaAngle)>PI/30)
 	{
 		return TRUE;
 	}

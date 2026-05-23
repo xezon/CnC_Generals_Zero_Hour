@@ -130,7 +130,7 @@ static Real angleClosestTo(Real a1, Real a2, Real desired)
 {
 	a1 = normalizeAngle(a1);
 	a2 = normalizeAngle(a2);
-	return (WWMath::FAbs_Origin(stdAngleDiff(desired, a1)) < WWMath::FAbs_Origin(stdAngleDiff(desired, a2))) ? a1 : a2;
+	return (WWMath::Fabs_Origin(stdAngleDiff(desired, a1)) < WWMath::Fabs_Origin(stdAngleDiff(desired, a2))) ? a1 : a2;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -298,7 +298,7 @@ UpdateSleepTime ToppleUpdate::update()
 		m_angularVelocity *= -d->m_bounceVelocityPercent;
 
 		if( BitIsSet( m_options, TOPPLE_OPTIONS_NO_BOUNCE ) == TRUE ||
-				WWMath::FAbs_Origin(m_angularVelocity) < VELOCITY_BOUNCE_LIMIT )
+				WWMath::Fabs_Origin(m_angularVelocity) < VELOCITY_BOUNCE_LIMIT )
 		{
 			// too slow, just stop
 			m_angularVelocity = 0;
@@ -338,7 +338,7 @@ UpdateSleepTime ToppleUpdate::update()
 				}
 			}
 		}
-		else if( WWMath::FAbs_Origin(m_angularVelocity) >= VELOCITY_BOUNCE_SOUND_LIMIT )
+		else if( WWMath::Fabs_Origin(m_angularVelocity) >= VELOCITY_BOUNCE_SOUND_LIMIT )
 		{
 			// fast enough bounce to warrant the bounce fx
 			if( BitIsSet( m_options, TOPPLE_OPTIONS_NO_FX ) == FALSE )

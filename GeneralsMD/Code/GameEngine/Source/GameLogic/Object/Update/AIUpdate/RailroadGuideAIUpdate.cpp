@@ -467,8 +467,8 @@ void RailroadBehavior::playImpactSound(Object *victim, const Coord3D *impactPosi
 	impact.setPosition(impactPosition);
 	if ( theirPhys )
 	{
-		vel += WWMath::FAbs_Origin(theirPhys->getVelocity()->length());
-		mass += WWMath::FAbs_Origin(theirPhys->getMass());
+		vel += WWMath::Fabs_Origin(theirPhys->getVelocity()->length());
+		mass += WWMath::Fabs_Origin(theirPhys->getMass());
 
 		vel /= 2;
 		mass /= 2;//average of him and me
@@ -700,7 +700,7 @@ UpdateSleepTime RailroadBehavior::update()
 		if ( m_conductorState == APPLY_BRAKES )
 		{
 			conductorPullInfo.speed *= modData->m_braking;
-			if (WWMath::FAbs_Origin(conductorPullInfo.speed) < 0.1f)
+			if (WWMath::Fabs_Origin(conductorPullInfo.speed) < 0.1f)
 			{
 				conductorPullInfo.speed = 0;
 				///////////////////////////////////////( &m_hissySteamSound );
@@ -1233,7 +1233,7 @@ void alignToTerrain( Real angle, const Coord3D& pos, const Coord3D& normal, Matr
 		x.normalize();
 	}
 
-	DEBUG_ASSERTCRASH(WWMath::FAbs_Origin(x.x*z.x + x.y*z.y + x.z*z.z)<0.0001,("dot is not zero"));
+	DEBUG_ASSERTCRASH(WWMath::Fabs_Origin(x.x*z.x + x.y*z.y + x.z*z.z)<0.0001,("dot is not zero"));
 
 	// now computing the y vector is trivial.
 	y.crossProduct( &z, &x, &y );

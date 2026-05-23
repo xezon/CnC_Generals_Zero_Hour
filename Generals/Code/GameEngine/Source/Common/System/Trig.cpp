@@ -71,7 +71,7 @@ Real ACos(Real x)
 
 Real ASin(Real x)
 {
-	return WWMath::ASin_Trig(x);
+	return WWMath::Asin_Trig(x);
 }
 
 double Sqrt(double x)
