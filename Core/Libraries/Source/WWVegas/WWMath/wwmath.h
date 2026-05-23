@@ -157,6 +157,8 @@ static WWINLINE double	Pow_Origin(double x, double y) { return gm_pow(x, y); }
 static WWINLINE float		Powf_Origin(float x, float y) { return gm_powf(x, y); }
 static WWINLINE double	Ceil_Origin(double x) { return gm_ceil(x); }
 static WWINLINE float		Ceilf_Origin(float x) { return gm_ceilf(x); }
+static WWINLINE double	Floor(double x) { return gm_floor(x); }
+static WWINLINE float		Floorf(float x) { return gm_floorf(x); }
 static WWINLINE float		Expf_Origin(float x) { return gm_expf(x); }
 static WWINLINE float		Log10f_Origin(float x) { return gm_log10f(x); }
 static WWINLINE float		Logf_Origin(float x) { return gm_logf(x); }
@@ -184,6 +186,8 @@ static WWINLINE double	Pow_Origin(double x, double y) { return pow(x, y); }
 static WWINLINE float		Powf_Origin(float x, float y) { return powf(x, y); }
 static WWINLINE double	Ceil_Origin(double x) { return ceil(x); }
 static WWINLINE float		Ceilf_Origin(float x) { return ceilf(x); }
+static WWINLINE double	Floor(double x) { return floor(x); }
+static WWINLINE float		Floorf(float x) { return floorf(x); }
 static WWINLINE float		Expf_Origin(float x) { return expf(x); }
 static WWINLINE float		Log10f_Origin(float x) { return log10f(x); }
 static WWINLINE float		Logf_Origin(float x) { return logf(x); }
@@ -193,7 +197,6 @@ static WWINLINE float		Tanhf_Origin(float x) { return tanhf(x); }
 #endif
 
 static WWINLINE float		Sign(float val);
-static WWINLINE float		Floor(float val) { return floorf(val); }
 static WWINLINE float		Round(float val) { return floorf(val + 0.5f); }
 static WWINLINE bool		Fast_Is_Float_Positive(const float & val);
 static WWINLINE bool		Is_Power_Of_2(const unsigned int val);
