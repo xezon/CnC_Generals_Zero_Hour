@@ -103,7 +103,7 @@ Find_Tangent
 		// where the 2 tangent points lie.
 		//
 		float angle_offset	= WWMath::Acos (radius / dist);
-		float base_angle		= WWMath::Atan2 (delta_x, -delta_y);
+		float base_angle		= WWMath::Atan2_Legacy (delta_x, -delta_y);
 		base_angle = WWMath::Wrap (base_angle, 0, DEG_TO_RADF (360));
 
 		//
@@ -185,10 +185,10 @@ Find_Turn_Arc
 	// the point halfway between the angles formed by the (prev-curr) and
 	// (next-curr) vectors.
 	//
-	float angle1 = ::WWMath::Atan2 ((prev_pt.Y - curr_pt.Y), prev_pt.X - curr_pt.X);
+	float angle1 = ::WWMath::Atan2_Legacy ((prev_pt.Y - curr_pt.Y), prev_pt.X - curr_pt.X);
 	angle1 = WWMath::Wrap (angle1, 0, DEG_TO_RADF (360));
 
-	float angle2 = ::WWMath::Atan2 ((next_pt.Y - curr_pt.Y), next_pt.X - curr_pt.X);
+	float angle2 = ::WWMath::Atan2_Legacy ((next_pt.Y - curr_pt.Y), next_pt.X - curr_pt.X);
 	angle2 = WWMath::Wrap (angle2, 0, DEG_TO_RADF (360));
 
 	float avg_angle = (angle1 + angle2) * 0.5F;
@@ -252,7 +252,7 @@ Find_Tangents
 	//
 	//	Find the angle where the current position lies on the turn arc
 	//
-	(*point_angle) = ::WWMath::Atan2 (curr_pt.X - arc_center.X, -(curr_pt.Y - arc_center.Y));
+	(*point_angle) = ::WWMath::Atan2_Legacy (curr_pt.X - arc_center.X, -(curr_pt.Y - arc_center.Y));
 	(*point_angle) = WWMath::Wrap ((*point_angle), 0, DEG_TO_RADF (360));
 
 	//

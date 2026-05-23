@@ -589,7 +589,7 @@ WWINLINE Matrix3x3& Matrix3x3::operator /= (float d)
 WWINLINE float Matrix3x3::Get_X_Rotation() const
 {
 	Vector3 v = (*this) * Vector3(0.0,1.0,0.0);
-	return WWMath::Atan2(v[2], v[1]);
+	return WWMath::Atan2_Legacy(v[2], v[1]);
 }
 
 /***********************************************************************************************
@@ -607,7 +607,7 @@ WWINLINE float Matrix3x3::Get_X_Rotation() const
 WWINLINE float Matrix3x3::Get_Y_Rotation() const
 {
 	Vector3 v = (*this) * Vector3(0.0,0.0,1.0);
-	return WWMath::Atan2(v[0],v[2]);
+	return WWMath::Atan2_Legacy(v[0],v[2]);
 }
 
 /***********************************************************************************************
@@ -625,7 +625,7 @@ WWINLINE float Matrix3x3::Get_Y_Rotation() const
 WWINLINE float Matrix3x3::Get_Z_Rotation() const
 {
 	Vector3 v = (*this) * Vector3(1.0,0.0,0.0);
-	return WWMath::Atan2(v[1],v[0]);
+	return WWMath::Atan2_Legacy(v[1],v[0]);
 }
 
 WWINLINE Vector3 Matrix3x3::Get_X_Vector() const

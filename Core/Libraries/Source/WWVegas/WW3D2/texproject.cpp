@@ -960,8 +960,8 @@ bool TexProjectClass::Compute_Perspective_Projection
 
 	float tan_hfov2 = WWMath::Fabs(box.Extent.X / (box.Center.Z + box.Extent.Z));
 	float tan_vfov2 = WWMath::Fabs(box.Extent.Y / (box.Center.Z + box.Extent.Z));
-	float hfov = 2.0f * WWMath::Atan(tan_hfov2);
-	float vfov = 2.0f * WWMath::Atan(tan_vfov2);
+	float hfov = 2.0f * WWMath::Atan_Legacy(tan_hfov2);
+	float vfov = 2.0f * WWMath::Atan_Legacy(tan_vfov2);
 
 	/*
 	** Plug in the results.

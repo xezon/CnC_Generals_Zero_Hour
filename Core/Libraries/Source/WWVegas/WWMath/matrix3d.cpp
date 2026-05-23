@@ -248,7 +248,7 @@ void Matrix3D::Set_Rotation(const Quaternion & q)
  *=============================================================================================*/
 float Matrix3D::Get_X_Rotation() const
 {
-	return WWMath::Atan2(Row[2][1], Row[1][1]);
+	return WWMath::Atan2_Legacy(Row[2][1], Row[1][1]);
 }
 
 
@@ -266,7 +266,7 @@ float Matrix3D::Get_X_Rotation() const
  *=============================================================================================*/
 float Matrix3D::Get_Y_Rotation() const
 {
-	return WWMath::Atan2(Row[0][2], Row[2][2]);
+	return WWMath::Atan2_Legacy(Row[0][2], Row[2][2]);
 }
 
 
@@ -284,7 +284,7 @@ float Matrix3D::Get_Y_Rotation() const
  *=============================================================================================*/
 float Matrix3D::Get_Z_Rotation() const
 {
-	return WWMath::Atan2(Row[1][0], Row[0][0]);
+	return WWMath::Atan2_Legacy(Row[1][0], Row[0][0]);
 }
 
 
