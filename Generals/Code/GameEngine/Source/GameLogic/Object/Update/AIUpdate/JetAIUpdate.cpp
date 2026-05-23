@@ -884,7 +884,7 @@ public:
 		}
 		else
 		{
-			Real dist = WWMath::Sqrtf_Origin(dSqr);
+			Real dist = WWMath::Sqrtf(dSqr);
 			if (dist<1) dist = 1;
 			pos.x += PATHFIND_CELL_SIZE_F*dx/(dist*LOGICFRAMES_PER_SECOND);
 			pos.y += PATHFIND_CELL_SIZE_F*dy/(dist*LOGICFRAMES_PER_SECOND);

@@ -173,7 +173,7 @@ void GeometryInfo::calcPitches(const Coord3D& thisPos, const GeometryInfo& that,
 	Coord3D thisCenter;
 	getCenterPosition(thisPos, thisCenter);
 
-	Real dxy = WWMath::Sqrt_Origin(sqr(thatPos.x - thisCenter.x) + sqr(thatPos.y - thisCenter.y));
+	Real dxy = WWMath::Sqrt(sqr(thatPos.x - thisCenter.x) + sqr(thatPos.y - thisCenter.y));
 
 	Real dz;
 
@@ -329,7 +329,7 @@ void GeometryInfo::clipPointToFootprint(const Coord3D& geomCenter, Coord3D& ptTo
 		{
 			Real dx = ptToClip.x - geomCenter.x;
 			Real dy = ptToClip.y - geomCenter.y;
-			Real radius = WWMath::Sqrt_Origin(sqr(dx) + sqr(dy));
+			Real radius = WWMath::Sqrt(sqr(dx) + sqr(dy));
 			if (radius > m_majorRadius)
 			{
 				Real ratio = m_majorRadius / radius;
@@ -361,7 +361,7 @@ Bool GeometryInfo::isPointInFootprint(const Coord3D& geomCenter, const Coord3D& 
 		{
 			Real dx = pt.x - geomCenter.x;
 			Real dy = pt.y - geomCenter.y;
-			Real radius = WWMath::Sqrt_Origin(sqr(dx) + sqr(dy));
+			Real radius = WWMath::Sqrt(sqr(dx) + sqr(dy));
 			return (radius <= m_majorRadius);
 			break;
 		}
@@ -506,8 +506,8 @@ void GeometryInfo::calcBoundingStuff()
 
 		case GEOMETRY_BOX:
 		{
-			m_boundingCircleRadius = WWMath::Sqrt_Origin(sqr(m_majorRadius) + sqr(m_minorRadius));
-			m_boundingSphereRadius = WWMath::Sqrt_Origin(sqr(m_majorRadius) + sqr(m_minorRadius) + sqr(m_height*0.5));
+			m_boundingCircleRadius = WWMath::Sqrt(sqr(m_majorRadius) + sqr(m_minorRadius));
+			m_boundingSphereRadius = WWMath::Sqrt(sqr(m_majorRadius) + sqr(m_minorRadius) + sqr(m_height*0.5));
 			break;
 		}
 	};

@@ -2369,7 +2369,7 @@ void TerrainLogic::setWaterHeight( const WaterHandle *water, Real height, Real d
 		center.z = 0.0f;  // irrelavant
 
 		// the max radius to scan around us is the diagonal of the bounding region
-		Real maxDist = WWMath::Sqrt_Origin( affectedRegion.width() * affectedRegion.width() +
+		Real maxDist = WWMath::Sqrt( affectedRegion.width() * affectedRegion.width() +
 												 affectedRegion.height() * affectedRegion.height() );
 
 		// scan the objects in the area of the water affected

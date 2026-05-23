@@ -48,7 +48,7 @@ static void appendSimulationMathCrc_Deterministic(XferCRC &xfer)
         WWMath::Atan2f(0.4f, 1.3f),
         WWMath::Sinhf_Origin(0.2f),
         WWMath::Coshf_Origin(0.4f) * WWMath::Tanhf_Origin(0.5f),
-        WWMath::Sqrtf_Origin(55788.84375f),
+        WWMath::Sqrtf(55788.84375f),
         WWMath::Expf_Origin(0.1f) * WWMath::Log10f_Origin(2.3f),
         WWMath::Logf_Origin(1.4f));
 

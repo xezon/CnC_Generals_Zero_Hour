@@ -95,7 +95,7 @@ static Real heightToSpeed(Real height)
 {
 	// don't bother trying to remember how far we've fallen; instead,
 	// back-calc it from our speed & gravity... v = sqrt(2*g*h)
-	return WWMath::Sqrt_Origin(WWMath::Fabs_Origin(2.0f * TheGlobalData->m_gravity * height));
+	return WWMath::Sqrt(WWMath::Fabs_Origin(2.0f * TheGlobalData->m_gravity * height));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -638,7 +638,7 @@ UpdateSleepTime PhysicsBehavior::update()
 			if (offset != 0.0f)
 			{
 				Vector3 xvec = mtx.Get_X_Vector();
-				Real xy = WWMath::Sqrtf_Origin(sqr(xvec.X) + sqr(xvec.Y));
+				Real xy = WWMath::Sqrtf(sqr(xvec.X) + sqr(xvec.Y));
 				Real pitchAngle = WWMath::Atan2(xvec.Z, xy);
 				Real remainingAngle = (offset > 0) ? ((PI/2) - pitchAngle) : (-(PI/2) + pitchAngle);
 				Real s = Sin(remainingAngle);
@@ -819,7 +819,7 @@ Real PhysicsBehavior::getVelocityMagnitude() const
 {
 	if (m_velMag == INVALID_VEL_MAG)
 	{
-		m_velMag = (Real)WWMath::Sqrtf_Origin( sqr(m_vel.x) + sqr(m_vel.y) + sqr(m_vel.z) );
+		m_velMag = (Real)WWMath::Sqrtf( sqr(m_vel.x) + sqr(m_vel.y) + sqr(m_vel.z) );
 	}
 	return m_velMag;
 }
@@ -841,7 +841,7 @@ Real PhysicsBehavior::getForwardSpeed2D() const
 	Real speedSquared = vx*vx + vy*vy;
 //	DEBUG_ASSERTCRASH( speedSquared != 0, ("zero speedSquared will overflow sqrtf()!") );// lorenzen... sanity check
 
-	Real speed = (Real)WWMath::Sqrtf_Origin( speedSquared );
+	Real speed = (Real)WWMath::Sqrtf( speedSquared );
 
 	if (dot >= 0.0f)
 		return speed;
@@ -864,7 +864,7 @@ Real PhysicsBehavior::getForwardSpeed3D() const
 
 	Real dot = vx + vy + vz;
 
-	Real speed = (Real)WWMath::Sqrtf_Origin( vx*vx + vy*vy + vz*vz );
+	Real speed = (Real)WWMath::Sqrtf( vx*vx + vy*vy + vz*vz );
 
 	if (dot >= 0.0f)
 		return speed;
@@ -911,7 +911,7 @@ void PhysicsBehavior::scrubVelocity2D( Real desiredVelocity )
 	}
 	else
 	{
-		Real curVelocity = WWMath::Sqrtf_Origin(m_vel.x*m_vel.x + m_vel.y*m_vel.y);
+		Real curVelocity = WWMath::Sqrtf(m_vel.x*m_vel.x + m_vel.y*m_vel.y);
 		if (desiredVelocity > curVelocity)
 		{
 			return;
@@ -1196,7 +1196,7 @@ void PhysicsBehavior::onCollide( Object *other, const Coord3D *loc, const Coord3
 
 	m_lastCollidee = other->getID();
 
-	Real dist = WWMath::Sqrtf_Origin(distSqr);
+	Real dist = WWMath::Sqrtf(distSqr);
 	Real overlap = usRadius + themRadius - dist;
 
 	// if objects are coincident, dist is zero, so force would be infinite -- clearly

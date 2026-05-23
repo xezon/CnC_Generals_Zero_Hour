@@ -281,7 +281,7 @@ public:
 			Real dy = primary->y - secondary->y;
 
 			//Calc length
-			Real length = WWMath::Sqrt_Origin( dx*dx + dy*dy );
+			Real length = WWMath::Sqrt( dx*dx + dy*dy );
 
 			//Normalize length
 			dx /= length;

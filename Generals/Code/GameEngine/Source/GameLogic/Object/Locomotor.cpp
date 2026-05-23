@@ -231,9 +231,9 @@ static void calcDirectionToApplyThrust(
 
 	Bool foundSolution = false;
 	Real distToGoalSqr = vecToGoal.Length2();
-	Real distToGoal = WWMath::Sqrt_Origin(distToGoalSqr);
+	Real distToGoal = WWMath::Sqrt(distToGoalSqr);
 	Real curVelMagSqr = curVel.Length2();
-	Real curVelMag = WWMath::Sqrt_Origin(curVelMagSqr);
+	Real curVelMag = WWMath::Sqrt(curVelMagSqr);
 	Real maxAccelSqr = sqr(maxAccel);
 
 	Real denom = curVelMagSqr - maxAccelSqr;
@@ -971,7 +971,7 @@ void Locomotor::locoUpdate_moveTowardsPosition(Object* obj, const Coord3D& goalP
 	Real dx = goalPos.x - obj->getPosition()->x;
 	Real dy = goalPos.y - obj->getPosition()->y;
 	Real dz = goalPos.z - obj->getPosition()->z;
-	Real dist = WWMath::Sqrt_Origin(dx*dx+dy*dy);
+	Real dist = WWMath::Sqrt(dx*dx+dy*dy);
 	if (dist>onPathDistToGoal)
 	{
 		if (!obj->isKindOf(KINDOF_PROJECTILE) && dist>2*onPathDistToGoal)
@@ -1083,7 +1083,7 @@ void Locomotor::locoUpdate_moveTowardsPosition(Object* obj, const Coord3D& goalP
 			// Projectiles never stop braking once they start.  jba.
 			obj->setStatus( MAKE_OBJECT_STATUS_MASK( OBJECT_STATUS_BRAKING ) );
 			// Projectiles cheat in 3 dimensions.
-			dist = WWMath::Sqrt_Origin(dx*dx+dy*dy+dz*dz);
+			dist = WWMath::Sqrt(dx*dx+dy*dy+dz*dz);
 			Real vel = physics->getVelocityMagnitude();
 			if (vel < MIN_VEL)
 				vel = MIN_VEL;
@@ -1533,7 +1533,7 @@ Bool Locomotor::fixInvalidPosition(Object* obj, PhysicsBehavior *physics)
 		//physics->clearAcceleration();
 
 		if (dot<0) {
-			dot = WWMath::Sqrt_Origin(-dot);
+			dot = WWMath::Sqrt(-dot);
 			correctionNormalized.x *= dot*physics->getMass();
 			correctionNormalized.y *= dot*physics->getMass();
 			physics->applyMotiveForce(&correctionNormalized);

@@ -176,7 +176,7 @@ static Bool calcTrajectory(
 
 	// calculating the pitch requires a bit more effort.
 	Real horizDistSqr = sqr(dx) + sqr(dy);
-	Real horizDist = WWMath::Sqrt_Origin(horizDistSqr);
+	Real horizDist = WWMath::Sqrt(horizDistSqr);
 
 	// calc the two possible pitches that will cover the given horizontal range.
 	// (this is actually only true if dz==0, but is a good first guess)
@@ -290,7 +290,7 @@ static Bool calcTrajectory(
 #endif
 
 		vx = velocity*cosPitches[preferred];
-		Real actualRange = (vx*(vz + WWMath::Sqrt_Origin(root)))/gravity;
+		Real actualRange = (vx*(vz + WWMath::Sqrt(root)))/gravity;
 		const Real CLOSE_ENOUGH_RANGE = 5.0f;
 		if (tooClose || (actualRange < horizDist - CLOSE_ENOUGH_RANGE))
 		{
@@ -369,7 +369,7 @@ void DumbProjectileBehavior::projectileFireAtObjectOrPosition( const Object *vic
 		// Some weapons want to scale their start speed to the range
 		Real minRange = detWeap->getMinimumAttackRange();
 		Real maxRange = detWeap->getUnmodifiedAttackRange();
-		Real range = WWMath::Sqrt_Origin(ThePartitionManager->getDistanceSquared( projectile, &victimPosToUse, FROM_CENTER_2D ) );
+		Real range = WWMath::Sqrt(ThePartitionManager->getDistanceSquared( projectile, &victimPosToUse, FROM_CENTER_2D ) );
 		Real rangeRatio = (range - minRange) / (maxRange - minRange);
 		m_flightPathSpeed = (rangeRatio * (weaponSpeed - minWeaponSpeed)) + minWeaponSpeed;
 	}
@@ -611,7 +611,7 @@ UpdateSleepTime DumbProjectileBehavior::update()
 			Real distVictimMovedSqr = sqr(delta.x) + sqr(delta.y) + sqr(delta.z);
 			if (distVictimMovedSqr > 0.1f)
 			{
-				Real distVictimMoved = WWMath::Sqrtf_Origin(distVictimMovedSqr);
+				Real distVictimMoved = WWMath::Sqrtf(distVictimMovedSqr);
 				if (distVictimMoved > d->m_flightPathAdjustDistPerFrame)
 					distVictimMoved = d->m_flightPathAdjustDistPerFrame;
 				delta.normalize();

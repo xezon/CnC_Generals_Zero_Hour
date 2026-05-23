@@ -3572,7 +3572,7 @@ StateReturnType AIAttackMoveToState::update()
 		if (distSqr < sqr(ATTACK_CLOSE_ENOUGH_CELLS*PATHFIND_CELL_SIZE_F)) {
 			return ret;
 		}
-		DEBUG_LOG(("AIAttackMoveToState::update Distance from goal %f, retrying.", WWMath::Sqrt_Origin(distSqr)));
+		DEBUG_LOG(("AIAttackMoveToState::update Distance from goal %f, retrying.", WWMath::Sqrt(distSqr)));
 
 		ret = STATE_CONTINUE;
 		m_retryCount--;

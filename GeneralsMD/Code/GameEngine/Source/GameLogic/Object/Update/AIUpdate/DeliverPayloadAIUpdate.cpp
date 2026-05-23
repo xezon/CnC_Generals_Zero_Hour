@@ -202,8 +202,8 @@ UpdateSleepTime DeliverPayloadAIUpdate::update()
 				{
 					//Calc strafe ratio
 					Real startDiveDistance = getData()->m_diveStartDistance;
-					Real endDiveDistance = WWMath::Sqrt_Origin( endDiveDistanceSquared );
-					Real currentDistance = WWMath::Sqrt_Origin( currentDistanceSquared );
+					Real endDiveDistance = WWMath::Sqrt( endDiveDistanceSquared );
+					Real currentDistance = WWMath::Sqrt( currentDistanceSquared );
 
 					Real diveRatio = (startDiveDistance - currentDistance) / (startDiveDistance - endDiveDistance);
 
@@ -1148,7 +1148,7 @@ StateReturnType HeadOffMapState::onEnter() // Give move order out of town
 	Region3D terrainExtent;
 	TheTerrainLogic->getExtent( &terrainExtent );
 	const Real FUDGE = 1.2f;
-	Real HUGE_DIST = FUDGE * WWMath::Sqrt_Origin(sqr(terrainExtent.hi.x - terrainExtent.lo.x) + sqr(terrainExtent.hi.y - terrainExtent.lo.y));
+	Real HUGE_DIST = FUDGE * WWMath::Sqrt(sqr(terrainExtent.hi.x - terrainExtent.lo.x) + sqr(terrainExtent.hi.y - terrainExtent.lo.y));
 
 	exitCoord.x += dir->x * HUGE_DIST;
 	exitCoord.y += dir->y * HUGE_DIST;

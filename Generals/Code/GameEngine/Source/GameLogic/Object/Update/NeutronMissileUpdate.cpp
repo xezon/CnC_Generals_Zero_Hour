@@ -512,7 +512,7 @@ UpdateSleepTime NeutronMissileUpdate::update()
 	if (m_noTurnDistLeft > 0.0f && oldPosValid)
 	{
 		Coord3D newPos = *getObject()->getPosition();
-		Real distThisTurn = WWMath::Sqrt_Origin(sqr(newPos.x-oldPos.x) + sqr(newPos.y-oldPos.y) + sqr(newPos.z-oldPos.z));
+		Real distThisTurn = WWMath::Sqrt(sqr(newPos.x-oldPos.x) + sqr(newPos.y-oldPos.y) + sqr(newPos.z-oldPos.z));
 		//DEBUG_LOG(("noTurnDist goes from %f to %f",m_noTurnDistLeft,m_noTurnDistLeft-distThisTurn));
 		m_noTurnDistLeft -= distThisTurn;
 	}

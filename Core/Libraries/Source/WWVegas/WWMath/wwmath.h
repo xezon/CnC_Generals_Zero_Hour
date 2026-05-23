@@ -137,8 +137,8 @@ static WWINLINE float Asin(float val);
 // Origin wrappers: replace bare CRT math calls in GameLogic.
 // Each wrapper preserves the exact type (float vs double) of the vanilla CRT call.
 #if USE_DETERMINISTIC_MATH
-static WWINLINE double	Sqrt_Origin(double x) { return gm_sqrt(x); }
-static WWINLINE float		Sqrtf_Origin(float x) { return gm_sqrtf(x); }
+static WWINLINE double	Sqrt(double x) { return gm_sqrt(x); }
+static WWINLINE float		Sqrtf(float x) { return gm_sqrtf(x); }
 static WWINLINE float		Atan2_Legacy(float y,float x) { return gm_atan2f(y,x); }
 static WWINLINE double	Atan2(double y, double x) { return gm_atan2(y, x); }
 static WWINLINE float		Atan2f(float y, float x) { return gm_atan2f(y, x); }
@@ -164,8 +164,8 @@ static WWINLINE float		Sinhf_Origin(float x) { return gm_sinhf(x); }
 static WWINLINE float		Coshf_Origin(float x) { return gm_coshf(x); }
 static WWINLINE float		Tanhf_Origin(float x) { return gm_tanhf(x); }
 #else
-static WWINLINE double	Sqrt_Origin(double x) { return sqrt(x); }
-static WWINLINE float		Sqrtf_Origin(float x) { return sqrtf(x); }
+static WWINLINE double	Sqrt(double x) { return sqrt(x); }
+static WWINLINE float		Sqrtf(float x) { return sqrtf(x); }
 static WWINLINE float		Atan2_Legacy(float y,float x) { return static_cast<float>(atan2(y,x)); }
 static WWINLINE double	Atan2(double y, double x) { return atan2(y, x); }
 static WWINLINE float		Atan2f(float y, float x) { return atan2f(y, x); }
