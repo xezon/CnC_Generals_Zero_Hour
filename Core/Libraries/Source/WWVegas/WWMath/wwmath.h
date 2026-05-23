@@ -134,9 +134,9 @@ static WWINLINE float Asin_Legacy(float val);
 #if USE_DETERMINISTIC_MATH
 static WWINLINE double	Sqrt(double x) { return gm_sqrt(x); }
 static WWINLINE float		Sqrtf(float x) { return gm_sqrtf(x); }
-static WWINLINE float		Atan2_Legacy(float y,float x) { return gm_atan2f(y,x); }
-static WWINLINE double	Atan2(double y, double x) { return gm_atan2(y, x); }
-static WWINLINE float		Atan2f(float y, float x) { return gm_atan2f(y, x); }
+static WWINLINE float		Atan2_Legacy(float x, float y) { return gm_atan2f(x, y); }
+static WWINLINE double	Atan2(double x, double y) { return gm_atan2(x, y); }
+static WWINLINE float		Atan2f(float x, float y) { return gm_atan2f(x, y); }
 static WWINLINE float		Atan_Legacy(float x) { return gm_atanf(x); }
 static WWINLINE double	Atan(double x) { return gm_atan(x); }
 static WWINLINE float		Atanf(float x) { return gm_atanf(x); }
@@ -169,9 +169,9 @@ static WWINLINE float		Tanhf(float x) { return gm_tanhf(x); }
 #else
 static WWINLINE double	Sqrt(double x) { return sqrt(x); }
 static WWINLINE float		Sqrtf(float x) { return sqrtf(x); }
-static WWINLINE float		Atan2_Legacy(float y,float x) { return (float)atan2((double)y,(double)x); }
-static WWINLINE double	Atan2(double y, double x) { return atan2(y, x); }
-static WWINLINE float		Atan2f(float y, float x) { return atan2f(y, x); }
+static WWINLINE float		Atan2_Legacy(float x, float y) { return (float)atan2((double)x, (double)y); }
+static WWINLINE double	Atan2(double x, double y) { return atan2(x, y); }
+static WWINLINE float		Atan2f(float x, float y) { return atan2f(x, y); }
 static WWINLINE float		Atan_Legacy(float x) { return (float)atan((double)x) }
 static WWINLINE double	Atan(double x) { return atan(x); }
 static WWINLINE float		Atanf(float x) { return atanf(x); }
