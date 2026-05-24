@@ -146,6 +146,13 @@ static WWINLINE float  Cosf(float val);
 static WWINLINE double Sin(double val);
 static WWINLINE float  Sinf(float val);
 
+static WWINLINE double Sinh(double x);
+static WWINLINE float  Sinhf(float x);
+static WWINLINE double Cosh(double x);
+static WWINLINE float  Coshf(float x);
+static WWINLINE double Tanh(double x);
+static WWINLINE float  Tanhf(float x);
+
 static WWINLINE double Fabs(double x);
 static WWINLINE float  Fabsf(float val);
 static WWINLINE float  Fabsf_Legacy(float x);
@@ -163,13 +170,6 @@ static WWINLINE double Log10(double x);
 static WWINLINE float  Log10f(float x);
 static WWINLINE double Log(double x);
 static WWINLINE float  Logf(float x);
-
-static WWINLINE double Sinh(double x);
-static WWINLINE float  Sinhf(float x);
-static WWINLINE double Cosh(double x);
-static WWINLINE float  Coshf(float x);
-static WWINLINE double Tanh(double x);
-static WWINLINE float  Tanhf(float x);
 
 static WWINLINE bool		Fast_Is_Float_Positive(const float & val);
 static WWINLINE bool		Is_Power_Of_2(const unsigned int val);
@@ -788,6 +788,60 @@ WWINLINE float WWMath::Sinf(float val)
 #endif
 }
 
+WWINLINE double WWMath::Sinh(double x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_sinh(x);
+#else
+	return sinh(x);
+#endif
+}
+
+WWINLINE float WWMath::Sinhf(float x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_sinhf(x);
+#else
+	return sinhf(x);
+#endif
+}
+
+WWINLINE double WWMath::Cosh(double x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_cosh(x);
+#else
+	return cosh(x);
+#endif
+}
+
+WWINLINE float WWMath::Coshf(float x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_coshf(x);
+#else
+	return coshf(x);
+#endif
+}
+
+WWINLINE double WWMath::Tanh(double x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_tanh(x);
+#else
+	return tanh(x);
+#endif
+}
+
+WWINLINE float WWMath::Tanhf(float x)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_tanhf(x);
+#else
+	return tanhf(x);
+#endif
+}
+
 WWINLINE double WWMath::Fabs(double x)
 {
 #if USE_DETERMINISTIC_MATH
@@ -908,60 +962,6 @@ WWINLINE float WWMath::Logf(float x)
 	return gm_logf(x);
 #else
 	return logf(x);
-#endif
-}
-
-WWINLINE double WWMath::Sinh(double x)
-{
-#if USE_DETERMINISTIC_MATH
-	return gm_sinh(x);
-#else
-	return sinh(x);
-#endif
-}
-
-WWINLINE float WWMath::Sinhf(float x)
-{
-#if USE_DETERMINISTIC_MATH
-	return gm_sinhf(x);
-#else
-	return sinhf(x);
-#endif
-}
-
-WWINLINE double WWMath::Cosh(double x)
-{
-#if USE_DETERMINISTIC_MATH
-	return gm_cosh(x);
-#else
-	return cosh(x);
-#endif
-}
-
-WWINLINE float WWMath::Coshf(float x)
-{
-#if USE_DETERMINISTIC_MATH
-	return gm_coshf(x);
-#else
-	return coshf(x);
-#endif
-}
-
-WWINLINE double WWMath::Tanh(double x)
-{
-#if USE_DETERMINISTIC_MATH
-	return gm_tanh(x);
-#else
-	return tanh(x);
-#endif
-}
-
-WWINLINE float WWMath::Tanhf(float x)
-{
-#if USE_DETERMINISTIC_MATH
-	return gm_tanhf(x);
-#else
-	return tanhf(x);
 #endif
 }
 
