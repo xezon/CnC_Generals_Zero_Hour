@@ -112,7 +112,6 @@ static void			Shutdown();
 static WWINLINE int Float_To_Int_Chop(float f);
 static WWINLINE int Float_To_Int_Floor(float f);
 
-static WWINLINE float Sqrt_Legacy(float val);
 static WWINLINE long  Float_To_Long(float f);
 
 static WWINLINE float Fast_Sin(float val);
@@ -125,6 +124,7 @@ static WWINLINE float Acos_Legacy(float val);
 static WWINLINE float Fast_Asin(float val);
 static WWINLINE float Asin_Legacy(float val);
 
+static WWINLINE float  Sqrt_Legacy(float val);
 static WWINLINE double Sqrt(double x);
 static WWINLINE float  Sqrtf(float x);
 static WWINLINE float  Inv_Sqrt_Legacy(float a);
@@ -541,6 +541,25 @@ WWINLINE float WWMath::Asin_Legacy(float val)
 	return gm_asinf(val);
 #else
 	return (float)asin((double)val);
+#endif
+}
+
+WWINLINE float WWMath::Sqrt_Legacy(float val)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_sqrtf(val);
+
+#elif defined(_MSC_VER) && defined(_M_IX86)
+	float retval;
+	__asm {
+		fld [val]
+		fsqrt
+		fstp [retval]
+	}
+	return retval;
+
+#else
+	return (float)sqrt((double)val);
 #endif
 }
 
@@ -987,29 +1006,6 @@ WWINLINE float WWMath::Tanhf(float x)
 	return gm_tanhf(x);
 #else
 	return tanhf(x);
-#endif
-}
-
-// ----------------------------------------------------------------------------
-// Sqrt
-// ----------------------------------------------------------------------------
-
-WWINLINE float WWMath::Sqrt_Legacy(float val)
-{
-#if USE_DETERMINISTIC_MATH
-	return gm_sqrtf(val);
-
-#elif defined(_MSC_VER) && defined(_M_IX86)
-	float retval;
-	__asm {
-		fld [val]
-		fsqrt
-		fstp [retval]
-	}
-	return retval;
-
-#else
-	return (float)sqrt((double)val);
 #endif
 }
 
