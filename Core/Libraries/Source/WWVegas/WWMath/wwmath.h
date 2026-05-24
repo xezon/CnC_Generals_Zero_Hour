@@ -155,6 +155,8 @@ static WWINLINE double Ceil(double x);
 static WWINLINE float  Ceilf(float x);
 static WWINLINE double Floor(double x);
 static WWINLINE float  Floorf(float x);
+static WWINLINE double Round(double x) { return Floor(x + 0.5); }
+static WWINLINE float  Roundf(float x) { return Floorf(x + 0.5f); }
 
 static WWINLINE double Exp(double x);
 static WWINLINE float  Expf(float x);
@@ -169,9 +171,6 @@ static WWINLINE double Cosh(double x);
 static WWINLINE float  Coshf(float x);
 static WWINLINE double Tanh(double x);
 static WWINLINE float  Tanhf(float x);
-
-static WWINLINE double	Round(double x) { return Floor(x + 0.5); }
-static WWINLINE float		Roundf(float x) { return Floorf(x + 0.5f); }
 
 static WWINLINE bool		Fast_Is_Float_Positive(const float & val);
 static WWINLINE bool		Is_Power_Of_2(const unsigned int val);
