@@ -209,127 +209,6 @@ static WWINLINE float Normalize_Angle(float angle); // Normalizes the angle to t
 };
 
 
-WWINLINE bool WWMath::Fast_Is_Float_Positive(const float & val)
-{
-	return !((*(int *)(&val)) & 0x80000000);
-}
-
-WWINLINE bool WWMath::Is_Power_Of_2(const unsigned int val)
-{
-	return !((val)&val-1);
-}
-
-WWINLINE float WWMath::Random_Float(float min,float max)
-{
-	return Random_Float() * (max-min) + min;
-}
-
-WWINLINE float WWMath::Clamp(float val, float min /*= 0.0f*/, float max /*= 1.0f*/)
-{
-	if(val < min) return min;
-	if(val > max) return max;
-	return val;
-}
-
-WWINLINE double WWMath::Clamp(double val, double min /*= 0.0f*/, double max /*= 1.0f*/)
-{
-	if(val < min) return min;
-	if(val > max) return max;
-	return val;
-}
-
-WWINLINE int WWMath::Clamp_Int(int val, int min_val, int max_val)
-{
-	if(val < min_val) return min_val;
-	if(val > max_val) return max_val;
-	return val;
-}
-
-WWINLINE float WWMath::Wrap(float val, float min /*= 0.0f*/, float max /*= 1.0f*/)
-{
-	// Implemented as an if rather than a while, to long loops
-	if ( val >= max )	val -= (max-min);
-	if ( val < min )	val += (max-min);
-
-	if ( val < min ) {
-		val = min;
-	}
-	if ( val > max ) {
-		val = max;
-	}
-	return val;
-}
-
-WWINLINE double WWMath::Wrap(double val, double min /*= 0.0f*/, double max /*= 1.0f*/)
-{
-	// Implemented as an if rather than a while, to long loops
-	if ( val >= max )	val -= (max-min);
-	if ( val < min )	val += (max-min);
-	if ( val < min ) {
-		val = min;
-	}
-	if ( val > max ) {
-		val = max;
-	}
-	return val;
-}
-
-WWINLINE float WWMath::Min(float a, float b)
-{
-	if (a<b) return a;
-	return b;
-}
-
-WWINLINE float WWMath::Max(float a, float b)
-{
-	if (a>b) return a;
-	return b;
-}
-
-WWINLINE float WWMath::Lerp(float a, float b, float t)
-{
-	return (a + (b - a)*t);
-}
-
-WWINLINE double WWMath::Lerp(double a, double b, float t)
-{
-	return (a + (b - a)*t);
-}
-
-WWINLINE float WWMath::Inverse_Lerp(float a, float b, float v)
-{
-	return (v - a) / (b - a);
-}
-
-WWINLINE double WWMath::Inverse_Lerp(double a, double b, float v)
-{
-	return (v - a) / (b - a);
-}
-
-WWINLINE bool WWMath::Is_Valid_Float(float x)
-{
-	unsigned long * plong = (unsigned long *)(&x);
-	unsigned long exponent = ((*plong) & 0x7F800000) >> (32-9);
-
-	// if exponent is 0xFF, this is a NAN
-	if (exponent == 0xFF) {
-		return false;
-	}
-	return true;
-}
-
-WWINLINE bool WWMath::Is_Valid_Double(double x)
-{
-	unsigned long * plong = (unsigned long *)(&x) + 1;
-	unsigned long exponent = ((*plong) & 0x7FF00000) >> (32-12);
-
-	// if exponent is 0x7FF, this is a NAN
-	if (exponent == 0x7FF) {
-		return false;
-	}
-	return true;
-}
-
 WWINLINE float WWMath::Sqrt_Legacy(float val)
 {
 #if USE_DETERMINISTIC_MATH
@@ -936,6 +815,127 @@ WWINLINE float WWMath::Logf(float x)
 #else
 	return logf(x);
 #endif
+}
+
+WWINLINE bool WWMath::Fast_Is_Float_Positive(const float & val)
+{
+	return !((*(int *)(&val)) & 0x80000000);
+}
+
+WWINLINE bool WWMath::Is_Power_Of_2(const unsigned int val)
+{
+	return !((val)&val-1);
+}
+
+WWINLINE float WWMath::Random_Float(float min,float max)
+{
+	return Random_Float() * (max-min) + min;
+}
+
+WWINLINE float WWMath::Clamp(float val, float min /*= 0.0f*/, float max /*= 1.0f*/)
+{
+	if(val < min) return min;
+	if(val > max) return max;
+	return val;
+}
+
+WWINLINE double WWMath::Clamp(double val, double min /*= 0.0f*/, double max /*= 1.0f*/)
+{
+	if(val < min) return min;
+	if(val > max) return max;
+	return val;
+}
+
+WWINLINE int WWMath::Clamp_Int(int val, int min_val, int max_val)
+{
+	if(val < min_val) return min_val;
+	if(val > max_val) return max_val;
+	return val;
+}
+
+WWINLINE float WWMath::Wrap(float val, float min /*= 0.0f*/, float max /*= 1.0f*/)
+{
+	// Implemented as an if rather than a while, to long loops
+	if ( val >= max )	val -= (max-min);
+	if ( val < min )	val += (max-min);
+
+	if ( val < min ) {
+		val = min;
+	}
+	if ( val > max ) {
+		val = max;
+	}
+	return val;
+}
+
+WWINLINE double WWMath::Wrap(double val, double min /*= 0.0f*/, double max /*= 1.0f*/)
+{
+	// Implemented as an if rather than a while, to long loops
+	if ( val >= max )	val -= (max-min);
+	if ( val < min )	val += (max-min);
+	if ( val < min ) {
+		val = min;
+	}
+	if ( val > max ) {
+		val = max;
+	}
+	return val;
+}
+
+WWINLINE float WWMath::Min(float a, float b)
+{
+	if (a<b) return a;
+	return b;
+}
+
+WWINLINE float WWMath::Max(float a, float b)
+{
+	if (a>b) return a;
+	return b;
+}
+
+WWINLINE float WWMath::Lerp(float a, float b, float t)
+{
+	return (a + (b - a)*t);
+}
+
+WWINLINE double WWMath::Lerp(double a, double b, float t)
+{
+	return (a + (b - a)*t);
+}
+
+WWINLINE float WWMath::Inverse_Lerp(float a, float b, float v)
+{
+	return (v - a) / (b - a);
+}
+
+WWINLINE double WWMath::Inverse_Lerp(double a, double b, float v)
+{
+	return (v - a) / (b - a);
+}
+
+WWINLINE bool WWMath::Is_Valid_Float(float x)
+{
+	unsigned long * plong = (unsigned long *)(&x);
+	unsigned long exponent = ((*plong) & 0x7F800000) >> (32-9);
+
+	// if exponent is 0xFF, this is a NAN
+	if (exponent == 0xFF) {
+		return false;
+	}
+	return true;
+}
+
+WWINLINE bool WWMath::Is_Valid_Double(double x)
+{
+	unsigned long * plong = (unsigned long *)(&x) + 1;
+	unsigned long exponent = ((*plong) & 0x7FF00000) >> (32-12);
+
+	// if exponent is 0x7FF, this is a NAN
+	if (exponent == 0x7FF) {
+		return false;
+	}
+	return true;
 }
 
 WWINLINE long WWMath::Float_To_Long(float f)
