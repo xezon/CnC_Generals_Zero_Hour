@@ -112,10 +112,6 @@ static void			Shutdown();
 static WWINLINE int Float_To_Int_Chop(float f);
 static WWINLINE int Float_To_Int_Floor(float f);
 
-static WWINLINE double Cos(double val);
-static WWINLINE float Cosf(float val);
-static WWINLINE double Sin(double val);
-static WWINLINE float Sinf(float val);
 static WWINLINE float Sqrt_Legacy(float val);
 static WWINLINE float Inv_Sqrt_Legacy(float a);
 static WWINLINE long  Float_To_Long(float f);
@@ -144,6 +140,10 @@ static WWINLINE double Asin(double x);
 static WWINLINE float  Asinf(float x);
 static WWINLINE double Tan(double x);
 static WWINLINE float  Tanf(float x);
+static WWINLINE double Cos(double val);
+static WWINLINE float  Cosf(float val);
+static WWINLINE double Sin(double val);
+static WWINLINE float  Sinf(float val);
 static WWINLINE double Fabs(double x);
 static WWINLINE float  Fabsf(float val);
 static WWINLINE float  Fabsf_Legacy(float x);
@@ -363,70 +363,6 @@ WWINLINE long WWMath::Float_To_Long(double f)
 
 #else
 	return (long)f;
-#endif
-}
-
-// ----------------------------------------------------------------------------
-// Cos
-// ----------------------------------------------------------------------------
-
-WWINLINE double WWMath::Cos(double val)
-{
-#if USE_DETERMINISTIC_MATH
-	return gm_cos(val);
-#else
-	return cos(val);
-#endif
-}
-
-WWINLINE float WWMath::Cosf(float val)
-{
-#if USE_DETERMINISTIC_MATH
-	return gm_cosf(val);
-
-#elif defined(_MSC_VER) && defined(_M_IX86)
-	float retval;
-	__asm {
-		fld [val]
-		fcos
-		fstp [retval]
-	}
-	return retval;
-
-#else
-	return cosf(val);
-#endif
-}
-
-// ----------------------------------------------------------------------------
-// Sin
-// ----------------------------------------------------------------------------
-
-WWINLINE double WWMath::Sin(double val)
-{
-#if USE_DETERMINISTIC_MATH
-	return gm_sin(val);
-#else
-	return sin(val);
-#endif
-}
-
-WWINLINE float WWMath::Sinf(float val)
-{
-#if USE_DETERMINISTIC_MATH
-	return gm_sinf(val);
-
-#elif defined(_MSC_VER) && defined(_M_IX86)
-	float retval;
-	__asm {
-		fld [val]
-		fsin
-		fstp [retval]
-	}
-	return retval;
-
-#else
-	return sinf(val);
 #endif
 }
 
@@ -728,6 +664,62 @@ WWINLINE float WWMath::Tanf(float x)
 	return gm_tanf(x);
 #else
 	return tanf(x);
+#endif
+}
+
+WWINLINE double WWMath::Cos(double val)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_cos(val);
+#else
+	return cos(val);
+#endif
+}
+
+WWINLINE float WWMath::Cosf(float val)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_cosf(val);
+
+#elif defined(_MSC_VER) && defined(_M_IX86)
+	float retval;
+	__asm {
+		fld [val]
+		fcos
+		fstp [retval]
+	}
+	return retval;
+
+#else
+	return cosf(val);
+#endif
+}
+
+WWINLINE double WWMath::Sin(double val)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_sin(val);
+#else
+	return sin(val);
+#endif
+}
+
+WWINLINE float WWMath::Sinf(float val)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_sinf(val);
+
+#elif defined(_MSC_VER) && defined(_M_IX86)
+	float retval;
+	__asm {
+		fld [val]
+		fsin
+		fstp [retval]
+	}
+	return retval;
+
+#else
+	return sinf(val);
 #endif
 }
 
