@@ -117,6 +117,8 @@ static WWINLINE float Fast_Inv_Cos(float val);
 static WWINLINE float Fast_Acos(float val);
 static WWINLINE float Fast_Asin(float val);
 
+static WWINLINE double Pow(double x, double y);
+static WWINLINE float  Powf(float x, float y);
 static WWINLINE float  Sqrt_Legacy(float val);
 static WWINLINE double Sqrt(double x);
 static WWINLINE float  Sqrtf(float x);
@@ -147,9 +149,6 @@ static WWINLINE float  Sinf(float val);
 static WWINLINE double Fabs(double x);
 static WWINLINE float  Fabsf(float val);
 static WWINLINE float  Fabsf_Legacy(float x);
-
-static WWINLINE double Pow(double x, double y);
-static WWINLINE float  Powf(float x, float y);
 
 static WWINLINE double Ceil(double x);
 static WWINLINE float  Ceilf(float x);
@@ -502,6 +501,24 @@ WWINLINE float WWMath::Sqrt_Legacy(float val)
 #endif
 }
 
+WWINLINE double WWMath::Pow(double x, double y)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_pow(x, y);
+#else
+	return pow(x, y);
+#endif
+}
+
+WWINLINE float WWMath::Powf(float x, float y)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_powf(x, y);
+#else
+	return powf(x, y);
+#endif
+}
+
 WWINLINE double WWMath::Sqrt(double x)
 {
 #if USE_DETERMINISTIC_MATH
@@ -801,24 +818,6 @@ WWINLINE float WWMath::Fabsf_Legacy(float x)
 	return gm_fabsf(x);
 #else
 	return fabsf(x);
-#endif
-}
-
-WWINLINE double WWMath::Pow(double x, double y)
-{
-#if USE_DETERMINISTIC_MATH
-	return gm_pow(x, y);
-#else
-	return pow(x, y);
-#endif
-}
-
-WWINLINE float WWMath::Powf(float x, float y)
-{
-#if USE_DETERMINISTIC_MATH
-	return gm_powf(x, y);
-#else
-	return powf(x, y);
 #endif
 }
 
