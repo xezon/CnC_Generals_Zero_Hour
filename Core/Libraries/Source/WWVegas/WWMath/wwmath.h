@@ -109,14 +109,6 @@ static void			Shutdown();
 
 // These are meant to be a collection of small math utility functions to be optimized at some point.
 
-static WWINLINE float Fast_Sin(float val);
-static WWINLINE float Fast_Inv_Sin(float val);
-static WWINLINE float Fast_Cos(float val);
-static WWINLINE float Fast_Inv_Cos(float val);
-
-static WWINLINE float Fast_Acos(float val);
-static WWINLINE float Fast_Asin(float val);
-
 static WWINLINE double Pow(double x, double y);
 static WWINLINE float  Powf(float x, float y);
 static WWINLINE float  Sqrt_Legacy(float val);
@@ -126,6 +118,8 @@ static WWINLINE float  Inv_Sqrt_Legacy(float a);
 static WWINLINE double Inv_Sqrt(double x);
 static WWINLINE float  Inv_Sqrtf(float x);
 
+static WWINLINE float  Fast_Acos(float val);
+static WWINLINE float  Fast_Asin(float val);
 static WWINLINE float  Acos_Legacy(float val);
 static WWINLINE double Acos(double x);
 static WWINLINE float  Acosf(float x);
@@ -139,6 +133,10 @@ static WWINLINE float  Atan2_Legacy(float x, float y);
 static WWINLINE double Atan2(double x, double y);
 static WWINLINE float  Atan2f(float x, float y);
 
+static WWINLINE float  Fast_Cos(float val);
+static WWINLINE float  Fast_Inv_Cos(float val);
+static WWINLINE float  Fast_Sin(float val);
+static WWINLINE float  Fast_Inv_Sin(float val);
 static WWINLINE double Cos(double val);
 static WWINLINE float  Cosf(float val);
 static WWINLINE double Sin(double val);
@@ -332,156 +330,6 @@ WWINLINE bool WWMath::Is_Valid_Double(double x)
 	return true;
 }
 
-// ----------------------------------------------------------------------------
-// Fast, table based sin
-// ----------------------------------------------------------------------------
-
-WWINLINE float WWMath::Fast_Sin(float val)
-{
-	val*=float(SIN_TABLE_SIZE) / (2.0f * WWMATH_PI);
-
-	int idx0=Float_To_Int_Floor(val);
-	int idx1=idx0+1;
-	float frac=val-(float)idx0;
-
-	idx0 = ((unsigned)idx0) & (SIN_TABLE_SIZE-1);
-	idx1 = ((unsigned)idx1) & (SIN_TABLE_SIZE-1);
-
-	return (1.0f - frac) * _FastSinTable[idx0] + frac * _FastSinTable[idx1];
-}
-
-// ----------------------------------------------------------------------------
-// Fast, table based 1.0f/sin
-// ----------------------------------------------------------------------------
-
-WWINLINE float WWMath::Fast_Inv_Sin(float val)
-{
-#if 0 // TODO: more testing, not reliable!
-	float index = val * float(SIN_TABLE_SIZE) / (2.0f * WWMATH_PI);
-
-	int idx0=Float_To_Int_Floor(index);
-	int idx1=idx0+1;
-	float frac=val-(float)idx0;
-
-	idx0 = ((unsigned)idx0) & (SIN_TABLE_SIZE-1);
-	idx1 = ((unsigned)idx1) & (SIN_TABLE_SIZE-1);
-
-	// The table becomes inaccurate near 0 and 2pi so fall back to doing a divide.
-	const int BUFFER = 16;
-	if ((idx0 <= BUFFER) || (idx0 >= SIN_TABLE_SIZE-BUFFER-1)) {
-		return 1.0f / Fast_Sin(val);
-	} else {
-		return (1.0f - frac) * _FastInvSinTable[idx0] + frac * _FastInvSinTable[idx1];
-	}
-#else
-	return 1.0f / Fast_Sin(val);
-#endif
-}
-
-
-// ----------------------------------------------------------------------------
-// Fast, table based cos
-// ----------------------------------------------------------------------------
-
-WWINLINE float WWMath::Fast_Cos(float val)
-{
-	val+=(WWMATH_PI * 0.5f);
-	val*=float(SIN_TABLE_SIZE) / (2.0f * WWMATH_PI);
-
-	int idx0=Float_To_Int_Floor(val);
-	int idx1=idx0+1;
-	float frac=val-(float)idx0;
-
-	idx0 = ((unsigned)idx0) & (SIN_TABLE_SIZE-1);
-	idx1 = ((unsigned)idx1) & (SIN_TABLE_SIZE-1);
-
-	return (1.0f - frac) * _FastSinTable[idx0] + frac * _FastSinTable[idx1];
-}
-
-// ----------------------------------------------------------------------------
-// Fast, table based 1.0f/cos
-// ----------------------------------------------------------------------------
-
-WWINLINE float WWMath::Fast_Inv_Cos(float val)
-{
-#if 0 // TODO: more testing, not reliable!
-	float index = val + (WWMATH_PI * 0.5f);
-	index *= float(SIN_TABLE_SIZE) / (2.0f * WWMATH_PI);
-
-	int idx0=Float_To_Int_Chop(index);
-	int idx1=idx0+1;
-	float frac=val-(float)idx0;
-
-	idx0 = ((unsigned)idx0) & (SIN_TABLE_SIZE-1);
-	idx1 = ((unsigned)idx1) & (SIN_TABLE_SIZE-1);
-
-	// The table becomes inaccurate near 0 and 2pi so fall back to doing a divide.
-	if ((idx0 <= 2) || (idx0 >= SIN_TABLE_SIZE-3)) {
-		return 1.0f / Fast_Cos(val);
-	} else {
-		return (1.0f - frac) * _FastInvSinTable[idx0] + frac * _FastInvSinTable[idx1];
-	}
-#else
-	return 1.0f / Fast_Cos(val);
-#endif
-}
-
-// ----------------------------------------------------------------------------
-// Fast, table based arc cos
-// ----------------------------------------------------------------------------
-
-WWINLINE float WWMath::Fast_Acos(float val)
-{
-	// Near -1 and +1, the table becomes too inaccurate
-	if (Fabsf(val) > 0.975f) {
-		return Acos_Legacy(val);
-	}
-
-	val*=float(ARC_TABLE_SIZE/2);
-
-	int idx0=Float_To_Int_Floor(val);
-	int idx1=idx0+1;
-	float frac=val-(float)idx0;
-
-	idx0+=ARC_TABLE_SIZE/2;
-	idx1+=ARC_TABLE_SIZE/2;
-
-	// we dont even get close to the edge of the table...
-	assert((idx0 >= 0) && (idx0 < ARC_TABLE_SIZE));
-	assert((idx1 >= 0) && (idx1 < ARC_TABLE_SIZE));
-
-	// compute and return the interpolated value
-	return (1.0f - frac) * _FastAcosTable[idx0] + frac * _FastAcosTable[idx1];
-}
-
-// ----------------------------------------------------------------------------
-// Fast, table based arc sin
-// ----------------------------------------------------------------------------
-
-WWINLINE float WWMath::Fast_Asin(float val)
-{
-	// Near -1 and +1, the table becomes too inaccurate
-	if (Fabsf(val) > 0.975f) {
-		return Asin_Legacy(val);
-	}
-
-	val*=float(ARC_TABLE_SIZE/2);
-
-	int idx0=Float_To_Int_Floor(val);
-	int idx1=idx0+1;
-	float frac=val-(float)idx0;
-
-	idx0+=ARC_TABLE_SIZE/2;
-	idx1+=ARC_TABLE_SIZE/2;
-
-	// we dont even get close to the edge of the table...
-	assert((idx0 >= 0) && (idx0 < ARC_TABLE_SIZE));
-	assert((idx1 >= 0) && (idx1 < ARC_TABLE_SIZE));
-
-	// compute and return the interpolated value
-	return (1.0f - frac) * _FastAsinTable[idx0] + frac * _FastAsinTable[idx1];
-}
-
 WWINLINE float WWMath::Sqrt_Legacy(float val)
 {
 #if USE_DETERMINISTIC_MATH
@@ -607,6 +455,54 @@ WWINLINE float WWMath::Inv_Sqrtf(float x)
 	return 1.0f / Sqrtf(x);
 }
 
+WWINLINE float WWMath::Fast_Acos(float val)
+{
+	// Near -1 and +1, the table becomes too inaccurate
+	if (Fabsf(val) > 0.975f) {
+		return Acos_Legacy(val);
+	}
+
+	val*=float(ARC_TABLE_SIZE/2);
+
+	int idx0=Float_To_Int_Floor(val);
+	int idx1=idx0+1;
+	float frac=val-(float)idx0;
+
+	idx0+=ARC_TABLE_SIZE/2;
+	idx1+=ARC_TABLE_SIZE/2;
+
+	// we dont even get close to the edge of the table...
+	assert((idx0 >= 0) && (idx0 < ARC_TABLE_SIZE));
+	assert((idx1 >= 0) && (idx1 < ARC_TABLE_SIZE));
+
+	// compute and return the interpolated value
+	return (1.0f - frac) * _FastAcosTable[idx0] + frac * _FastAcosTable[idx1];
+}
+
+WWINLINE float WWMath::Fast_Asin(float val)
+{
+	// Near -1 and +1, the table becomes too inaccurate
+	if (Fabsf(val) > 0.975f) {
+		return Asin_Legacy(val);
+	}
+
+	val*=float(ARC_TABLE_SIZE/2);
+
+	int idx0=Float_To_Int_Floor(val);
+	int idx1=idx0+1;
+	float frac=val-(float)idx0;
+
+	idx0+=ARC_TABLE_SIZE/2;
+	idx1+=ARC_TABLE_SIZE/2;
+
+	// we dont even get close to the edge of the table...
+	assert((idx0 >= 0) && (idx0 < ARC_TABLE_SIZE));
+	assert((idx1 >= 0) && (idx1 < ARC_TABLE_SIZE));
+
+	// compute and return the interpolated value
+	return (1.0f - frac) * _FastAsinTable[idx0] + frac * _FastAsinTable[idx1];
+}
+
 WWINLINE float WWMath::Acos_Legacy(float val)
 {
 #if USE_DETERMINISTIC_MATH
@@ -711,6 +607,83 @@ WWINLINE float WWMath::Atan2f(float x, float y)
 	return gm_atan2f(x, y);
 #else
 	return atan2f(x, y);
+#endif
+}
+
+WWINLINE float WWMath::Fast_Cos(float val)
+{
+	val+=(WWMATH_PI * 0.5f);
+	val*=float(SIN_TABLE_SIZE) / (2.0f * WWMATH_PI);
+
+	int idx0=Float_To_Int_Floor(val);
+	int idx1=idx0+1;
+	float frac=val-(float)idx0;
+
+	idx0 = ((unsigned)idx0) & (SIN_TABLE_SIZE-1);
+	idx1 = ((unsigned)idx1) & (SIN_TABLE_SIZE-1);
+
+	return (1.0f - frac) * _FastSinTable[idx0] + frac * _FastSinTable[idx1];
+}
+
+WWINLINE float WWMath::Fast_Inv_Cos(float val)
+{
+#if 0 // TODO: more testing, not reliable!
+	float index = val + (WWMATH_PI * 0.5f);
+	index *= float(SIN_TABLE_SIZE) / (2.0f * WWMATH_PI);
+
+	int idx0=Float_To_Int_Chop(index);
+	int idx1=idx0+1;
+	float frac=val-(float)idx0;
+
+	idx0 = ((unsigned)idx0) & (SIN_TABLE_SIZE-1);
+	idx1 = ((unsigned)idx1) & (SIN_TABLE_SIZE-1);
+
+	// The table becomes inaccurate near 0 and 2pi so fall back to doing a divide.
+	if ((idx0 <= 2) || (idx0 >= SIN_TABLE_SIZE-3)) {
+		return 1.0f / Fast_Cos(val);
+	} else {
+		return (1.0f - frac) * _FastInvSinTable[idx0] + frac * _FastInvSinTable[idx1];
+	}
+#else
+	return 1.0f / Fast_Cos(val);
+#endif
+}
+
+WWINLINE float WWMath::Fast_Sin(float val)
+{
+	val*=float(SIN_TABLE_SIZE) / (2.0f * WWMATH_PI);
+
+	int idx0=Float_To_Int_Floor(val);
+	int idx1=idx0+1;
+	float frac=val-(float)idx0;
+
+	idx0 = ((unsigned)idx0) & (SIN_TABLE_SIZE-1);
+	idx1 = ((unsigned)idx1) & (SIN_TABLE_SIZE-1);
+
+	return (1.0f - frac) * _FastSinTable[idx0] + frac * _FastSinTable[idx1];
+}
+
+WWINLINE float WWMath::Fast_Inv_Sin(float val)
+{
+#if 0 // TODO: more testing, not reliable!
+	float index = val * float(SIN_TABLE_SIZE) / (2.0f * WWMATH_PI);
+
+	int idx0=Float_To_Int_Floor(index);
+	int idx1=idx0+1;
+	float frac=val-(float)idx0;
+
+	idx0 = ((unsigned)idx0) & (SIN_TABLE_SIZE-1);
+	idx1 = ((unsigned)idx1) & (SIN_TABLE_SIZE-1);
+
+	// The table becomes inaccurate near 0 and 2pi so fall back to doing a divide.
+	const int BUFFER = 16;
+	if ((idx0 <= BUFFER) || (idx0 >= SIN_TABLE_SIZE-BUFFER-1)) {
+		return 1.0f / Fast_Sin(val);
+	} else {
+		return (1.0f - frac) * _FastInvSinTable[idx0] + frac * _FastInvSinTable[idx1];
+	}
+#else
+	return 1.0f / Fast_Sin(val);
 #endif
 }
 
