@@ -108,7 +108,6 @@ static void			Init();
 static void			Shutdown();
 
 // These are meant to be a collection of small math utility functions to be optimized at some point.
-static WWINLINE float Fabsf(float val);
 
 static WWINLINE int Float_To_Int_Chop(float f);
 static WWINLINE int Float_To_Int_Floor(float f);
@@ -146,6 +145,7 @@ static WWINLINE float  Asinf(float x);
 static WWINLINE double Tan(double x);
 static WWINLINE float  Tanf(float x);
 static WWINLINE double Fabs(double x);
+static WWINLINE float  Fabsf(float val);
 static WWINLINE float  Fabsf_Legacy(float x);
 static WWINLINE double Pow(double x, double y);
 static WWINLINE float  Powf(float x, float y);
@@ -206,20 +206,6 @@ static WWINLINE float Normalize_Angle(float angle); // Normalizes the angle to t
 
 };
 
-WWINLINE float WWMath::Fabsf(float val)
-{
-#if USE_DETERMINISTIC_MATH
-	return gm_fabsf(val);
-
-#elif defined(_MSC_VER) && defined(_M_IX86)
-	int value=*(int*)&val;
-	value&=0x7fffffff;
-	return *(float*)&value;
-
-#else
-	return fabsf(val);
-#endif
-}
 
 WWINLINE bool WWMath::Fast_Is_Float_Positive(const float & val)
 {
@@ -751,6 +737,21 @@ WWINLINE double WWMath::Fabs(double x)
 	return gm_fabs(x);
 #else
 	return fabs(x);
+#endif
+}
+
+WWINLINE float WWMath::Fabsf(float val)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_fabsf(val);
+
+#elif defined(_MSC_VER) && defined(_M_IX86)
+	int value=*(int*)&val;
+	value&=0x7fffffff;
+	return *(float*)&value;
+
+#else
+	return fabsf(val);
 #endif
 }
 
