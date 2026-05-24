@@ -41,14 +41,8 @@
 #include <float.h>
 #include <assert.h>
 
-// Use __has_include because wwmath.h is transitively included by targets that may not link gamemath.
-#if defined(__has_include)
-	#if __has_include("gmath.h")
-		#include "gmath.h"
-		#ifndef USE_DETERMINISTIC_MATH
-		#define USE_DETERMINISTIC_MATH (1)
-		#endif
-	#endif
+#if USE_DETERMINISTIC_MATH
+#include "gmath.h"
 #endif
 
 /*

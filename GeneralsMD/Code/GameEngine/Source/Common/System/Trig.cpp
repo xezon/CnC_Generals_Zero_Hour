@@ -32,17 +32,8 @@
 #include "Lib/BaseType.h"
 #include "Lib/trig.h"
 
-#if defined(__has_include)
-	#if __has_include("gmath.h")
-		#include "gmath.h"
-		#ifndef USE_DETERMINISTIC_MATH
-		#define USE_DETERMINISTIC_MATH (1)
-		#endif
-	#else
-		#include <math.h>
-	#endif
-#else
-	#include <math.h>
+#if USE_DETERMINISTIC_MATH
+#include "gmath.h"
 #endif
 
 #if USE_DETERMINISTIC_MATH
