@@ -113,7 +113,6 @@ static WWINLINE int Float_To_Int_Chop(float f);
 static WWINLINE int Float_To_Int_Floor(float f);
 
 static WWINLINE float Sqrt_Legacy(float val);
-static WWINLINE float Inv_Sqrt_Legacy(float a);
 static WWINLINE long  Float_To_Long(float f);
 
 static WWINLINE float Fast_Sin(float val);
@@ -128,6 +127,7 @@ static WWINLINE float Asin_Legacy(float val);
 
 static WWINLINE double Sqrt(double x);
 static WWINLINE float  Sqrtf(float x);
+static WWINLINE float  Inv_Sqrt_Legacy(float a);
 static WWINLINE double Inv_Sqrt(double x);
 static WWINLINE float  Inv_Sqrtf(float x);
 static WWINLINE float  Atan2_Legacy(float x, float y);
@@ -562,6 +562,66 @@ WWINLINE float WWMath::Sqrtf(float x)
 #endif
 }
 
+WWINLINE float WWMath::Inv_Sqrt_Legacy(float a)
+{
+#if USE_DETERMINISTIC_MATH
+	return 1.0f / gm_sqrtf(a);
+
+#elif defined(_MSC_VER) && defined(_M_IX86)
+	// Some 30% faster inverse square root than regular C++ compiled, from Intel's math library
+	float retval;
+
+	__asm {
+		mov		eax, 0be6eb508h
+		mov		DWORD PTR [esp-12],03fc00000h ;  1.5 on the stack
+		sub		eax, DWORD PTR [a]; a
+		sub		DWORD PTR [a], 800000h ; a/2 a=Y0
+		shr		eax, 1     ; firs approx in eax=R0
+		mov		DWORD PTR [esp-8], eax
+
+		fld		DWORD PTR [esp-8] ;r
+		fmul	st, st            ;r*r
+		fld		DWORD PTR [esp-8] ;r
+		fxch	st(1)
+		fmul	DWORD PTR [a];a ;r*r*y0
+		fld		DWORD PTR [esp-12];load 1.5
+		fld		st(0)
+		fsub	st,st(2)			   ;r1 = 1.5 - y1
+		;x1 = st(3)
+		;y1 = st(2)
+		;1.5 = st(1)
+		;r1 = st(0)
+
+		fld		st(1)
+		fxch	st(1)
+		fmul	st(3),st			; y2=y1*r1*...
+		fmul	st(3),st			; y2=y1*r1*r1
+		fmulp	st(4),st            ; x2=x1*r1
+		fsub	st,st(2)               ; r2=1.5-y2
+		;x2=st(3)
+		;y2=st(2)
+		;1.5=st(1)
+		;r2 = st(0)
+
+		fmul	st(2),st			;y3=y2*r2*...
+		fmul	st(3),st			;x3=x2*r2
+		fmulp	st(2),st			;y3=y2*r2*r2
+		fxch	st(1)
+		fsubp	st(1),st			;r3= 1.5 - y3
+		;x3 = st(1)
+		;r3 = st(0)
+		fmulp	st(1), st
+
+		fstp retval
+	}
+
+	return retval;
+
+#else
+	return 1.0f / (float)sqrt((double)a);
+#endif
+}
+
 WWINLINE double WWMath::Inv_Sqrt(double x)
 {
 	return 1.0 / Sqrt(x);
@@ -977,70 +1037,6 @@ WWINLINE int WWMath::Float_To_Int_Floor(float f)
 
 	r = ((r & expsign) ^ (sign)) + ((!((mantissa<<8)&imask)&(expsign^((a-1)>>31)))&sign);	// if (fabs(value)<1.0) value = 0; copy sign; if (value < 0 && value==(int)(value)) value++;
 	return r;
-}
-
-// ----------------------------------------------------------------------------
-// Inverse square root
-// ----------------------------------------------------------------------------
-
-WWINLINE float WWMath::Inv_Sqrt_Legacy(float a)
-{
-#if USE_DETERMINISTIC_MATH
-	return 1.0f / gm_sqrtf(a);
-
-#elif defined(_MSC_VER) && defined(_M_IX86)
-	// Some 30% faster inverse square root than regular C++ compiled, from Intel's math library
-	float retval;
-
-	__asm {
-		mov		eax, 0be6eb508h
-		mov		DWORD PTR [esp-12],03fc00000h ;  1.5 on the stack
-		sub		eax, DWORD PTR [a]; a
-		sub		DWORD PTR [a], 800000h ; a/2 a=Y0
-		shr		eax, 1     ; firs approx in eax=R0
-		mov		DWORD PTR [esp-8], eax
-
-		fld		DWORD PTR [esp-8] ;r
-		fmul	st, st            ;r*r
-		fld		DWORD PTR [esp-8] ;r
-		fxch	st(1)
-		fmul	DWORD PTR [a];a ;r*r*y0
-		fld		DWORD PTR [esp-12];load 1.5
-		fld		st(0)
-		fsub	st,st(2)			   ;r1 = 1.5 - y1
-		;x1 = st(3)
-		;y1 = st(2)
-		;1.5 = st(1)
-		;r1 = st(0)
-
-		fld		st(1)
-		fxch	st(1)
-		fmul	st(3),st			; y2=y1*r1*...
-		fmul	st(3),st			; y2=y1*r1*r1
-		fmulp	st(4),st            ; x2=x1*r1
-		fsub	st,st(2)               ; r2=1.5-y2
-		;x2=st(3)
-		;y2=st(2)
-		;1.5=st(1)
-		;r2 = st(0)
-
-		fmul	st(2),st			;y3=y2*r2*...
-		fmul	st(3),st			;x3=x2*r2
-		fmulp	st(2),st			;y3=y2*r2*r2
-		fxch	st(1)
-		fsubp	st(1),st			;r3= 1.5 - y3
-		;x3 = st(1)
-		;r3 = st(0)
-		fmulp	st(1), st
-
-		fstp retval
-	}
-
-	return retval;
-
-#else
-	return 1.0f / (float)sqrt((double)a);
-#endif
 }
 
 WWINLINE float WWMath::Normalize_Angle(float angle)
