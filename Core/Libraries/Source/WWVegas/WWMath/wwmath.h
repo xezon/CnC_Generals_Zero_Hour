@@ -209,6 +209,24 @@ static WWINLINE float Normalize_Angle(float angle); // Normalizes the angle to t
 };
 
 
+WWINLINE double WWMath::Pow(double x, double y)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_pow(x, y);
+#else
+	return pow(x, y);
+#endif
+}
+
+WWINLINE float WWMath::Powf(float x, float y)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_powf(x, y);
+#else
+	return powf(x, y);
+#endif
+}
+
 WWINLINE float WWMath::Sqrt_Legacy(float val)
 {
 #if USE_DETERMINISTIC_MATH
@@ -225,24 +243,6 @@ WWINLINE float WWMath::Sqrt_Legacy(float val)
 
 #else
 	return (float)sqrt((double)val);
-#endif
-}
-
-WWINLINE double WWMath::Pow(double x, double y)
-{
-#if USE_DETERMINISTIC_MATH
-	return gm_pow(x, y);
-#else
-	return pow(x, y);
-#endif
-}
-
-WWINLINE float WWMath::Powf(float x, float y)
-{
-#if USE_DETERMINISTIC_MATH
-	return gm_powf(x, y);
-#else
-	return powf(x, y);
 #endif
 }
 
