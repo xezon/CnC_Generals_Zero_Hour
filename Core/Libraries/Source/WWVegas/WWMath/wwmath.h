@@ -109,11 +109,6 @@ static void			Shutdown();
 
 // These are meant to be a collection of small math utility functions to be optimized at some point.
 
-static WWINLINE int Float_To_Int_Chop(float f);
-static WWINLINE int Float_To_Int_Floor(float f);
-
-static WWINLINE long  Float_To_Long(float f);
-
 static WWINLINE float Fast_Sin(float val);
 static WWINLINE float Fast_Inv_Sin(float val);
 static WWINLINE float Fast_Cos(float val);
@@ -196,13 +191,16 @@ static WWINLINE double	Lerp(double a, double b, float t);
 static WWINLINE float		Inverse_Lerp(float a, float b, float v);
 static WWINLINE double	Inverse_Lerp(double a, double b, float v);
 
-static WWINLINE long			Float_To_Long(double f);
-
 static WWINLINE unsigned char Unit_Float_To_Byte(float f) { return (unsigned char)(f*255.0f); }
 static WWINLINE float			Byte_To_Unit_Float(unsigned char byte) { return ((float)byte) / 255.0f; }
 
 static WWINLINE bool			Is_Valid_Float(float x);
 static WWINLINE bool			Is_Valid_Double(double x);
+
+static WWINLINE int Float_To_Int_Chop(float f);
+static WWINLINE int Float_To_Int_Floor(float f);
+static WWINLINE long Float_To_Long(float f);
+static WWINLINE long Float_To_Long(double f);
 
 static WWINLINE float Normalize_Angle(float angle); // Normalizes the angle to the range -PI..PI
 
@@ -328,44 +326,6 @@ WWINLINE bool WWMath::Is_Valid_Double(double x)
 		return false;
 	}
 	return true;
-}
-
-// ----------------------------------------------------------------------------
-// Float to long
-// ----------------------------------------------------------------------------
-
-WWINLINE long WWMath::Float_To_Long(float f)
-{
-#if USE_DETERMINISTIC_MATH
-	return gm_lrintf(f);
-
-#elif defined(_MSC_VER) && defined(_M_IX86)
-	long i;
-	__asm {
-		fld [f]
-		fistp [i]
-	}
-	return i;
-
-#else
-	return (long)f;
-#endif
-}
-
-WWINLINE long WWMath::Float_To_Long(double f)
-{
-#if USE_DETERMINISTIC_MATH
-	return gm_lrint(f);
-
-#elif defined(_MSC_VER) && defined(_M_IX86)
-	long retval;
-	__asm fld qword ptr [f]
-	__asm fistp dword ptr [retval]
-	return retval;
-
-#else
-	return (long)f;
-#endif
 }
 
 // ----------------------------------------------------------------------------
@@ -1006,6 +966,40 @@ WWINLINE float WWMath::Tanhf(float x)
 	return gm_tanhf(x);
 #else
 	return tanhf(x);
+#endif
+}
+
+WWINLINE long WWMath::Float_To_Long(float f)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_lrintf(f);
+
+#elif defined(_MSC_VER) && defined(_M_IX86)
+	long i;
+	__asm {
+		fld [f]
+		fistp [i]
+	}
+	return i;
+
+#else
+	return (long)f;
+#endif
+}
+
+WWINLINE long WWMath::Float_To_Long(double f)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_lrint(f);
+
+#elif defined(_MSC_VER) && defined(_M_IX86)
+	long retval;
+	__asm fld qword ptr [f]
+	__asm fistp dword ptr [retval]
+	return retval;
+
+#else
+	return (long)f;
 #endif
 }
 
