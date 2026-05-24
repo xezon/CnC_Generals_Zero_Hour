@@ -115,9 +115,7 @@ static WWINLINE float Fast_Cos(float val);
 static WWINLINE float Fast_Inv_Cos(float val);
 
 static WWINLINE float Fast_Acos(float val);
-static WWINLINE float Acos_Legacy(float val);
 static WWINLINE float Fast_Asin(float val);
-static WWINLINE float Asin_Legacy(float val);
 
 static WWINLINE float  Sqrt_Legacy(float val);
 static WWINLINE double Sqrt(double x);
@@ -131,8 +129,10 @@ static WWINLINE float  Atan2f(float x, float y);
 static WWINLINE float  Atan_Legacy(float x);
 static WWINLINE double Atan(double x);
 static WWINLINE float  Atanf(float x);
+static WWINLINE float  Acos_Legacy(float val);
 static WWINLINE double Acos(double x);
 static WWINLINE float  Acosf(float x);
+static WWINLINE float  Asin_Legacy(float val);
 static WWINLINE double Asin(double x);
 static WWINLINE float  Asinf(float x);
 static WWINLINE double Tan(double x);
@@ -449,19 +449,6 @@ WWINLINE float WWMath::Fast_Acos(float val)
 }
 
 // ----------------------------------------------------------------------------
-// Arc cos
-// ----------------------------------------------------------------------------
-
-WWINLINE float WWMath::Acos_Legacy(float val)
-{
-#if USE_DETERMINISTIC_MATH
-	return gm_acosf(val);
-#else
-	return (float)acos((double)val);
-#endif
-}
-
-// ----------------------------------------------------------------------------
 // Fast, table based arc sin
 // ----------------------------------------------------------------------------
 
@@ -487,19 +474,6 @@ WWINLINE float WWMath::Fast_Asin(float val)
 
 	// compute and return the interpolated value
 	return (1.0f - frac) * _FastAsinTable[idx0] + frac * _FastAsinTable[idx1];
-}
-
-// ----------------------------------------------------------------------------
-// Arc sin
-// ----------------------------------------------------------------------------
-
-WWINLINE float WWMath::Asin_Legacy(float val)
-{
-#if USE_DETERMINISTIC_MATH
-	return gm_asinf(val);
-#else
-	return (float)asin((double)val);
-#endif
 }
 
 WWINLINE float WWMath::Sqrt_Legacy(float val)
@@ -663,6 +637,15 @@ WWINLINE float WWMath::Atanf(float x)
 #endif
 }
 
+WWINLINE float WWMath::Acos_Legacy(float val)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_acosf(val);
+#else
+	return (float)acos((double)val);
+#endif
+}
+
 WWINLINE double WWMath::Acos(double x)
 {
 #if USE_DETERMINISTIC_MATH
@@ -678,6 +661,15 @@ WWINLINE float WWMath::Acosf(float x)
 	return gm_acosf(x);
 #else
 	return acosf(x);
+#endif
+}
+
+WWINLINE float WWMath::Asin_Legacy(float val)
+{
+#if USE_DETERMINISTIC_MATH
+	return gm_asinf(val);
+#else
+	return (float)asin((double)val);
 #endif
 }
 
