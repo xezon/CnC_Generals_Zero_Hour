@@ -372,8 +372,8 @@ void RotateTextureMapperClass::Calculate_Texture_Matrix(Matrix4x4 &tex_matrix)
 
 	// Set up the rotation matrix
 	float c,s;
-	c=WWMath::Cosf(CurrentAngle);
-	s=WWMath::Sinf(CurrentAngle);
+	c=WWMath::Cosf_Legacy(CurrentAngle);
+	s=WWMath::Sinf_Legacy(CurrentAngle);
 	tex_matrix.Make_Identity();
 
 	// subtract center

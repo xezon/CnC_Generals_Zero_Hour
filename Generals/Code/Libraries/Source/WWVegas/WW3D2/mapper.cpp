@@ -326,8 +326,8 @@ void RotateTextureMapperClass::Apply(int uv_array_index)
 
 	// Set up the rotation matrix
 	float c,s;
-	c=WWMath::Cosf(CurrentAngle);
-	s=WWMath::Sinf(CurrentAngle);
+	c=WWMath::Cosf_Legacy(CurrentAngle);
+	s=WWMath::Sinf_Legacy(CurrentAngle);
 	Matrix4x4 m(true);
 
 	// subtract center

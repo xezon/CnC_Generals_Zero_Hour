@@ -208,8 +208,8 @@ Find_Turn_Arc
 	//
 	//	Find the point on the circle at this angle
 	//
-	arc_center->X = curr_pt.X + (radius * ::WWMath::Cosf (avg_angle));
-	arc_center->Y = curr_pt.Y + (radius * ::WWMath::Sinf (avg_angle));
+	arc_center->X = curr_pt.X + (radius * ::WWMath::Cosf_Legacy (avg_angle));
+	arc_center->Y = curr_pt.Y + (radius * ::WWMath::Sinf_Legacy (avg_angle));
 	arc_center->Z = curr_pt.Z;
 
 	//
@@ -378,12 +378,12 @@ VehicleCurveClass::Update_Arc_List ()
 		//	Determine at what points these angles intersect the arc
 		//
 		Vector3 point_in (0, 0, 0);
-		point_in.X = arc_center.X + (m_Radius * ::WWMath::Sinf (point_angle + angle_in_delta));
-		point_in.Y = arc_center.Y + (m_Radius * -::WWMath::Cosf (point_angle + angle_in_delta));
+		point_in.X = arc_center.X + (m_Radius * ::WWMath::Sinf_Legacy (point_angle + angle_in_delta));
+		point_in.Y = arc_center.Y + (m_Radius * -::WWMath::Cosf_Legacy (point_angle + angle_in_delta));
 
 		Vector3 point_out (0, 0, 0);
-		point_out.X = arc_center.X + (m_Radius * ::WWMath::Sinf (point_angle + angle_out_delta));
-		point_out.Y = arc_center.Y + (m_Radius * -::WWMath::Cosf (point_angle + angle_out_delta));
+		point_out.X = arc_center.X + (m_Radius * ::WWMath::Sinf_Legacy (point_angle + angle_out_delta));
+		point_out.Y = arc_center.Y + (m_Radius * -::WWMath::Cosf_Legacy (point_angle + angle_out_delta));
 
 		//
 		//	Sanity check to ensure the vehicle doesn't try to go the long way around the
@@ -513,8 +513,8 @@ VehicleCurveClass::Evaluate (float time, Vector3 *set_val)
 		//float angle = arc_info0.point_angle + (arc_info0.angle_out_delta) * percent;
 		float angle = arc_info0.point_angle + arc_info0.angle_out_delta;
 
-		set_val->X = arc_info0.center.X + (arc_info0.radius * ::WWMath::Sinf (angle));
-		set_val->Y = arc_info0.center.Y + (arc_info0.radius * -::WWMath::Cosf (angle));
+		set_val->X = arc_info0.center.X + (arc_info0.radius * ::WWMath::Sinf_Legacy (angle));
+		set_val->Y = arc_info0.center.Y + (arc_info0.radius * -::WWMath::Cosf_Legacy (angle));
 
 		m_Sharpness = WWMath::Clamp (WWMath::Fabsf (arc_info0.angle_out_delta) / DEG_TO_RADF (15), 0, 1.0F);
 		m_SharpnessPos.X = set_val->X;
@@ -556,13 +556,13 @@ VehicleCurveClass::Evaluate (float time, Vector3 *set_val)
 		/*float percent = 1.0F - ((seg_time - time2) / (1.0F - time2));
 		float angle = arc_info1.point_angle + (arc_info1.angle_in_delta * percent);
 
-		set_val->X = arc_info1.center.X + (arc_info1.radius * ::WWMath::Sinf (angle));
-		set_val->Y = arc_info1.center.Y + (arc_info1.radius * -::WWMath::Cosf (angle));			*/
+		set_val->X = arc_info1.center.X + (arc_info1.radius * ::WWMath::Sinf_Legacy (angle));
+		set_val->Y = arc_info1.center.Y + (arc_info1.radius * -::WWMath::Cosf_Legacy (angle));			*/
 
 		float angle = arc_info1.point_angle + (arc_info1.angle_out_delta);
 
-		set_val->X = arc_info1.center.X + (arc_info1.radius * ::WWMath::Sinf (angle));
-		set_val->Y = arc_info1.center.Y + (arc_info1.radius * -::WWMath::Cosf (angle));
+		set_val->X = arc_info1.center.X + (arc_info1.radius * ::WWMath::Sinf_Legacy (angle));
+		set_val->Y = arc_info1.center.Y + (arc_info1.radius * -::WWMath::Cosf_Legacy (angle));
 
 		m_Sharpness = WWMath::Clamp (WWMath::Fabsf (arc_info1.angle_out_delta) / DEG_TO_RADF (15), 0, 1.0F);
 		m_SharpnessPos.X = set_val->X;

@@ -389,7 +389,7 @@ WWINLINE float Vector2::Length2() const
  *========================================================================*/
 WWINLINE void Vector2::Rotate(float theta)
 {
-	Rotate(WWMath::Sinf(theta), WWMath::Cosf(theta));
+	Rotate(WWMath::Sinf_Legacy(theta), WWMath::Cosf_Legacy(theta));
 }
 
 /**************************************************************************
@@ -429,7 +429,7 @@ WWINLINE void Vector2::Rotate(float s, float c)
  *========================================================================*/
 WWINLINE bool Vector2::Rotate_Towards_Vector(Vector2 &target, float max_theta, bool & positive_turn)
 {
-	return Rotate_Towards_Vector(target, WWMath::Sinf(max_theta), WWMath::Cosf(max_theta), positive_turn);
+	return Rotate_Towards_Vector(target, WWMath::Sinf_Legacy(max_theta), WWMath::Cosf_Legacy(max_theta), positive_turn);
 }
 
 /**************************************************************************

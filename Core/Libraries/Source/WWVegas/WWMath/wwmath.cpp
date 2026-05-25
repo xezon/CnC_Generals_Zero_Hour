@@ -69,7 +69,7 @@ void		WWMath::Init()
 #if RETAIL_COMPATIBLE_CRC
 		_FastSinTable[a]=sin(cv);
 #else
-		_FastSinTable[a]=Sinf(cv);
+		_FastSinTable[a]=Sinf_Legacy(cv);
 #endif
 
 		if (a>0) {

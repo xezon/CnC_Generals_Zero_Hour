@@ -284,8 +284,8 @@ void EulerAnglesClass::To_Matrix(Matrix3D & M)
 	}
 
 	ti = a0;				tj = a1;				th = a2;
-	ci = WWMath::Cosf(ti);		cj = WWMath::Cosf(tj);		ch = WWMath::Cosf(th);
-	si = WWMath::Sinf(ti);		sj = WWMath::Sinf(tj);		sh = WWMath::Sinf(th);
+	ci = WWMath::Cosf_Legacy(ti);		cj = WWMath::Cosf_Legacy(tj);		ch = WWMath::Cosf_Legacy(th);
+	si = WWMath::Sinf_Legacy(ti);		sj = WWMath::Sinf_Legacy(tj);		sh = WWMath::Sinf_Legacy(th);
 
 	cc = ci*ch;
 	cs = ci*sh;

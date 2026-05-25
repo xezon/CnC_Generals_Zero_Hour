@@ -87,8 +87,8 @@ static float project_to_sphere(float,float,float);
  *=============================================================================================*/
 Quaternion::Quaternion(const Vector3 & axis,float angle)
 {
-	float s = WWMath::Sinf(angle/2);
-	float c = WWMath::Cosf(angle/2);
+	float s = WWMath::Sinf_Legacy(angle/2);
+	float c = WWMath::Cosf_Legacy(angle/2);
 	X = s * axis.X;
 	Y = s * axis.Y;
 	Z = s * axis.Z;
@@ -228,8 +228,8 @@ Quaternion Axis_To_Quat(const Vector3 &a, float phi)
 	q[1] = tmp[1];
 	q[2] = tmp[2];
 
-	q.Scale(WWMath::Sinf(phi / 2.0f));
-	q[3] =  WWMath::Cosf(phi / 2.0f);
+	q.Scale(WWMath::Sinf_Legacy(phi / 2.0f));
+	q[3] =  WWMath::Cosf_Legacy(phi / 2.0f);
 
 	return q;
 }
@@ -325,10 +325,10 @@ normal_slerp:
 // normal slerp!
 //	else {
 //		theta = WWMath::Acos_Legacy(cos_t);
-//		sin_t = WWMath::Sinf(theta);
+//		sin_t = WWMath::Sinf_Legacy(theta);
 //		oo_sin_t = 1.0 / sin_t;
-//		beta = WWMath::Sinf(theta - alpha*theta) * oo_sin_t;
-//		alpha = WWMath::Sinf(alpha*theta) * oo_sin_t;
+//		beta = WWMath::Sinf_Legacy(theta - alpha*theta) * oo_sin_t;
+//		alpha = WWMath::Sinf_Legacy(alpha*theta) * oo_sin_t;
 // }
 //	if (qflip) {
 //		alpha = -alpha;
@@ -513,10 +513,10 @@ void Slerp(Quaternion& res, const Quaternion & p,const Quaternion & q,float alph
 
 		// normal slerp!
 		theta = WWMath::Acos_Legacy(cos_t);
-		float sin_t = WWMath::Sinf(theta);
+		float sin_t = WWMath::Sinf_Legacy(theta);
 		oo_sin_t = 1.0f / sin_t;
-		beta = WWMath::Sinf(theta - alpha*theta) * oo_sin_t;
-		alpha = WWMath::Sinf(alpha*theta) * oo_sin_t;
+		beta = WWMath::Sinf_Legacy(theta - alpha*theta) * oo_sin_t;
+		alpha = WWMath::Sinf_Legacy(alpha*theta) * oo_sin_t;
 	}
 
 	if (qflip) {
@@ -568,7 +568,7 @@ void Slerp_Setup(const Quaternion & p,const Quaternion & q,SlerpInfoStruct * sle
 
 		slerpinfo->Linear = false;
 		slerpinfo->Theta = WWMath::Acos_Legacy(cos_t);
-		slerpinfo->SinT = WWMath::Sinf(slerpinfo->Theta);
+		slerpinfo->SinT = WWMath::Sinf_Legacy(slerpinfo->Theta);
 
 	}
 }
@@ -600,8 +600,8 @@ Quaternion Cached_Slerp(const Quaternion & p,const Quaternion & q,float alpha,Sl
 
 		// normal slerp!
 		oo_sin_t = 1.0f / slerpinfo->Theta;
-		beta = WWMath::Sinf(slerpinfo->Theta - alpha*slerpinfo->Theta) * oo_sin_t;
-		alpha = WWMath::Sinf(alpha*slerpinfo->Theta) * oo_sin_t;
+		beta = WWMath::Sinf_Legacy(slerpinfo->Theta - alpha*slerpinfo->Theta) * oo_sin_t;
+		alpha = WWMath::Sinf_Legacy(alpha*slerpinfo->Theta) * oo_sin_t;
 	}
 
 	if (slerpinfo->Flip) {
@@ -632,8 +632,8 @@ void Cached_Slerp(const Quaternion & p,const Quaternion & q,float alpha,SlerpInf
 
 		// normal slerp!
 		oo_sin_t = 1.0f / slerpinfo->Theta;
-		beta = WWMath::Sinf(slerpinfo->Theta - alpha*slerpinfo->Theta) * oo_sin_t;
-		alpha = WWMath::Sinf(alpha*slerpinfo->Theta) * oo_sin_t;
+		beta = WWMath::Sinf_Legacy(slerpinfo->Theta - alpha*slerpinfo->Theta) * oo_sin_t;
+		alpha = WWMath::Sinf_Legacy(alpha*slerpinfo->Theta) * oo_sin_t;
 	}
 
 	if (slerpinfo->Flip) {
