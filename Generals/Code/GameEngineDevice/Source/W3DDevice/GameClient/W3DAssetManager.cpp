@@ -688,7 +688,7 @@ RenderObjClass * W3DAssetManager::Create_Render_Obj(
 	GetPrecisionTimer(&startTime64);
 	#endif
 
-	Bool reallyscale = (WWMath::Fabsf(scale - ident_scale) > scale_epsilon);
+	Bool reallyscale = (WWMath::Fabsf_Legacy(scale - ident_scale) > scale_epsilon);
 	Bool reallycolor = (color & 0xFFFFFF) != 0;	//black is not a valid color and assumes no custom coloring.
 	Bool reallytexture = (oldTexture != nullptr && newTexture != nullptr);
 

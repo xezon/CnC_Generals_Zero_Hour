@@ -197,8 +197,8 @@ Find_Turn_Arc
 	//	Find the shortest delta between the two angles (either clockwise or
 	// counterclockwise).
 	//
-	float delta1 = WWMath::Fabsf (::Get_Angle_Delta (angle1, angle2, true));
-	float delta2 = WWMath::Fabsf (::Get_Angle_Delta (angle1, angle2, false));
+	float delta1 = WWMath::Fabsf_Legacy (::Get_Angle_Delta (angle1, angle2, true));
+	float delta2 = WWMath::Fabsf_Legacy (::Get_Angle_Delta (angle1, angle2, false));
 	if (delta1 < delta2) {
 		avg_angle = angle1 - (delta1 * 0.5F);
 	} else {
@@ -489,8 +489,8 @@ VehicleCurveClass::Evaluate (float time, Vector3 *set_val)
 	//		- Straight line from exit of last curve to enter of this curve
 	//		- Enter curve for the current point
 	//
-	float arc_length0		= arc_info0.radius * WWMath::Fabsf (arc_info0.angle_out_delta);
-	float arc_length1		= arc_info1.radius * WWMath::Fabsf (arc_info1.angle_in_delta);
+	float arc_length0		= arc_info0.radius * WWMath::Fabsf_Legacy (arc_info0.angle_out_delta);
+	float arc_length1		= arc_info1.radius * WWMath::Fabsf_Legacy (arc_info1.angle_in_delta);
 	float other_length	= ((arc_info1.point_in - arc_info0.point_out).Length ()) / 2;
 	float total_length	= arc_length0 + arc_length1 + other_length;
 
@@ -516,7 +516,7 @@ VehicleCurveClass::Evaluate (float time, Vector3 *set_val)
 		set_val->X = arc_info0.center.X + (arc_info0.radius * ::WWMath::Sinf_Legacy (angle));
 		set_val->Y = arc_info0.center.Y + (arc_info0.radius * -::WWMath::Cosf_Legacy (angle));
 
-		m_Sharpness = WWMath::Clamp (WWMath::Fabsf (arc_info0.angle_out_delta) / DEG_TO_RADF (15), 0, 1.0F);
+		m_Sharpness = WWMath::Clamp (WWMath::Fabsf_Legacy (arc_info0.angle_out_delta) / DEG_TO_RADF (15), 0, 1.0F);
 		m_SharpnessPos.X = set_val->X;
 		m_SharpnessPos.Y = set_val->Y;
 		m_SharpnessPos.Z = Keys[index0].Point.Z + (Keys[index1].Point.Z - Keys[index0].Point.Z) * seg_time;
@@ -542,7 +542,7 @@ VehicleCurveClass::Evaluate (float time, Vector3 *set_val)
 		//set_val->X = arc_info0.point_out.X + (arc_info1.point_in.X - arc_info0.point_out.X) * percent;
 		//set_val->Y = arc_info0.point_out.Y + (arc_info1.point_in.Y - arc_info0.point_out.Y) * percent;
 
-		m_Sharpness = WWMath::Clamp (WWMath::Fabsf (arc_info1.angle_out_delta) / DEG_TO_RADF (15), 0, 1.0F);
+		m_Sharpness = WWMath::Clamp (WWMath::Fabsf_Legacy (arc_info1.angle_out_delta) / DEG_TO_RADF (15), 0, 1.0F);
 		m_SharpnessPos = arc_info1.point_in;
 
 		m_LastTime = Keys[index0].Time + (Keys[index1].Time - Keys[index0].Time) * time2;
@@ -564,7 +564,7 @@ VehicleCurveClass::Evaluate (float time, Vector3 *set_val)
 		set_val->X = arc_info1.center.X + (arc_info1.radius * ::WWMath::Sinf_Legacy (angle));
 		set_val->Y = arc_info1.center.Y + (arc_info1.radius * -::WWMath::Cosf_Legacy (angle));
 
-		m_Sharpness = WWMath::Clamp (WWMath::Fabsf (arc_info1.angle_out_delta) / DEG_TO_RADF (15), 0, 1.0F);
+		m_Sharpness = WWMath::Clamp (WWMath::Fabsf_Legacy (arc_info1.angle_out_delta) / DEG_TO_RADF (15), 0, 1.0F);
 		m_SharpnessPos.X = set_val->X;
 		m_SharpnessPos.Y = set_val->Y;
 		m_SharpnessPos.Z = Keys[index0].Point.Z + (Keys[index1].Point.Z - Keys[index0].Point.Z) * seg_time;

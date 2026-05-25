@@ -1204,8 +1204,8 @@ HTreeClass * HTreeClass::Create_Interpolated(const HTreeClass * tree_base,
 	// Clone the first one,
 	HTreeClass * new_tree = W3DNEW HTreeClass( *tree_base );
 
-	float	a_scale_abs = WWMath::Fabsf( a_scale );
-	float	b_scale_abs = WWMath::Fabsf( b_scale );
+	float	a_scale_abs = WWMath::Fabsf_Legacy( a_scale );
+	float	b_scale_abs = WWMath::Fabsf_Legacy( b_scale );
 
 	if ( a_scale_abs + b_scale_abs > 0 ) {
 

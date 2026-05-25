@@ -172,13 +172,13 @@ void W3DParticleSystemManager::doParticles(RenderInfoClass &rinfo)
 			psize = p->getSize();
 
 			//Cull particle to edges of screen and terrain.
-			if (WWMath::Fabsf(pos->x - bcX) > (beX + psize))
+			if (WWMath::Fabsf_Legacy(pos->x - bcX) > (beX + psize))
 				continue;
 
-			if (WWMath::Fabsf(pos->y - bcY) > (beY + psize))
+			if (WWMath::Fabsf_Legacy(pos->y - bcY) > (beY + psize))
 				continue;
 
-			if (WWMath::Fabsf(pos->z - bcZ) > (beZ + psize))
+			if (WWMath::Fabsf_Legacy(pos->z - bcZ) > (beZ + psize))
 				continue;
 
 			m_fieldParticleCount += ( sys->getPriority() == AREA_EFFECT && sys->m_isGroundAligned != FALSE );

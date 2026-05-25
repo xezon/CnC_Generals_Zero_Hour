@@ -277,10 +277,10 @@ WWINLINE bool Quaternion::Is_Valid() const
 
 WWINLINE bool Equal_Within_Epsilon(const Quaternion &a, const Quaternion &b, float epsilon)
 {
-   return(	(WWMath::Fabsf(a.X - b.X) < epsilon) &&
-				(WWMath::Fabsf(a.Y - b.Y) < epsilon) &&
-				(WWMath::Fabsf(a.Z - b.Z) < epsilon)	&&
-				(WWMath::Fabsf(a.W - b.W) < epsilon) );
+   return(	(WWMath::Fabsf_Legacy(a.X - b.X) < epsilon) &&
+				(WWMath::Fabsf_Legacy(a.Y - b.Y) < epsilon) &&
+				(WWMath::Fabsf_Legacy(a.Z - b.Z) < epsilon)	&&
+				(WWMath::Fabsf_Legacy(a.W - b.W) < epsilon) );
 }
 
 /***********************************************************************************************

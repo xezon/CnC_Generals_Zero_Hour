@@ -287,17 +287,17 @@ OBBoxCollisionTestClass::OBBoxCollisionTestClass
 	Move(move)
 {
 	Vector3 max_extent;
-	max_extent.X =	WWMath::Fabsf(Box.Basis[0][0] * Box.Extent.X) +
-						WWMath::Fabsf(Box.Basis[0][1] * Box.Extent.Y) +
-						WWMath::Fabsf(Box.Basis[0][2] * Box.Extent.Z) + 0.01f;
+	max_extent.X =	WWMath::Fabsf_Legacy(Box.Basis[0][0] * Box.Extent.X) +
+						WWMath::Fabsf_Legacy(Box.Basis[0][1] * Box.Extent.Y) +
+						WWMath::Fabsf_Legacy(Box.Basis[0][2] * Box.Extent.Z) + 0.01f;
 
-	max_extent.Y =	WWMath::Fabsf(Box.Basis[1][0] * Box.Extent.X) +
-						WWMath::Fabsf(Box.Basis[1][1] * Box.Extent.Y) +
-						WWMath::Fabsf(Box.Basis[1][2] * Box.Extent.Z) + 0.01f;
+	max_extent.Y =	WWMath::Fabsf_Legacy(Box.Basis[1][0] * Box.Extent.X) +
+						WWMath::Fabsf_Legacy(Box.Basis[1][1] * Box.Extent.Y) +
+						WWMath::Fabsf_Legacy(Box.Basis[1][2] * Box.Extent.Z) + 0.01f;
 
-	max_extent.Z =	WWMath::Fabsf(Box.Basis[2][0] * Box.Extent.X) +
-						WWMath::Fabsf(Box.Basis[2][1] * Box.Extent.Y) +
-						WWMath::Fabsf(Box.Basis[2][2] * Box.Extent.Z) + 0.01f;
+	max_extent.Z =	WWMath::Fabsf_Legacy(Box.Basis[2][0] * Box.Extent.X) +
+						WWMath::Fabsf_Legacy(Box.Basis[2][1] * Box.Extent.Y) +
+						WWMath::Fabsf_Legacy(Box.Basis[2][2] * Box.Extent.Z) + 0.01f;
 
 	SweepMin = Box.Center - max_extent;
 	SweepMax = Box.Center + max_extent;

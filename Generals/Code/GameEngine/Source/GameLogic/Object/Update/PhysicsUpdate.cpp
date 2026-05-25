@@ -571,9 +571,9 @@ UpdateSleepTime PhysicsBehavior::update()
 
 		// when vel gets tiny, just clamp to zero
 		const Real THRESH = 0.001f;
-		if (WWMath::Fabsf_Legacy(m_vel.x) < THRESH) m_vel.x = 0.0f;
-		if (WWMath::Fabsf_Legacy(m_vel.y) < THRESH) m_vel.y = 0.0f;
-		if (WWMath::Fabsf_Legacy(m_vel.z) < THRESH) m_vel.z = 0.0f;
+		if (WWMath::Fabsf(m_vel.x) < THRESH) m_vel.x = 0.0f;
+		if (WWMath::Fabsf(m_vel.y) < THRESH) m_vel.y = 0.0f;
+		if (WWMath::Fabsf(m_vel.z) < THRESH) m_vel.z = 0.0f;
 
 		m_velMag = INVALID_VEL_MAG;
 

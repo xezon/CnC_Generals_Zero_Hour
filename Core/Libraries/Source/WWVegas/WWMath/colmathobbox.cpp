@@ -59,13 +59,13 @@ CollisionMath::Overlap_Test(const OBBoxClass & box,const Vector3 & point)
 	Matrix3x3::Transpose_Rotate_Vector(box.Basis,(point - box.Center),&localpoint);
 
 	// if the point is outside any of the extents, it is outside the box
-	if (WWMath::Fabsf(localpoint.X) > box.Extent.X) {
+	if (WWMath::Fabsf_Legacy(localpoint.X) > box.Extent.X) {
 		return OUTSIDE;
 	}
-	if (WWMath::Fabsf(localpoint.Y) > box.Extent.Y) {
+	if (WWMath::Fabsf_Legacy(localpoint.Y) > box.Extent.Y) {
 		return OUTSIDE;
 	}
-	if (WWMath::Fabsf(localpoint.Z) > box.Extent.Z) {
+	if (WWMath::Fabsf_Legacy(localpoint.Z) > box.Extent.Z) {
 		return OUTSIDE;
 	}
 	return INSIDE;

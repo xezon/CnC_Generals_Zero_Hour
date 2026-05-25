@@ -136,7 +136,7 @@ inline float OBBoxClass::Project_To_Axis(const Vector3 & axis) const
 	float z = Extent[2] * Vector3::Dot_Product(axis,Vector3(Basis[0][2],Basis[1][2],Basis[2][2]));
 
 	// projection is the sum of the absolute values of the projections of the three extents
-	return (WWMath::Fabsf(x) + WWMath::Fabsf(y) + WWMath::Fabsf(z));
+	return (WWMath::Fabsf_Legacy(x) + WWMath::Fabsf_Legacy(y) + WWMath::Fabsf_Legacy(z));
 }
 
 
@@ -214,17 +214,17 @@ inline void OBBoxClass::Compute_Axis_Aligned_Extent(Vector3 * set_extent) const
 	WWASSERT(set_extent != nullptr);
 
 	// x extent is the box projected onto the x axis
-	set_extent->X =	WWMath::Fabsf(Extent[0] * Basis[0][0]) +
-							WWMath::Fabsf(Extent[1] * Basis[0][1]) +
-							WWMath::Fabsf(Extent[2] * Basis[0][2]);
+	set_extent->X =	WWMath::Fabsf_Legacy(Extent[0] * Basis[0][0]) +
+							WWMath::Fabsf_Legacy(Extent[1] * Basis[0][1]) +
+							WWMath::Fabsf_Legacy(Extent[2] * Basis[0][2]);
 
-	set_extent->Y =	WWMath::Fabsf(Extent[0] * Basis[1][0]) +
-							WWMath::Fabsf(Extent[1] * Basis[1][1]) +
-							WWMath::Fabsf(Extent[2] * Basis[1][2]);
+	set_extent->Y =	WWMath::Fabsf_Legacy(Extent[0] * Basis[1][0]) +
+							WWMath::Fabsf_Legacy(Extent[1] * Basis[1][1]) +
+							WWMath::Fabsf_Legacy(Extent[2] * Basis[1][2]);
 
-	set_extent->Z =	WWMath::Fabsf(Extent[0] * Basis[2][0]) +
-							WWMath::Fabsf(Extent[1] * Basis[2][1]) +
-							WWMath::Fabsf(Extent[2] * Basis[2][2]);
+	set_extent->Z =	WWMath::Fabsf_Legacy(Extent[0] * Basis[2][0]) +
+							WWMath::Fabsf_Legacy(Extent[1] * Basis[2][1]) +
+							WWMath::Fabsf_Legacy(Extent[2] * Basis[2][2]);
 }
 
 

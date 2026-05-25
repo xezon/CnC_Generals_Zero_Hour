@@ -343,9 +343,9 @@ WWINLINE bool operator != (const Vector3 &a,const Vector3 &b)
  *========================================================================*/
 WWINLINE bool Equal_Within_Epsilon(const Vector3 &a,const Vector3 &b,float epsilon)
 {
-   return(	(WWMath::Fabsf(a.X - b.X) < epsilon) &&
-				(WWMath::Fabsf(a.Y - b.Y) < epsilon) &&
-				(WWMath::Fabsf(a.Z - b.Z) < epsilon)	);
+   return(	(WWMath::Fabsf_Legacy(a.X - b.X) < epsilon) &&
+				(WWMath::Fabsf_Legacy(a.Y - b.Y) < epsilon) &&
+				(WWMath::Fabsf_Legacy(a.Z - b.Z) < epsilon)	);
 }
 
 
@@ -488,9 +488,9 @@ WWINLINE float Vector3::Quick_Length() const
 {
 	// this method of approximating the length comes from Graphics Gems 1 and
 	// supposedly gives an error of +/- 8%
-	float max = WWMath::Fabsf(X);
-	float mid = WWMath::Fabsf(Y);
-	float min = WWMath::Fabsf(Z);
+	float max = WWMath::Fabsf_Legacy(X);
+	float mid = WWMath::Fabsf_Legacy(Y);
+	float min = WWMath::Fabsf_Legacy(Z);
 	float tmp;
 
 	if (max < mid) { tmp = max; max = mid; mid = tmp; }
