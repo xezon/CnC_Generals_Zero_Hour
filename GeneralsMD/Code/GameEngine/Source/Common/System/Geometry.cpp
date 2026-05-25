@@ -279,8 +279,8 @@ void GeometryInfo::get2DBounds(const Coord3D& geomCenter, Real angle, Region2D& 
 
 		case GEOMETRY_BOX:
 		{
-			Real c = (Real)cos(angle);
-			Real s = (Real)sin(angle);
+			Real c = (Real)WWMath::Cos(angle);
+			Real s = (Real)WWMath::Sin(angle);
 			Real exc = m_majorRadius*c;
 			Real eyc = m_minorRadius*c;
 			Real exs = m_majorRadius*s;

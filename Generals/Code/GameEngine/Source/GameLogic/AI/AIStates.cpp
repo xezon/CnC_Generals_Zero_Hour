@@ -3804,8 +3804,8 @@ void AIFollowWaypointPathState::computeGoal(Bool useGroupOffsets)
 		dy = dest.y - m_priorWaypoint->getLocation()->y;
 		angle = WWMath::Atan2(dy, dx);
 		Real deltaAngle = angle - m_angle;
-		Real s = sin(deltaAngle);
-		Real c = cos(deltaAngle);
+		Real s = WWMath::Sin(deltaAngle);
+		Real c = WWMath::Cos(deltaAngle);
 		Real x = m_groupOffset.x * c - m_groupOffset.y * s;
 		Real y = m_groupOffset.y * c + m_groupOffset.x * s;
 		m_groupOffset.x = x;
