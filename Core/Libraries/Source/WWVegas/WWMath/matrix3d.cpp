@@ -552,7 +552,7 @@ Matrix3D * Matrix3D::Get_Inverse(Matrix3D * out, float * detOut, const Matrix3D 
 	if (detOut)
 			*detOut = det;
 
-	if (fabsf(det) < 1e-8f)
+	if (WWMath::Fabsf(det) < 1e-8f)
 			return NULL;
 
 	const float invDet = 1.0f / det;
