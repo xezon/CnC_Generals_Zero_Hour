@@ -36,20 +36,17 @@
 #include "gmath.h"
 #endif
 
+Real Sin(Real x) { return WWMath::Sinf(x); }
+Real Cos(Real x) { return WWMath::Cosf(x); }
+Real Tan(Real x) { return WWMath::Tanf(x); }
+Real ACos(Real x) { return WWMath::Acosf(x); }
+Real ASin(Real x) { return WWMath::Asinf(x); }
+Real Sqrt(Real x)
+{
 #if USE_DETERMINISTIC_MATH
-Real Sin(Real x) { return gm_sinf(x); }
-Real Cos(Real x) { return gm_cosf(x); }
-Real Tan(Real x) { return gm_tanf(x); }
-Real ACos(Real x) { return gm_acosf(x); }
-Real ASin(Real x) { return gm_asinf(x); }
-Real Sqrt(Real x) { return gm_sqrtf(x); }
-double Sqrt(double x) { return gm_sqrt(x); }
+	return gm_sqrtf(x);
 #else
-Real Sin(Real x) { return sinf(x); }
-Real Cos(Real x) { return cosf(x); }
-Real Tan(Real x) { return tanf(x); }
-Real ACos(Real x) { return acosf(x); }
-Real ASin(Real x) { return asinf(x); }
-Real Sqrt(Real x) { return (Real)sqrt((double)x); }
-double Sqrt(double x) { return sqrt(x); }
+	return (Real)sqrt((double)x);
 #endif
+}
+double Sqrt(double x) { return WWMath::Sqrt(x); }
