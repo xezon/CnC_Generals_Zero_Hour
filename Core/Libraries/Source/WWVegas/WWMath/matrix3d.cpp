@@ -414,7 +414,7 @@ void Matrix3D::buildTransformMatrix( const Vector3 &pos, const Vector3 &dir )
 	float sinp, cosp;	// sine and cosine of the pitch ("up-down" tilt about y)
 	float siny, cosy;	// sine and cosine of the yaw ("left-right"tilt about z)
 
-	float len2 = (float)sqrt( (dir.X * dir.X) + (dir.Y * dir.Y) );
+	float len2 = (float)WWMath::Sqrt( (dir.X * dir.X) + (dir.Y * dir.Y) );
 
 	sinp = dir.Z;
 	cosp = len2;
@@ -472,8 +472,8 @@ void Matrix3D::Obj_Look_At(const Vector3 &p,const Vector3 &t,float roll)
 	dy = (t[1] - p[1]);
 	dz = (t[2] - p[2]);
 
-	len1 = (float)sqrt(dx*dx + dy*dy + dz*dz);
-	len2 = (float)sqrt(dx*dx + dy*dy);
+	len1 = (float)WWMath::Sqrt(dx*dx + dy*dy + dz*dz);
+	len2 = (float)WWMath::Sqrt(dx*dx + dy*dy);
 
 	if (len1 != 0.0f) {
 		sinp = dz/len1;
