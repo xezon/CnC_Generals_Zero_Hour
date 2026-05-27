@@ -92,6 +92,7 @@ extern float _FastInvSinTable[SIN_TABLE_SIZE];
 ** Include the various other header files in the WWMATH library
 ** in order to get matrices, quaternions, etc.
 */
+// TheSuperHackers @todo The Legacy functions can be removed when retail compatibility is abandoned.
 class WWMath
 {
 public:
@@ -100,8 +101,6 @@ public:
 // shutdown processing will be handled in these functions
 static void			Init();
 static void			Shutdown();
-
-// These are meant to be a collection of small math utility functions to be optimized at some point.
 
 static WWINLINE double Pow(double x, double y);
 static WWINLINE float  Powf(float x, float y);
