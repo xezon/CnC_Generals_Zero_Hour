@@ -111,7 +111,7 @@ struct DisplaySetting
 		: imageName(nullptr)
 		, font("Arial")
 		, text(nullptr)
-		, screenHeightFactor(0.5f)
+		, centerOffsetY(0)
 		, sizeX(10)
 		, sizeY(10)
 		, bold(false)
@@ -121,7 +121,7 @@ struct DisplaySetting
 	const Char* imageName;
 	const Char* font;
 	const WideChar* text;
-	Real screenHeightFactor;
+	Int centerOffsetY;
 	Int sizeX;
 	Int sizeY;
 	Bool bold;
@@ -132,9 +132,10 @@ void Intro::doTheSuperHackers()
 {
 	std::vector<DisplaySetting> settings;
 
-	constexpr const Real startY = 0.35f;
-
-	const Real fontScale = GlobalLanguage::getResolutionFontSizeScale(GlobalLanguage::ResolutionFontSizeMethod_Strict);
+	const Real resolutionScale = GlobalLanguage::getResolutionFontSizeScale(GlobalLanguage::ResolutionFontSizeMethod_Strict);
+	const Int screenWidth = TheDisplay->getWidth();
+	const Int screenHeight = TheDisplay->getHeight();
+	Int centerOffsetY = -(screenHeight * 0.05f);
 
 	// "Lucida Console" is Windows XP native.
 	// "Consolas" is Windows Vista native, can be installed in 2000, XP
@@ -145,8 +146,10 @@ void Intro::doTheSuperHackers()
 		DisplaySetting setting;
 		setting.font = "Lucida Console";
 		setting.text = m_unicodeStrings[0].str();
-		setting.screenHeightFactor = startY;
 		setting.sizeY = 16;
+		centerOffsetY -= setting.sizeY * resolutionScale * 2;
+		setting.centerOffsetY = centerOffsetY;
+		centerOffsetY += setting.sizeY * resolutionScale * 2;
 		setting.bold = false;
 		setting.centered = true;
 		settings.push_back(setting);
@@ -154,15 +157,16 @@ void Intro::doTheSuperHackers()
 	{
 		// Team name
 		DisplaySetting setting;
-		setting.font = "Lucida Console";
+		setting.font = "Courier New";
 		setting.text =
 			L"\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u0020\u0020\u0020\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u2588\u2588\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u0020\u0020\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u2588\u2588\u2588\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u000a"
 			L"\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u2588\u2588\u0020\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u0020\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u2588\u2588\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u0020\u0020\u000a"
 			L"\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u2588\u2588\u2588\u2588\u2588\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u2588\u2588\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u0020\u2588\u2588\u2588\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u0020\u0020\u0020\u0020\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u0020\u0020\u2588\u2588\u2588\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u2588\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u000a"
 			L"\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u2588\u2588\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u2588\u2588\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u0020\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u2588\u2588\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u0020\u0020\u2588\u2588\u0020\u000a"
 			L"\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u0020\u0020\u0020\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u0020\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u0020\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u0020\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u0020\u2588\u2588\u0020\u0020\u0020\u2588\u2588\u0020\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u0020";
-		setting.screenHeightFactor = startY + 0.07f;
 		setting.sizeY = 6;
+		setting.centerOffsetY = centerOffsetY;
+		centerOffsetY += setting.sizeY * 5 * resolutionScale * 2.5f;
 		setting.bold = false;
 		setting.centered = true;
 		settings.push_back(setting);
@@ -171,9 +175,10 @@ void Intro::doTheSuperHackers()
 		// Website
 		DisplaySetting setting;
 		setting.font = "Lucida Console";
-		setting.text = L"www.thesuperhackers.org";
-		setting.screenHeightFactor = startY + 0.20f;
+		setting.text = L"thesuperhackers.org";
 		setting.sizeY = 16;
+		setting.centerOffsetY = centerOffsetY;
+		centerOffsetY += setting.sizeY * resolutionScale * 2;
 		setting.bold = false;
 		setting.centered = true;
 		settings.push_back(setting);
@@ -182,7 +187,7 @@ void Intro::doTheSuperHackers()
 		// China Hacker image
 		DisplaySetting setting;
 		setting.imageName = "SNHacker2_L";
-		setting.screenHeightFactor = startY + 0.27f;
+		setting.centerOffsetY = centerOffsetY;
 		setting.sizeX = (Int)(122 * 0.50f);
 		setting.sizeY = (Int)(98 * 0.50f);
 		settings.push_back(setting);
@@ -194,19 +199,20 @@ void Intro::doTheSuperHackers()
 	{
 		const DisplaySetting& s = settings[i];
 		DisplayEntity& e = m_displayEntities[i];
-		e.sizeX = Int(s.sizeX * fontScale);
-		e.sizeY = Int(s.sizeY * fontScale);
+		e.sizeX = Int(s.sizeX * resolutionScale);
+		e.sizeY = Int(s.sizeY * resolutionScale);
 		if (s.text != nullptr)
 		{
 			e.displayString = TheDisplayStringManager->newDisplayString();
 			e.displayString->setText(s.text);
 			e.displayString->setFont(TheFontLibrary->getFont(s.font, e.sizeY, s.bold));
+			e.displayString->setWordWrap(screenWidth);
 		}
 		if (s.imageName != nullptr)
 		{
 			e.image = TheMappedImageCollection->findImageByName(s.imageName);
 		}
-		e.screenHeightFactor = s.screenHeightFactor;
+		e.centerOffsetY = s.centerOffsetY;
 	}
 
 	doAsyncWait(3000);
@@ -249,8 +255,7 @@ void Intro::drawDisplayEntities()
 			ICoord2D pos;
 			e.displayString->getSize(&pos.x, &pos.y);
 			pos.x = (screenWidth / 2) - (pos.x / 2);
-			pos.y = (Int)(e.screenHeightFactor * screenHeight);
-			e.displayString->setWordWrap(screenWidth);
+			pos.y = (screenHeight / 2) + e.centerOffsetY;
 			e.displayString->draw(pos.x, pos.y, color, dropColor);
 		}
 		if (e.image != nullptr)
@@ -258,7 +263,7 @@ void Intro::drawDisplayEntities()
 			IRegion2D region;
 			region.lo.x = (screenWidth / 2) - (e.sizeX / 2);
 			region.hi.x = (screenWidth / 2) + (e.sizeX / 2);
-			region.lo.y = (Int)(e.screenHeightFactor * screenHeight);
+			region.lo.y = (screenHeight / 2) + e.centerOffsetY;
 			region.hi.y = region.lo.y + e.sizeY;
 			TheDisplay->drawImage(e.image, region.lo.x, region.lo.y, region.hi.x, region.hi.y, color);
 		}

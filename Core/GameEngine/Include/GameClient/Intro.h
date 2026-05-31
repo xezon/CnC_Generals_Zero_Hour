@@ -43,7 +43,7 @@ class Intro
 			, image(nullptr)
 			, sizeX(10)
 			, sizeY(10)
-			, screenHeightFactor(0.5f)
+			, centerOffsetY(0)
 		{}
 		~DisplayEntity();
 
@@ -51,7 +51,7 @@ class Intro
 		const Image* image;
 		Int sizeX;
 		Int sizeY;
-		Real screenHeightFactor; // 0..1
+		Int centerOffsetY;
 	};
 
 public:
