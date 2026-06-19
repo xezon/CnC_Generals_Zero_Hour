@@ -2790,7 +2790,9 @@ inline Bool isLowerPriority(const UpdateModulePtr a, const UpdateModulePtr b)
 	DEBUG_ASSERTCRASH(a && b, ("these may no longer be null"));
 	UnsignedInt f1 = a->friend_getPriority();
 	UnsignedInt f2 = b->friend_getPriority();
-	return f1 > f2;
+	if (f1 != f2)
+		return f1 > f2;
+	return a->friend_getObject()->getID() > b->friend_getObject()->getID();
 }
 
 // ------------------------------------------------------------------------------------------------
