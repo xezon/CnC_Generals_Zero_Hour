@@ -1483,18 +1483,17 @@ static void Apply_Mip_Reduction(unsigned& mip_level_count, unsigned reduction, u
 	// Otherwise take as many mip levels as the texture wants, not to exceed the count in file...
 	if (mip_level_count == MIP_LEVELS_ALL)
 	{
-		WWASSERT(reduction < mip_count);
-		mip_level_count = mip_count - reduction;
+		mip_level_count = mip_count;
 	}
 	else
 	{
 		if (mip_level_count > mip_count)
 			mip_level_count = mip_count;
-
-		// Reduce requested number by those removed.
-		WWASSERT(reduction < mip_level_count);
-		mip_level_count -= reduction;
 	}
+
+	// Reduce requested number by those removed.
+	WWASSERT(reduction < mip_level_count);
+	mip_level_count -= reduction;
 
 	// Once more, verify that the mip level count is correct (in case it was changed here it might not
 	// match the size...well actually it doesn't have to match but it can't be bigger than the size)
@@ -1509,9 +1508,6 @@ static void Apply_Mip_Reduction(unsigned& mip_level_count, unsigned reduction, u
 
 	if (mip_level_count > max_mip_level_count)
 		mip_level_count = max_mip_level_count;
-
-	if (mip_level_count < 1u)
-		mip_level_count = 1u;
 }
 
 
