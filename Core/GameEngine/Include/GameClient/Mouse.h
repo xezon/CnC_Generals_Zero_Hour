@@ -322,12 +322,19 @@ public:
 	void onGamePaused(Bool paused);
 
 	Bool isClick(
+		UnsignedInt mouseClickTimeMs0,
+		UnsignedInt mouseClickTimeMs1,
+		const ICoord2D &mouseAnchor0,
+		const ICoord2D &mouseAnchor1
+		);
+
+	Bool isClick(
+		UnsignedInt mouseClickTimeMs0,
+		UnsignedInt mouseClickTimeMs1,
 		const ICoord2D &mouseAnchor0,
 		const ICoord2D &mouseAnchor1,
 		const Coord3D &cameraPos0,
-		const Coord3D &cameraPos1,
-		UnsignedInt mouseClickTimeMs0,
-		UnsignedInt mouseClickTimeMs1
+		const Coord3D &cameraPos1
 		);
 
 	AsciiString m_tooltipFontName;		///< tooltip font
