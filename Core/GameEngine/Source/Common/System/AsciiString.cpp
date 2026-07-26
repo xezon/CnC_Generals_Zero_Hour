@@ -427,6 +427,31 @@ void AsciiString::toLower()
 }
 
 // -----------------------------------------------------
+void AsciiString::toUpper()
+{
+	validate();
+
+	if (m_data == nullptr)
+		return;
+
+	const StringCaseInfo info = getStringCaseInfo(m_data->peek());
+
+	if (info.lowercaseCount == 0)
+		return;
+
+	ensureUniqueBufferOfSize(info.length, true, nullptr, nullptr);
+
+	char* str = m_data->peek();
+	while (*str)
+	{
+		*str = toupper(*str);
+		++str;
+	}
+
+	validate();
+}
+
+// -----------------------------------------------------
 void AsciiString::removeLastChar()
 {
 	truncateBy(1);
