@@ -47,7 +47,7 @@ File * Win32LocalFileSystem::openFile(const Char *filename, Int access, size_t b
 	//USE_PERF_TIMER(Win32LocalFileSystem_openFile)
 
 	// sanity check
-	if (strlen(filename) <= 0) {
+	if (*filename == '\0') {
 		return nullptr;
 	}
 
@@ -119,32 +119,30 @@ Bool Win32LocalFileSystem::doesFileExist(const Char *filename) const
 	if (_access(filename, 0) == 0) {
 		return TRUE;
 	}
+
 	return FALSE;
 }
 
 void Win32LocalFileSystem::getFileListInDirectory(const AsciiString& currentDirectory, const AsciiString& originalDirectory, const AsciiString& searchName, FilenameList & filenameList, Bool searchSubdirectories) const
 {
-	HANDLE fileHandle = nullptr;
-	WIN32_FIND_DATA findData;
+	AsciiString directory = originalDirectory;
+	directory.concat(currentDirectory);
 
-	AsciiString asciisearch;
-	asciisearch = originalDirectory;
-	asciisearch.concat(currentDirectory);
+	AsciiString asciisearch = directory;
 	asciisearch.concat(searchName);
 
 	Bool done = FALSE;
 
-	fileHandle = FindFirstFile(asciisearch.str(), &findData);
+	WIN32_FIND_DATA findData;
+	HANDLE fileHandle = FindFirstFile(asciisearch.str(), &findData);
 	done = (fileHandle == INVALID_HANDLE_VALUE);
 
 	while (!done)	{
 		if (!(findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) &&
 				(strcmp(findData.cFileName, ".") != 0 && strcmp(findData.cFileName, "..") != 0)) {
-			// if we haven't already, add this filename to the list.
+				// if we haven't already, add this filename to the list.
 				// a stl set should only allow one copy of each filename
-				AsciiString newFilename;
-				newFilename = originalDirectory;
-				newFilename.concat(currentDirectory);
+				AsciiString newFilename = directory;
 				newFilename.concat(findData.cFileName);
 				if (filenameList.find(newFilename) == filenameList.end()) {
 					filenameList.insert(newFilename);
@@ -156,9 +154,7 @@ void Win32LocalFileSystem::getFileListInDirectory(const AsciiString& currentDire
 	FindClose(fileHandle);
 
 	if (searchSubdirectories) {
-		AsciiString subdirsearch;
-		subdirsearch = originalDirectory;
-		subdirsearch.concat(currentDirectory);
+		AsciiString subdirsearch = directory;
 		subdirsearch.concat("*.");
 		fileHandle = FindFirstFile(subdirsearch.str(), &findData);
 		done = fileHandle == INVALID_HANDLE_VALUE;

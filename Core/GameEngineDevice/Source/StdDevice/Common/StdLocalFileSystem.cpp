@@ -130,7 +130,7 @@ File * StdLocalFileSystem::openFile(const Char *filename, Int access, size_t buf
 	//USE_PERF_TIMER(StdLocalFileSystem_openFile)
 
 	// sanity check
-	if (strlen(filename) <= 0) {
+	if (*filename == '\0') {
 		return nullptr;
 	}
 
@@ -210,10 +210,10 @@ Bool StdLocalFileSystem::doesFileExist(const Char *filename) const
 
 void StdLocalFileSystem::getFileListInDirectory(const AsciiString& currentDirectory, const AsciiString& originalDirectory, const AsciiString& searchName, FilenameList & filenameList, Bool searchSubdirectories) const
 {
+	AsciiString directory = originalDirectory;
+	directory.concat(currentDirectory);
 
-	AsciiString asciisearch;
-	asciisearch = originalDirectory;
-	asciisearch.concat(currentDirectory);
+	AsciiString asciisearch = directory;
 	auto searchExt = std::filesystem::path(searchName.str()).extension();
 	if (asciisearch.isEmpty()) {
 		asciisearch = ".";
@@ -285,7 +285,7 @@ Bool StdLocalFileSystem::getFileInfo(const AsciiString& filename, FileInfo *file
 {
 	std::filesystem::path path = fixFilenameFromWindowsPath(filename.str(), 0);
 
-	if(path.empty()) {
+	if (path.empty()) {
 		return FALSE;
 	}
 
