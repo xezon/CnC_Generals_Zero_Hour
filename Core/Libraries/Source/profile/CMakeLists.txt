@@ -1,19 +1,19 @@
 set(PROFILE_SRC
-    "internal_cmd.h"
-    "internal_funclevel.h"
-    "internal_highlevel.h"
-    "internal_result.h"
-    "internal.h"
-    "profile_cmd.cpp"
-    "profile_doc.h"
-    "profile_funclevel.cpp"
-    "profile_funclevel.h"
-    "profile_highlevel.cpp"
-    "profile_highlevel.h"
-    "profile_result.cpp"
-    "profile_result.h"
-    "profile.cpp"
-    "profile.h"
+    "profile/internal_cmd.h"
+    "profile/internal_funclevel.h"
+    "profile/internal_highlevel.h"
+    "profile/internal_result.h"
+    "profile/internal.h"
+    "profile/profile_cmd.cpp"
+    "profile/profile_doc.h"
+    "profile/profile_funclevel.cpp"
+    "profile/profile_funclevel.h"
+    "profile/profile_highlevel.cpp"
+    "profile/profile_highlevel.h"
+    "profile/profile_result.cpp"
+    "profile/profile_result.h"
+    "profile/profile.cpp"
+    "profile/profile.h"
 )
 
 add_library(core_profile_legacy STATIC)
@@ -26,8 +26,8 @@ target_include_directories(core_profile_legacy INTERFACE
 
 target_precompile_headers(core_profile_legacy PRIVATE
     [["Precompiled/precompiled.h"]] # Must be first
-    "profile.h"
-    "internal.h"
+    "profile/profile.h"
+    "profile/internal.h"
     <windows.h>
 )
 

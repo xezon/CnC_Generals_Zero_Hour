@@ -1,24 +1,24 @@
 set(DEBUG_SRC
-    "debug_cmd.cpp"
-    "debug_cmd.h"
-    "debug_debug.cpp"
-    "debug_debug.h"
-    "debug_doc.h"
-    "debug_except.cpp"
-    "debug_getdefaultcommands.cpp"
-    "debug_internal.cpp"
-    "debug_io_con.cpp"
-    "debug_io_flat.cpp"
-    "debug_io_net.cpp"
-    "debug_io_ods.cpp"
-    "debug_io.h"
-    "debug_macro.h"
-    "debug_stack.cpp"
-    "debug_stack.h"
-    "debug.h"
-    "internal_except.h"
-    "internal_io.h"
-    "internal.h"
+    "debug/debug_cmd.cpp"
+    "debug/debug_cmd.h"
+    "debug/debug_debug.cpp"
+    "debug/debug_debug.h"
+    "debug/debug_doc.h"
+    "debug/debug_except.cpp"
+    "debug/debug_getdefaultcommands.cpp"
+    "debug/debug_internal.cpp"
+    "debug/debug_io_con.cpp"
+    "debug/debug_io_flat.cpp"
+    "debug/debug_io_net.cpp"
+    "debug/debug_io_ods.cpp"
+    "debug/debug_io.h"
+    "debug/debug_macro.h"
+    "debug/debug_stack.cpp"
+    "debug/debug_stack.h"
+    "debug/debug.h"
+    "debug/internal_except.h"
+    "debug/internal_io.h"
+    "debug/internal.h"
 )
 
 add_library(core_debug STATIC)
@@ -31,10 +31,10 @@ target_include_directories(core_debug INTERFACE
 
 target_precompile_headers(core_debug PRIVATE
     [["Precompiled/precompiled.h"]] # Must be first
-    "debug.h"
-    "internal.h"
-    "internal_except.h"
-    "internal_io.h"
+    "debug/debug.h"
+    "debug/internal.h"
+    "debug/internal_except.h"
+    "debug/internal_io.h"
     <windows.h>
 )
 
